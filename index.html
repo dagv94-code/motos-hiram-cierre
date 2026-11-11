@@ -58,7 +58,7 @@
         </div>
     </header>
 
-    <!-- NAVEGACIÓN DE PESTAÑAS -->
+    <!-- NAVEGACIÓN -->
     <nav class="bg-slate-900/80 backdrop-blur border-b border-slate-800 print:hidden">
         <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto text-sm">
             <button onclick="cambiarPestana('cierre')" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
@@ -73,7 +73,7 @@
     <!-- CONTENIDO -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- 1. PESTAÑA CIERRE DIARIO -->
+        <!-- 1. CIERRE DIARIO -->
         <section id="seccion-cierre" class="space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex justify-between items-center flex-wrap gap-4 print:hidden">
                 <div>
@@ -85,7 +85,7 @@
                 </button>
             </div>
 
-            <!-- TARJETAS DE RESUMEN -->
+            <!-- TARJETAS -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
                     <p class="text-xs font-bold text-slate-400 uppercase">Total Facturado</p>
@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <!-- TABLA DE MOTOS -->
+            <!-- TABLA MOTOS -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
                     <span class="font-bold text-sm text-white"><i class="fa-solid fa-motorcycle text-red-500 mr-2"></i> Registro de Ventas de Motos y Abonos (CXC)</span>
@@ -134,7 +134,7 @@
                 </div>
             </div>
 
-            <!-- TABLA DE TALLER -->
+            <!-- TABLA TALLER -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
                     <span class="font-bold text-sm text-white"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-2"></i> Movimientos y Servicios de Taller</span>
@@ -340,11 +340,14 @@
                     </div>
                 </div>
 
-                <!-- MEDIOS DE PAGO -->
+                <!-- MEDIOS DE PAGO CON ARQUEO DE EFECTIVO -->
                 <div class="border-t border-slate-800 pt-3 space-y-2">
-                    <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Pago (Abono u Operación del Día)</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Pago</h4>
                     <div class="grid grid-cols-3 gap-2">
-                        <div><label class="text-xs text-slate-400">Efectivo ($)</label><input type="number" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400" value="0"></div>
+                        <div>
+                            <label class="text-xs text-slate-400 flex justify-between">Efectivo ($) <button type="button" onclick="abrirArqueoModal()" class="text-red-400 underline text-[10px]">Arqueo</button></label>
+                            <input type="number" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400" value="0" readonly>
+                        </div>
                         <div><label class="text-xs text-slate-400">Zelle ($)</label><input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0"></div>
                         <div><label class="text-xs text-slate-400">Binance/Tower ($)</label><input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0"></div>
                     </div>
@@ -353,6 +356,26 @@
             <div class="border-t border-slate-800 pt-3 flex justify-end gap-2">
                 <button onclick="cerrarModal()" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="procesarRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl font-bold text-sm shadow">Guardar en Cierre</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SECUNDARIO DE ARQUEO DE EFECTIVO -->
+    <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-60 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-white">
+            <h3 class="text-base font-bold border-b border-slate-800 pb-2">Arqueo Rápido de Efectivo ($)</h3>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-center"><span>Billetes $100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center"><span>Billetes $50</span><input type="number" id="arq50" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center"><span>Billetes $20</span><input type="number" id="arq20" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center"><span>Billetes $10 / $5 / $1</span><input type="number" id="arq10" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
+            </div>
+            <div class="bg-slate-800 p-3 rounded-xl flex justify-between font-bold text-sm">
+                <span>Total Efectivo:</span>
+                <span id="lblArqTotal" class="text-emerald-400">$0.00</span>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="cerrarArqueoModal()" class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold">Aceptar y Cargar</button>
             </div>
         </div>
     </div>
@@ -409,6 +432,23 @@
 
         function cerrarModal() { document.getElementById('modalRegistro').classList.add('hidden'); }
 
+        function abrirArqueoModal() { document.getElementById('modalArqueo').classList.remove('hidden'); }
+        function cerrarArqueoModal() {
+            let t = (parseFloat(document.getElementById('arq100').value || 0) * 100) +
+                    (parseFloat(document.getElementById('arq50').value || 0) * 50) +
+                    (parseFloat(document.getElementById('arq20').value || 0) * 20) +
+                    (parseFloat(document.getElementById('arq10').value || 0) * 10);
+            document.getElementById('pagoEfec').value = t;
+            document.getElementById('modalArqueo').classList.add('hidden');
+        }
+        function calcularArqueoModal() {
+            let t = (parseFloat(document.getElementById('arq100').value || 0) * 100) +
+                    (parseFloat(document.getElementById('arq50').value || 0) * 50) +
+                    (parseFloat(document.getElementById('arq20').value || 0) * 20) +
+                    (parseFloat(document.getElementById('arq10').value || 0) * 10);
+            document.getElementById('lblArqTotal').innerText = `$${t.toFixed(2)}`;
+        }
+
         function actualizarPrecioMoto() {
             let v = document.getElementById('regModeloMoto').value.split('|');
             document.getElementById('regPrecioMoto').value = v[1];
@@ -429,13 +469,12 @@
                 let abonoAnt = parseFloat(document.getElementById('regAbonoAnt').value) || 0;
                 let modalidad = document.getElementById('regModalidad').value;
 
-                // VALIDACIÓN ESTRICTA DE CONTADO
-                if(modalidad === 'CONTADO') {
-                    let totalPendienteRequerido = facturado - abonoAnt;
-                    if(Math.abs(pagoDia - totalPendienteRequerido) > 0.01) {
-                        alert(`Error: La modalidad es de CONTADO. El pago del día ($${pagoDia.toFixed(2)}) debe cubrir exactamente el monto pendiente de la factura ($${totalPendienteRequerido.toFixed(2)}). Verifique los abonos o cambie la modalidad a Apartado / Motos Yes.`);
-                        return;
-                    }
+                let pendienteRequerido = facturado - abonoAnt;
+
+                // VALIDACIÓN ESTRICTA: SI ES CONTADO, EL PAGO DEBE CUBRID EL TOTAL
+                if(modalidad === 'CONTADO' && Math.abs(pagoDia - pendienteRequerido) > 0.01) {
+                    alert(`Error: La modalidad es de CONTADO. El pago del día ($${pagoDia.toFixed(2)}) debe cubrir exactamente el monto pendiente de la factura ($${pendienteRequerido.toFixed(2)}). Si es pago parcial, seleccione Apartado o Motos Yes.`);
+                    return;
                 }
 
                 let cxc = facturado - abonoAnt - pagoDia;
@@ -454,7 +493,7 @@
             }
 
             cerrarModal();
-            document.getElementById('regClient').value = '';
+            document.getElementById('regCliente').value = '';
             document.getElementById('regFactura').value = '';
             document.getElementById('pagoEfec').value = 0;
             document.getElementById('pagoZelle').value = 0;
@@ -502,7 +541,7 @@
                 renderMotos();
                 alert('Registro eliminado con éxito.');
             } else if(claveIngresada !== null) {
-                alert('Clave incorrecta. No se puede eliminar el registro.');
+                alert('Clave incorrecta.');
             }
         }
 
