@@ -7,11 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+    <!-- Firebase SDK por CDN Global (Sin errores de módulos import) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAqyGE49TBXXfYpAMBKmLb1fprmOnHwJYY",
             authDomain: "motos-hiram-db.firebaseapp.com",
@@ -20,12 +19,9 @@
             messagingSenderId: "178070782865",
             appId: "1:178070782865:web:bc56d65046412efce8d030"
         };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
         window.db = db;
-        window.firebaseOperations = { collection, addDoc, getDocs, query, orderBy, serverTimestamp };
-        window.dispatchEvent(new Event('firebase-ready'));
     </script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased">
@@ -389,8 +385,6 @@
             "CABIMAS": { admin: "Alejandra Florida", gerente: "Néstor Córdoba" }
         };
 
-        window.addEventListener('firebase-ready', () => { cargarHistoricoNube(); });
-
         function cambiarPestana(p) {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => {
@@ -596,13 +590,13 @@
             try {
                 let sucursal = document.getElementById('sucursalActiva').value;
                 let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
-                await window.firebaseOperations.addDoc(window.firebaseOperations.collection(window.db, "cierres"), {
+                await db.collection("cierres").add({
                     sucursal: sucursal,
                     fecha: new Date().toLocaleString(),
                     totalFacturado: totF,
                     motos: movimientosMotos,
                     taller: movimientosTaller,
-                    timestamp: window.firebaseOperations.serverTimestamp()
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 alert('¡Cierre sincronizado con éxito en Firebase para la sede ' + sucursal + '!');
             } catch(e) {
@@ -614,8 +608,7 @@
         async function cargarHistoricoNube() {
             let tbody = document.getElementById('tablaHistoricoBody');
             try {
-                let q = window.firebaseOperations.query(window.firebaseOperations.collection(window.db, "cierres"), window.firebaseOperations.orderBy("timestamp", "desc"));
-                let snap = await window.firebaseOperations.getDocs(q);
+                let snap = await db.collection("cierres").orderBy("timestamp", "desc").get();
                 if(snap.empty) {
                     tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No hay registros previos en la nube.</td></tr>`;
                     return;
