@@ -281,8 +281,8 @@
     </main>
 
     <!-- MODAL DE REGISTRO UNIFICADO -->
-    <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-8 text-white">
+    <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-40 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-8 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-lg font-bold" id="modalTitulo">Registrar Operación</h3>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
@@ -340,15 +340,15 @@
                     </div>
                 </div>
 
-                <!-- MEDIOS DE PAGO CON BOTÓN DE ARQUEO DEDICADO -->
+                <!-- MEDIOS DE PAGO -->
                 <div class="border-t border-slate-800 pt-3 space-y-2">
                     <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Pago</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Efectivo ($)</label>
-                            <div class="flex gap-1.5">
+                            <div class="flex gap-1">
                                 <input type="text" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400 text-center text-sm" value="$0.00" readonly>
-                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap shadow transition"><i class="fa-solid fa-vault mr-1"></i> Arqueo</button>
+                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap cursor-pointer"><i class="fa-solid fa-vault mr-1"></i> Arqueo</button>
                             </div>
                         </div>
                         <div>
@@ -370,11 +370,11 @@
     </div>
 
     <!-- MODAL DE ARQUEO DE EFECTIVO -->
-    <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-[70] flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-white">
+    <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                 <h3 class="text-base font-bold"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> Arqueo por Denominaciones ($)</h3>
-                <button onclick="document.getElementById('modalArqueo').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="cerrarArqueoModal(false)" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-2 text-xs">
                 <div class="flex justify-between items-center"><span>Billetes $100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
@@ -387,7 +387,7 @@
                 <span id="lblArqTotal" class="text-emerald-400">$0.00</span>
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="cerrarArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow">Aceptar y Cargar</button>
+                <button onclick="cerrarArqueoModal(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Aceptar y Cargar</button>
             </div>
         </div>
     </div>
@@ -454,16 +454,22 @@
 
         function cerrarModal() { document.getElementById('modalRegistro').classList.add('hidden'); }
 
-        function abrirArqueoModal() { document.getElementById('modalArqueo').classList.remove('hidden'); }
-        function cerrarArqueoModal() {
-            let t = (parseFloat(document.getElementById('arq100').value || 0) * 100) +
-                    (parseFloat(document.getElementById('arq50').value || 0) * 50) +
-                    (parseFloat(document.getElementById('arq20').value || 0) * 20) +
-                    (parseFloat(document.getElementById('arq10').value || 0) * 10);
-            efectivoCalculado = t;
-            document.getElementById('pagoEfec').value = `$${t.toFixed(2)}`;
+        function abrirArqueoModal() {
+            document.getElementById('modalArqueo').classList.remove('hidden');
+        }
+
+        function cerrarArqueoModal(guardar) {
+            if(guardar) {
+                let t = (parseFloat(document.getElementById('arq100').value || 0) * 100) +
+                        (parseFloat(document.getElementById('arq50').value || 0) * 50) +
+                        (parseFloat(document.getElementById('arq20').value || 0) * 20) +
+                        (parseFloat(document.getElementById('arq10').value || 0) * 10);
+                efectivoCalculado = t;
+                document.getElementById('pagoEfec').value = `$${t.toFixed(2)}`;
+            }
             document.getElementById('modalArqueo').classList.add('hidden');
         }
+
         function calcularArqueoModal() {
             let t = (parseFloat(document.getElementById('arq100').value || 0) * 100) +
                     (parseFloat(document.getElementById('arq50').value || 0) * 50) +
@@ -494,7 +500,6 @@
 
                 let pendienteRequerido = facturado - abonoAnt;
 
-                // VALIDACIÓN ESTRICTA: SI ES CONTADO, EL PAGO DEBE CUBRIR EL TOTAL EXACTO
                 if(modalidad === 'CONTADO' && Math.abs(pagoDia - pendienteRequerido) > 0.01) {
                     alert(`Error: La modalidad es de CONTADO. El pago del día ($${pagoDia.toFixed(2)}) debe cubrir exactamente el monto pendiente de la factura ($${pendienteRequerido.toFixed(2)}). Si es pago parcial, seleccione Apartado o Motos Yes.`);
                     return;
