@@ -61,6 +61,7 @@
                     <i class="fa-solid fa-calendar text-red-500"></i> Fecha:
                     <input type="date" id="inputFechaCierre" onchange="actualizarValoresGlobales()" class="bg-slate-900 border border-slate-600 rounded p-1 text-white font-bold text-xs cursor-pointer">
                 </div>
+                <!-- TASA BCV GLOBAL -->
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-amber-400">
                     <i class="fa-solid fa-coins"></i> Tasa: 
                     <input type="number" id="txtTasaBCV" value="1000" placeholder="Ej. 1000" oninput="actualizarValoresGlobales()" class="w-20 bg-slate-900 border border-amber-500 rounded p-1 text-center font-bold text-white text-xs"> Bs/$
@@ -195,7 +196,7 @@
                         <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-cant font-bold text-xs" value="1" oninput="calcularSeguros()"></div>
                         <div><label class="text-[10px] text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-precio font-bold text-xs" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
                         <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 seg-sub text-xs">$0.00</p></div>
-                        <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+                        <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold cursor-pointer">Eliminar</button></div>
                     </div>
                 </div>
             </div>
@@ -490,14 +491,6 @@
             document.getElementById('lblFechaHoy').innerText = fechaTexto;
             document.getElementById('lblFechaPDF').innerText = fechaTexto;
             document.getElementById('lblTasaPDF').innerText = tasaBCV.toFixed(2);
-        }
-
-        function actualizarTasaGlobal() {
-            actualizarValoresGlobales();
-        }
-
-        function actualizarFechaGlobal() {
-            actualizarValoresGlobales();
         }
 
         function cambiarPestana(p) {
@@ -811,6 +804,7 @@
 
         function renderInventario() {
             let container = document.getElementById('inventarioContainer');
+            if(!container) return;
             container.innerHTML = '';
             let totalUnidades = 0;
             for (let [mod, cant] of Object.entries(inventario)) {
