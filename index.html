@@ -462,7 +462,7 @@
         let tipoActual = 'MOTO';
         let movimientosMotos = [];
         let movimientosTaller = [];
-        let tasaBCV = 0;
+        let tasaBCV = 1000;
         let efectivoCalculado = 0;
         let zelleData = { monto: 0, ref: '', titular: '' };
         let binanceData = { monto: 0, recibido: 0, ref: '' };
@@ -486,7 +486,7 @@
 
         function actualizarValoresGlobales() {
             let tasaInput = document.getElementById('txtTasaBCV');
-            tasaBCV = tasaInput ? parseFloat(tasaInput.value) || 0 : 0;
+            tasaBCV = tasaInput ? parseFloat(tasaInput.value) || 0 : 1000;
             
             let fechaEl = document.getElementById('inputFechaCierre');
             let fechaVal = fechaEl ? fechaEl.value : '';
@@ -509,19 +509,19 @@
             });
             let sec = document.getElementById(`seccion-${p}`);
             if(sec) sec.classList.remove('hidden');
-            if(event && event.currentTarget) {
-                event.currentTarget.classList.add('text-red-500', 'border-red-500', 'font-bold');
-                event.currentTarget.classList.remove('text-slate-400', 'border-transparent', 'font-semibold');
-            }
-            if(p === 'historico') cargarHistoricoNube();
         }
 
         function actualizarPersonalSede() {
             let sede = document.getElementById('sucursalActiva').value;
-            document.getElementById('lblAdminNombre').innerText = personalSedes[sede].admin;
-            document.getElementById('lblGerenteNombre').innerText = personalSedes[sede].gerente;
-            document.getElementById('txtSedeInfo').innerText = `Sede: ${sede} • Adm: ${personalSedes[sede].admin} • Gerente: ${personalSedes[sede].gerente}`;
-            document.getElementById('lblReporteTitulo').innerText = `REPORTE DE CIERRE DIARIO - ${sede}`;
+            let adminEl = document.getElementById('lblAdminNombre');
+            let gerenteEl = document.getElementById('lblGerenteNombre');
+            let sedeInfoEl = document.getElementById('txtSedeInfo');
+            let reporteTitEl = document.getElementById('lblReporteTitulo');
+
+            if(adminEl) adminEl.innerText = personalSedes[sede].admin;
+            if(gerenteEl) gerenteEl.innerText = personalSedes[sede].gerente;
+            if(sedeInfoEl) sedeInfoEl.innerText = `Sede: ${sede} • Adm: ${personalSedes[sede].admin} • Gerente: ${personalSedes[sede].gerente}`;
+            if(reporteTitEl) reporteTitEl.innerText = `REPORTE DE CIERRE DIARIO - ${sede}`;
         }
 
         function iniciarModalRegistro(tipo) {
@@ -531,9 +531,13 @@
                 return;
             }
             tipoActual = tipo;
-            document.getElementById('modalTitulo').innerText = tipo === 'MOTO' ? 'Registrar Venta de Motocicleta o Abono' : 'Registrar Servicio de Taller';
-            document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
-            document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
+            let modalTit = document.getElementById('modalTitulo');
+            if(modalTit) modalTit.innerText = tipo === 'MOTO' ? 'Registrar Venta de Motocicleta o Abono' : 'Registrar Servicio de Taller';
+            
+            let grupoMoto = document.getElementById('grupoMotoCampos');
+            let grupoTaller = document.getElementById('grupoTallerCampos');
+            if(grupoMoto) grupoMoto.classList.toggle('hidden', tipo !== 'MOTO');
+            if(grupoTaller) grupoTaller.classList.toggle('hidden', tipo !== 'TALLER');
             
             document.getElementById('regFactura').value = '';
             document.getElementById('regCliente').value = '';
@@ -715,9 +719,12 @@
             if(!tbody) return;
             if(movimientosMotos.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
-                document.getElementById('lblTotalFacturado').innerText = '$0.00';
-                document.getElementById('lblTotalAbonos').innerText = '$0.00';
-                document.getElementById('lblTotalCXC').innerText = '$0.00';
+                let f = document.getElementById('lblTotalFacturado');
+                let a = document.getElementById('lblTotalAbonos');
+                let c = document.getElementById('lblTotalCXC');
+                if(f) f.innerText = '$0.00';
+                if(a) a.innerText = '$0.00';
+                if(c) c.innerText = '$0.00';
                 actualizarResumenFinanciero();
                 return;
             }
@@ -923,7 +930,7 @@
         window.onload = () => { 
             let hoy = new Date().toISOString().split('T')[0];
             let inputF = document.getElementById('inputFechaCierre');
-            if(inputF) inputF.value = hoy;
+            if(inputF && !inputF.value) inputF.value = hoy;
             actualizarValoresGlobales(); 
             renderInventario(); 
             calcularSeguros(); 
