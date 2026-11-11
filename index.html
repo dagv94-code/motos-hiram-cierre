@@ -50,7 +50,7 @@
                     </select>
                 </div>
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-slate-300">
-                    <i class="fa-solid fa-calendar text-red-500 mr-1"></i> 11/11/2026
+                    <i class="fa-solid fa-calendar text-red-500 mr-1"></i> Miércoles, 11 de nov. de 2026
                 </div>
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-amber-400">
                     <i class="fa-solid fa-coins mr-1"></i> Tasa: <span id="lblTasaHeader">997.92</span> Bs/$
@@ -62,7 +62,7 @@
         </div>
     </header>
 
-    <!-- NAVEGACIÓN PRINCIPAL -->
+    <!-- NAVEGACIÓN COMPLETA DE PESTAÑAS -->
     <nav class="bg-slate-900/80 backdrop-blur border-b border-slate-800 print:hidden">
         <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto text-sm">
             <button onclick="cambiarPestana('cierre')" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
@@ -77,7 +77,7 @@
     <!-- CONTENIDO -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- 1. CIERRE DIARIO -->
+        <!-- 1. PESTAÑA CIERRE DIARIO -->
         <section id="seccion-cierre" class="space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex justify-between items-center flex-wrap gap-4 print:hidden">
                 <div>
@@ -85,11 +85,31 @@
                     <p class="text-xs text-slate-400" id="txtSedeInfo">Sede: Maracaibo (Principal) • Adm: Jennmary Parra • Gerente: Lic. David García</p>
                 </div>
                 <button onclick="generarReportePDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-2 text-sm">
-                    <i class="fa-solid fa-print"></i> Totalizar y Imprimir / PDF
+                    <i class="fa-solid fa-print"></i> Totalizar y Generar PDF
                 </button>
             </div>
 
-            <!-- TABLA DE VENTAS Y ABONOS (CXC) -->
+            <!-- TARJETAS DE RESUMEN -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Total Facturado</p>
+                    <p class="text-2xl font-black text-white" id="lblTotalFacturado">$0.00</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Total Abonos / Pagos Hoy</p>
+                    <p class="text-2xl font-black text-emerald-400" id="lblTotalAbonos">$0.00</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Cuentas por Cobrar (CXC)</p>
+                    <p class="text-2xl font-black text-amber-400" id="lblTotalCXC">$0.00</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Seguro Caracas</p>
+                    <p class="text-2xl font-black text-blue-400" id="lblTotalSegurosCard">$0.00</p>
+                </div>
+            </div>
+
+            <!-- TABLA DE VENTAS Y ABONOS (MOTOS) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
                     <span class="font-bold text-sm text-white"><i class="fa-solid fa-motorcycle text-red-500 mr-2"></i> Registro de Ventas de Motos y Abonos (CXC)</span>
@@ -118,7 +138,7 @@
                 </div>
             </div>
 
-            <!-- TABLA DE MOVIMIENTOS Y TALLER -->
+            <!-- TABLA DE TALLER Y SERVICIOS -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
                     <span class="font-bold text-sm text-white"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-2"></i> Movimientos y Servicios de Taller</span>
@@ -162,7 +182,7 @@
             </div>
         </section>
 
-        <!-- 2. ARQUEO & DIVISAS -->
+        <!-- 2. PESTAÑA ARQUEO & DIVISAS -->
         <section id="seccion-arqueo" class="hidden space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
@@ -196,7 +216,7 @@
             </div>
         </section>
 
-        <!-- 3. SEGURO CARACAS -->
+        <!-- 3. PESTAÑA SEGURO CARACAS -->
         <section id="seccion-seguros" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-3xl mx-auto space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -218,15 +238,15 @@
             </div>
         </section>
 
-        <!-- 4. INVENTARIO -->
+        <!-- 4. PESTAÑA INVENTARIO MOTOS -->
         <section id="seccion-inventario" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-4xl mx-auto space-y-4">
-                <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid boxes-stacked text-red-500 mr-2"></i> Inventario de Motos al Cierre</h2>
+                <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-boxes-stacked text-red-500 mr-2"></i> Inventario de Motos al Cierre</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="inventarioContainer"></div>
             </div>
         </section>
 
-        <!-- 5. HISTÓRICO NUBE -->
+        <!-- 5. PESTAÑA HISTÓRICO NUBE -->
         <section id="seccion-historico" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
                 <h2 class="text-xl font-bold text-white mb-4">Cierres Históricos Sincronizados (Maracaibo y Cabimas)</h2>
@@ -248,7 +268,7 @@
             </div>
         </section>
 
-        <!-- 6. CONFIGURACIÓN -->
+        <!-- 6. PESTAÑA CONFIGURACIÓN -->
         <section id="seccion-config" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-xl space-y-4">
                 <h2 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Configuración y Seguridad</h2>
@@ -452,10 +472,17 @@
             let tbody = document.getElementById('tablaMotosBody');
             if(movimientosMotos.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
+                document.getElementById('lblTotalFacturado').innerText = '$0.00';
+                document.getElementById('lblTotalAbonos').innerText = '$0.00';
+                document.getElementById('lblTotalCXC').innerText = '$0.00';
                 return;
             }
             tbody.innerHTML = '';
+            let totF = 0, totA = 0, totC = 0;
             movimientosMotos.forEach((m, idx) => {
+                totF += m.facturado;
+                totA += m.pagoDia;
+                totC += m.cxc;
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-800/40 border-b border-slate-800">
                         <td class="p-3 font-semibold text-white">${m.cliente}</td>
@@ -469,6 +496,9 @@
                     </tr>
                 `;
             });
+            document.getElementById('lblTotalFacturado').innerText = `$${totF.toFixed(2)}`;
+            document.getElementById('lblTotalAbonos').innerText = `$${totA.toFixed(2)}`;
+            document.getElementById('lblTotalCXC').innerText = `$${totC.toFixed(2)}`;
         }
 
         function renderTaller() {
@@ -538,6 +568,7 @@
                 total += sub;
             });
             document.getElementById('lblTotalSeguroCaracas').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('lblTotalSegurosCard').innerText = `$${total.toFixed(2)}`;
         }
 
         function guardarConfiguracion() {
