@@ -24,7 +24,7 @@
         window.db = db;
     </script>
     <style>
-        /* ESTILO GERENCIAL PROFESIONAL PARA PDF Y IMPRESIÓN (FONDO BLANCO Y FORMAL) */
+        /* ESTILO GERENCIAL PROFESIONAL PARA PDF E IMPRESIÓN (FONDO BLANCO Y FORMAL) */
         @media print {
             body { background: #ffffff !important; color: #000000 !important; font-family: Arial, sans-serif; font-size: 11px; }
             .print\:hidden { display: none !important; }
@@ -33,7 +33,6 @@
             table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
             th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; color: #000000 !important; }
             th { background-color: #f1f5f9 !important; font-weight: bold; }
-            .card-reporte { background: #ffffff !important; border: 1px solid #cbd5e1 !important; color: #000000 !important; box-shadow: none !important; }
         }
     </style>
 </head>
@@ -58,8 +57,10 @@
                         <option value="CABIMAS">Cabimas</option>
                     </select>
                 </div>
-                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-slate-300">
-                    <i class="fa-solid fa-calendar text-red-500 mr-1"></i> <span id="lblFechaHoy"></span>
+                <!-- CALENDARIO DE FECHA DE CIERRE -->
+                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-slate-300">
+                    <i class="fa-solid fa-calendar text-red-500"></i> Fecha:
+                    <input type="date" id="inputFechaCierre" onchange="actualizarFechaGlobal()" class="bg-slate-900 border border-slate-600 rounded p-1 text-white font-bold text-xs">
                 </div>
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-amber-400">
                     <i class="fa-solid fa-coins"></i> Tasa: 
@@ -93,7 +94,7 @@
                 <h2 class="text-sm font-extrabold text-red-500 mt-1 uppercase" id="lblReporteTitulo">REPORTE DE CIERRE DIARIO - MARACAIBO</h2>
             </div>
             <div class="text-right text-xs text-slate-300 space-y-0.5">
-                <p><span class="font-bold">Fecha:</span> <span id="lblFechaPDF">--/--/----</span></p>
+                <p><span class="font-bold">Fecha del Cierre:</span> <span id="lblFechaPDF" class="font-bold text-white">--/--/----</span></p>
                 <p><span class="font-bold">Tasa Oficial BCV:</span> <span id="lblTasaPDF" class="text-amber-400 font-bold">0.00</span> Bs/$</p>
             </div>
         </div>
@@ -118,7 +119,7 @@
             </div>
         </div>
 
-        <!-- 1. TABLA DE MOTOS -->
+        <!-- 1. TABLA DE MOTOS CON CHECK "SIN MOVIMIENTOS" -->
         <div class="space-y-3">
             <div class="flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center gap-3">
@@ -150,7 +151,7 @@
             </div>
         </div>
 
-        <!-- 2. TABLA DE TALLER -->
+        <!-- 2. TABLA DE TALLER CON CHECK "SIN MOVIMIENTOS" -->
         <div class="space-y-3">
             <div class="flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center gap-3">
@@ -180,7 +181,7 @@
             </div>
         </div>
 
-        <!-- 3. PÓLIZAS SEGURO CARACAS -->
+        <!-- 3. PÓLIZAS SEGURO CARACAS CON CHECK "0 PÓLIZAS" -->
         <div class="space-y-3">
             <div class="flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center gap-3">
@@ -485,10 +486,15 @@
 
         function actualizarTasaGlobal() {
             tasaBCV = parseFloat(document.getElementById('txtTasaBCV').value) || 0;
-            let f = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('lblFechaHoy').innerText = f.charAt(0).toUpperCase() + f.slice(1);
-            document.getElementById('lblFechaPDF').innerText = new Date().toLocaleDateString();
+            let fechaVal = document.getElementById('inputFechaCierre').value;
+            let fechaTexto = fechaVal ? new Date(fechaVal + 'T00:00:00').toLocaleDateString() : new Date().toLocaleDateString();
+            document.getElementById('lblFechaHoy').innerText = fechaTexto;
+            document.getElementById('lblFechaPDF').innerText = fechaTexto;
             document.getElementById('lblTasaPDF').innerText = tasaBCV.toFixed(2);
+        }
+
+        function actualizarFechaGlobal() {
+            actualizarTasaGlobal();
         }
 
         function cambiarPestana(p) {
@@ -522,7 +528,7 @@
             document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
             document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
             
-            // Limpiar inputs del modal para que entren en blanco
+            // Limpiar inputs del modal
             document.getElementById('regFactura').value = '';
             document.getElementById('regCliente').value = '';
             document.getElementById('regAbonoAnt').value = '0';
@@ -691,7 +697,6 @@
                 document.getElementById('contenedorSegurosArea').style.display = chk ? 'none' : 'block';
                 if(chk) {
                     document.getElementById('lblTotalSeguroCaracas').innerText = '$0.00';
-                    document.getElementById('lblTotalSegurosCard').innerText = '$0.00';
                 } else {
                     calcularSeguros();
                 }
@@ -706,6 +711,7 @@
                 document.getElementById('lblTotalFacturado').innerText = '$0.00';
                 document.getElementById('lblTotalAbonos').innerText = '$0.00';
                 document.getElementById('lblTotalCXC').innerText = '$0.00';
+                actualizarResumenFinanciero();
                 return;
             }
             tbody.innerHTML = '';
@@ -730,12 +736,14 @@
             document.getElementById('lblTotalFacturado').innerText = `$${totF.toFixed(2)}`;
             document.getElementById('lblTotalAbonos').innerText = `$${totA.toFixed(2)}`;
             document.getElementById('lblTotalCXC').innerText = `$${totC.toFixed(2)}`;
+            actualizarResumenFinanciero();
         }
 
         function renderTaller() {
             let tbody = document.getElementById('tablaTallerBody');
             if(movimientosTaller.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
+                actualizarResumenFinanciero();
                 return;
             }
             tbody.innerHTML = '';
@@ -751,6 +759,7 @@
                     </tr>
                 `;
             });
+            actualizarResumenFinanciero();
         }
 
         function actualizarResumenFinanciero() {
@@ -843,17 +852,33 @@
                 });
             }
             document.getElementById('lblTotalSeguroCaracas').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('lblTotalSegurosCard').innerText = `$${total.toFixed(2)}`;
         }
 
-        function totalizarYDescargarPDF() {
+        async function totalizarYDescargarPDF() {
             actualizarTasaGlobal();
             if(tasaBCV <= 0) {
                 alert('Atención: Debe ingresar la Tasa del Día antes de totalizar y generar el reporte PDF.');
                 return;
             }
 
-            // Descargar PDF automáticamente en formato corporativo gerencial blanco
+            // 1. Guardar automáticamente en Firebase
+            try {
+                let sucursal = document.getElementById('sucursalActiva').value;
+                let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
+                await db.collection("cierres").add({
+                    sucursal: sucursal,
+                    fecha: new Date().toLocaleString(),
+                    tasa: tasaBCV,
+                    totalFacturado: totF,
+                    motos: movimientosMotos,
+                    taller: movimientosTaller,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(e) {
+                console.error("Error al guardar en Firebase:", e);
+            }
+
+            // 2. Descargar PDF automáticamente en formato gerencial blanco
             let element = document.getElementById('areaPDF');
             let opt = {
                 margin:       [10, 10, 10, 10],
@@ -864,11 +889,17 @@
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                alert('¡Cierre consolidado y PDF gerencial descargado con éxito!');
+                alert('¡Cierre consolidado, guardado en la nube y PDF descargado con éxito!');
             });
         }
 
-        window.onload = () => { actualizarTasaGlobal(); renderInventario(); calcularSeguros(); };
+        window.onload = () => { 
+            let hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('inputFechaCierre').value = hoy;
+            actualizarTasaGlobal(); 
+            renderInventario(); 
+            calcularSeguros(); 
+        };
     </script>
 </body>
 </html>
