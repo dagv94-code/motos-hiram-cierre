@@ -24,16 +24,22 @@
         window.db = db;
     </script>
     <style>
+        /* ESTILO GERENCIAL PROFESIONAL PARA PDF Y IMPRESIÓN */
         @media print {
-            body { background: white !important; color: black !important; }
+            body { background: #ffffff !important; color: #000000 !important; font-family: Arial, sans-serif; font-size: 11px; }
             .print\:hidden { display: none !important; }
             .page-break { page-break-before: always; }
+            main { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+            th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; color: #000000 !important; }
+            th { background-color: #f1f5f9 !important; font-weight: bold; }
+            .card-reporte { background: #ffffff !important; border: 1px solid #cbd5e1 !important; color: #000000 !important; box-shadow: none !important; }
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased">
 
-    <!-- HEADER INSTITUCIONAL -->
+    <!-- HEADER INSTITUCIONAL (WEB) -->
     <header class="bg-slate-900 border-b border-slate-800 shadow-xl print:hidden">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
@@ -57,7 +63,7 @@
                 </div>
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-amber-400">
                     <i class="fa-solid fa-coins"></i> Tasa: 
-                    <input type="number" id="txtTasaBCV" value="" placeholder="Ej. 997.92" oninput="actualizarTasaGlobal()" class="w-20 bg-slate-900 border border-amber-500 rounded p-1 text-center font-bold text-white text-xs"> Bs/$
+                    <input type="number" id="txtTasaBCV" value="1000" placeholder="Ej. 1000" oninput="actualizarTasaGlobal()" class="w-20 bg-slate-900 border border-amber-500 rounded p-1 text-center font-bold text-white text-xs"> Bs/$
                 </div>
                 <button onclick="totalizarYDescargarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
                     <i class="fa-solid fa-file-pdf"></i> Totalizar y Descargar PDF
@@ -76,185 +82,197 @@
         </div>
     </nav>
 
-    <!-- CONTENIDO GENERAL (ÁREA DE PDF GERENCIAL) -->
-    <main id="areaPDF" class="max-w-5xl mx-auto px-6 py-8 space-y-8 bg-slate-950 text-slate-100">
+    <!-- CONTENIDO GENERAL (ÁREA DE REPORTE PROFESIONAL PARA PDF) -->
+    <main id="areaPDF" class="max-w-4xl mx-auto px-6 py-8 space-y-6 bg-slate-950 text-slate-100">
 
-        <!-- ENCABEZADO INSTITUCIONAL PARA PDF -->
-        <div class="border-b-2 border-red-600 pb-4 flex justify-between items-start">
+        <!-- ENCABEZADO GERENCIAL OFICIAL -->
+        <div class="border-b-2 border-red-600 pb-3 flex justify-between items-start">
             <div>
-                <h1 class="text-xl font-black tracking-wider text-white">MOTOS HIRAM, C.A.</h1>
+                <h1 class="text-lg font-black tracking-wider text-white">MOTOS HIRAM, C.A.</h1>
                 <p class="text-xs text-slate-400">ZULIA • RIF: J-050770055-0</p>
-                <h2 class="text-base font-extrabold text-red-500 mt-1 uppercase" id="lblReporteTitulo">REPORTE DE CIERRE DIARIO - MARACAIBO</h2>
+                <h2 class="text-sm font-extrabold text-red-500 mt-1 uppercase" id="lblReporteTitulo">REPORTE DE CIERRE DIARIO - MARACAIBO</h2>
             </div>
-            <div class="text-right text-xs text-slate-300 space-y-1">
+            <div class="text-right text-xs text-slate-300 space-y-0.5">
                 <p><span class="font-bold">Fecha:</span> <span id="lblFechaPDF">--/--/----</span></p>
                 <p><span class="font-bold">Tasa Oficial BCV:</span> <span id="lblTasaPDF" class="text-amber-400 font-bold">0.00</span> Bs/$</p>
-                <p><span class="font-bold">Versión:</span> 1.4</p>
             </div>
         </div>
 
-        <!-- PÁGINA 1: TRANSACCIONES (MOTOS Y TALLER) -->
-        <div class="space-y-6">
-            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-motorcycle text-red-500 mr-2"></i> 1. Relación de Ventas y Abonos de Motos</h3>
+        <!-- TARJETAS DE RESUMEN EJECUTIVO -->
+        <div class="grid grid-cols-4 gap-3">
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Total Facturado</p>
+                <p class="text-lg font-black text-white" id="lblTotalFacturado">$0.00</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Pagos del Día</p>
+                <p class="text-lg font-black text-emerald-400" id="lblTotalAbonos">$0.00</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Cuentas por Cobrar</p>
+                <p class="text-lg font-black text-amber-400" id="lblTotalCXC">$0.00</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Seguro Caracas</p>
+                <p class="text-lg font-black text-blue-400" id="lblTotalSegurosCard">$0.00</p>
+            </div>
+        </div>
+
+        <!-- 1. TABLA DE MOTOS -->
+        <div class="space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-motorcycle text-red-500 mr-1.5"></i> 1. Ventas y Abonos de Motocicletas</h3>
+                <button onclick="iniciarModalRegistro('MOTO')" class="bg-red-600 hover:bg-red-700 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1 print:hidden">
+                    <i class="fa-solid fa-plus"></i> Cargar Venta Moto
+                </button>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800">
-                            <th class="p-2.5">Cliente</th>
-                            <th class="p-2.5">Descripción / Modelo</th>
-                            <th class="p-2.5">Factura</th>
-                            <th class="p-2.5">Facturación ($)</th>
-                            <th class="p-2.5">Abonos Ant. ($)</th>
-                            <th class="p-2.5">Pago Día ($)</th>
-                            <th class="p-2.5">CXC ($)</th>
-                            <th class="p-2.5 text-center print:hidden">Acción</th>
+                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800 text-[10px]">
+                            <th class="p-2">Cliente</th>
+                            <th class="p-2">Modelo</th>
+                            <th class="p-2">Factura</th>
+                            <th class="p-2">Facturación ($)</th>
+                            <th class="p-2">Abonos Ant. ($)</th>
+                            <th class="p-2">Pago Día ($)</th>
+                            <th class="p-2">CXC ($)</th>
+                            <th class="p-2 text-center print:hidden">Acción</th>
                         </tr>
                     </thead>
                     <tbody id="tablaMotosBody" class="divide-y divide-slate-800/60">
-                        <tr><td colspan="8" class="p-4 text-center text-slate-500 italic">No hay registros de motos cargados para hoy.</td></tr>
+                        <tr><td colspan="8" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-end print:hidden">
-                <button onclick="iniciarModalRegistro('MOTO')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-plus"></i> Cargar Venta / Abono Moto
-                </button>
-            </div>
         </div>
 
-        <div class="space-y-6">
-            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-2"></i> 2. Movimientos y Servicios de Taller</h3>
+        <!-- 2. TABLA DE TALLER -->
+        <div class="space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-1.5"></i> 2. Movimientos y Servicios de Taller</h3>
+                <button onclick="iniciarModalRegistro('TALLER')" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1 print:hidden">
+                    <i class="fa-solid fa-plus"></i> Cargar Taller
+                </button>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800">
-                            <th class="p-2.5">Cliente</th>
-                            <th class="p-2.5">N° Factura</th>
-                            <th class="p-2.5">Concepto / Descripción</th>
-                            <th class="p-2.5">Medio de Pago</th>
-                            <th class="p-2.5">Total ($)</th>
-                            <th class="p-2.5 text-center print:hidden">Acción</th>
+                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800 text-[10px]">
+                            <th class="p-2">Cliente</th>
+                            <th class="p-2">N° Factura</th>
+                            <th class="p-2">Concepto / Descripción</th>
+                            <th class="p-2">Medio de Pago</th>
+                            <th class="p-2">Total ($)</th>
+                            <th class="p-2 text-center print:hidden">Acción</th>
                         </tr>
                     </thead>
                     <tbody id="tablaTallerBody" class="divide-y divide-slate-800/60">
-                        <tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Espacio en blanco)</td></tr>
+                        <tr><td colspan="6" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Se imprimirá en blanco si no aplica)</td></tr>
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-end print:hidden">
-                <button onclick="iniciarModalRegistro('TALLER')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-plus"></i> Cargar Servicio Taller
-                </button>
+        </div>
+
+        <!-- 3. PÓLIZAS SEGURO CARACAS -->
+        <div class="space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-shield-cat text-red-500 mr-1.5"></i> 3. Pólizas Pendientes Seguros Caracas</h3>
+                <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-[11px] px-3 py-1 rounded font-bold border border-slate-700 print:hidden"><i class="fa-solid fa-plus mr-1"></i> Agregar Línea (+)</button>
+            </div>
+            <div id="contenedorSeguros" class="space-y-2 text-xs">
+                <div class="grid grid-cols-4 gap-2 items-center bg-slate-900 p-2 rounded-lg border border-slate-800 linea-seguro">
+                    <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-cant font-bold text-xs" value="1" oninput="calcularSeguros()"></div>
+                    <div><label class="text-[10px] text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-precio font-bold text-xs" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
+                    <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 seg-sub text-xs">$0.00</p></div>
+                    <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                <span>Total Pólizas Seguro Caracas:</span>
+                <span id="lblTotalSeguroCaracas" class="text-white text-sm">$0.00</span>
             </div>
         </div>
 
-        <!-- SALTO DE PÁGINA PROFESIONAL PARA PDF -->
+        <!-- SALTO DE PÁGINA PARA PDF (PÁGINA 2) -->
         <div class="page-break"></div>
 
-        <!-- PÁGINA 2: RESUMEN FINANCIERO, MEDIOS DE PAGO, SEGUROS E INVENTARIO -->
-        <div class="space-y-6 pt-4">
-            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> 3. Resumen y Detalle de Formas de Pago</h3>
+        <!-- 4. RESUMEN Y DETALLE DE FORMAS DE PAGO -->
+        <div class="space-y-4 pt-4">
+            <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-vault text-emerald-500 mr-1.5"></i> 4. Resumen Detallado de Formas de Pago y Referencias</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-                <!-- DETALLE EFECTIVO -->
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <!-- EFECTIVO -->
+                <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
                     <h4 class="font-bold text-emerald-400 uppercase text-xs border-b border-slate-800 pb-1">Efectivo Divisas ($)</h4>
-                    <div id="resumenEfectivoList" class="space-y-1 text-slate-300">
-                        <p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p>
-                    </div>
-                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                    <div id="resumenEfectivoList" class="space-y-1 text-slate-300"><p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p></div>
+                    <div class="flex justify-between font-black pt-1.5 border-t border-slate-800 text-xs">
                         <span>Total Efectivo:</span>
                         <span id="resumenEfectivoTotal" class="text-emerald-400">$0.00</span>
                     </div>
                 </div>
 
-                <!-- DETALLE ZELLE -->
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <h4 class="font-bold text-blue-400 uppercase text-xs border-b border-slate-800 pb-1">Zelle ($)</h4>
-                    <div id="resumenZelleList" class="space-y-1 text-slate-300">
-                        <p class="italic text-slate-500">Sin pagos por Zelle registrados.</p>
-                    </div>
-                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                <!-- ZELLE -->
+                <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                    <h4 class="font-bold text-blue-400 uppercase text-xs border-b border-slate-800 pb-1">Zelle ($) - Referencias y Titulares</h4>
+                    <div id="resumenZelleList" class="space-y-1 text-slate-300"><p class="italic text-slate-500">Sin pagos por Zelle registrados.</p></div>
+                    <div class="flex justify-between font-black pt-1.5 border-t border-slate-800 text-xs">
                         <span>Total Zelle:</span>
                         <span id="resumenZelleTotal" class="text-blue-400">$0.00</span>
                     </div>
                 </div>
 
-                <!-- DETALLE BINANCE -->
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <h4 class="font-bold text-amber-400 uppercase text-xs border-b border-slate-800 pb-1">Binance / Towerbank ($)</h4>
-                    <div id="resumenBinanceList" class="space-y-1 text-slate-300">
-                        <p class="italic text-slate-500">Sin pagos por Binance registrados.</p>
-                    </div>
-                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                <!-- BINANCE -->
+                <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                    <h4 class="font-bold text-amber-400 uppercase text-xs border-b border-slate-800 pb-1">Binance / Towerbank ($) - Referencias TX</h4>
+                    <div id="resumenBinanceList" class="space-y-1 text-slate-300"><p class="italic text-slate-500">Sin pagos por Binance registrados.</p></div>
+                    <div class="flex justify-between font-black pt-1.5 border-t border-slate-800 text-xs">
                         <span>Total Binance:</span>
                         <span id="resumenBinanceTotal" class="text-amber-400">$0.00</span>
                     </div>
                 </div>
 
-                <!-- DETALLE BOLÍVARES -->
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                <!-- BOLÍVARES -->
+                <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
                     <h4 class="font-bold text-purple-400 uppercase text-xs border-b border-slate-800 pb-1">Bolívares (Pago Móvil / Transf / Punto)</h4>
-                    <div id="resumenBsList" class="space-y-1 text-slate-300">
-                        <p class="italic text-slate-500">Sin pagos en Bolívares registrados.</p>
-                    </div>
-                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                    <div id="resumenBsList" class="space-y-1 text-slate-300"><p class="italic text-slate-500">Sin pagos en Bolívares registrados.</p></div>
+                    <div class="flex justify-between font-black pt-1.5 border-t border-slate-800 text-xs">
                         <span>Total Bs. Equivalente:</span>
                         <span id="resumenBsTotal" class="text-purple-400">$0.00</span>
                     </div>
                 </div>
             </div>
 
-            <!-- CUADRE GERENCIAL DE CIERRE (DIFERENCIA = 0) -->
-            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-                <h4 class="font-bold text-slate-200 uppercase text-xs border-b border-slate-800 pb-1">Cuadre General de Cierre</h4>
-                <div class="grid grid-cols-3 gap-4 text-center font-bold">
-                    <div class="bg-slate-800 p-2.5 rounded-lg"><p class="text-[10px] text-slate-400">Total Ingresos Recibidos</p><p id="cuadreIngresos" class="text-emerald-400 text-base">$0.00</p></div>
-                    <div class="bg-slate-800 p-2.5 rounded-lg"><p class="text-[10px] text-slate-400">Total Venta Facturada</p><p id="cuadreVentas" class="text-white text-base">$0.00</p></div>
-                    <div class="bg-slate-800 p-2.5 rounded-lg"><p class="text-[10px] text-slate-400">Diferencia (Debe ser $0.00)</p><p id="cuadreDiferencia" class="text-cyan-400 text-base">$0.00</p></div>
+            <!-- CUADRE GERENCIAL EXACTO (DIFERENCIA = 0) -->
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                <h4 class="font-bold text-slate-200 uppercase text-xs border-b border-slate-800 pb-1">Cuadre Gerencial de Cierre (Debe ser $0.00)</h4>
+                <div class="grid grid-cols-3 gap-3 text-center font-bold">
+                    <div class="bg-slate-800 p-2 rounded-lg"><p class="text-[10px] text-slate-400">Total Ingresos Recibidos</p><p id="cuadreIngresos" class="text-emerald-400 text-sm">$0.00</p></div>
+                    <div class="bg-slate-800 p-2 rounded-lg"><p class="text-[10px] text-slate-400">Total Venta Facturada</p><p id="cuadreVentas" class="text-white text-sm">$0.00</p></div>
+                    <div class="bg-slate-800 p-2 rounded-lg"><p class="text-[10px] text-slate-400">Diferencia (Cuadre)</p><p id="cuadreDiferencia" class="text-cyan-400 text-sm">$0.00</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- PÓLIZAS SEGURO CARACAS -->
-        <div class="space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-shield-cat text-red-500 mr-2"></i> 4. Pólizas Pendientes Seguros Caracas</h3>
-                <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1 rounded font-bold border border-slate-700 print:hidden"><i class="fa-solid fa-plus mr-1"></i> Agregar Línea (+)</button>
-            </div>
-            <div id="contenedorSeguros" class="space-y-2 text-xs">
-                <div class="grid grid-cols-4 gap-2 items-center bg-slate-900 p-2.5 rounded-lg border border-slate-800 linea-seguro">
-                    <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-cant font-bold" value="1" oninput="calcularSeguros()"></div>
-                    <div><label class="text-[10px] text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-precio font-bold" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
-                    <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 seg-sub">$0.00</p></div>
-                    <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
-                </div>
-            </div>
-            <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-3 rounded-lg border border-slate-800">
-                <span>Total Pólizas Seguro Caracas:</span>
-                <span id="lblTotalSeguroCaracas" class="text-white text-sm">$0.00</span>
-            </div>
-        </div>
-
-        <!-- INVENTARIO AL CIERRE -->
-        <div class="space-y-4">
-            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-boxes-stacked text-red-500 mr-2"></i> 5. Inventario de Motos al Cierre</h3>
+        <!-- 5. INVENTARIO AL CIERRE -->
+        <div class="space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-boxes-stacked text-red-500 mr-1.5"></i> 5. Inventario de Motos al Cierre</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs" id="inventarioContainer"></div>
-            <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-3 rounded-lg border border-slate-800">
+            <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-2.5 rounded-lg border border-slate-800">
                 <span>Total Unidades en Existencia:</span>
                 <span id="lblTotalInventario" class="text-emerald-400 text-sm">0</span>
             </div>
         </div>
 
         <!-- FIRMAS GERENCIALES -->
-        <div class="grid grid-cols-2 gap-8 pt-8 border-t border-slate-800">
-            <div class="text-center space-y-2">
-                <div class="pt-10 border-b border-slate-600 w-3/4 mx-auto"></div>
+        <div class="grid grid-cols-2 gap-8 pt-6 border-t border-slate-800">
+            <div class="text-center space-y-1">
+                <div class="pt-8 border-b border-slate-600 w-3/4 mx-auto"></div>
                 <p class="font-bold text-white text-xs" id="lblAdminNombre">Jennmary Parra</p>
                 <p class="text-[10px] text-slate-400">Preparado por (Analista Administrativo)</p>
             </div>
-            <div class="text-center space-y-2">
-                <div class="pt-10 border-b border-slate-600 w-3/4 mx-auto"></div>
+            <div class="text-center space-y-1">
+                <div class="pt-8 border-b border-slate-600 w-3/4 mx-auto"></div>
                 <p class="font-bold text-white text-xs" id="lblGerenteNombre">Lic. David A. García V. (CI: 22.362.833)</p>
                 <p class="text-[10px] text-slate-400">Revisado por (Gerente de Concesionario)</p>
             </div>
@@ -266,26 +284,26 @@
     <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-lg font-bold" id="modalTitulo">Registrar Operación</h3>
+                <h3 class="text-base font-bold" id="modalTitulo">Registrar Operación</h3>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="space-y-3 text-sm">
-                <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="font-bold text-xs text-slate-400">Nro. de Factura</label>
-                        <input type="text" id="regFactura" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white" placeholder="Ej. 00151">
+                        <label class="font-bold text-slate-400">Nro. de Factura</label>
+                        <input type="text" id="regFactura" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white" placeholder="Ej. 00151">
                     </div>
                     <div>
-                        <label class="font-bold text-xs text-slate-400">Nombre del Cliente</label>
-                        <input type="text" id="regCliente" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white" placeholder="Nombre completo">
+                        <label class="font-bold text-slate-400">Nombre del Cliente</label>
+                        <input type="text" id="regCliente" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white" placeholder="Nombre completo">
                     </div>
                 </div>
 
                 <!-- GRUPO MOTO -->
-                <div id="grupoMotoCampos" class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div id="grupoMotoCampos" class="space-y-2 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
                     <div>
-                        <label class="font-bold text-xs text-slate-400">Modelo de Motocicleta</label>
-                        <select id="regModeloMoto" onchange="actualizarPrecioMoto()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white">
+                        <label class="font-bold text-slate-400">Modelo de Motocicleta</label>
+                        <select id="regModeloMoto" onchange="actualizarPrecioMoto()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold text-white">
                             <option value="BOXER CT100|1420">Boxer CT100 - $1,420</option>
                             <option value="BOXER BM150|1890">Boxer BM150 - $1,890</option>
                             <option value="PULSAR NEON 150|2500">Pulsar Neon 150 - $2,500</option>
@@ -297,11 +315,11 @@
                         </select>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <div><label class="font-bold text-xs text-slate-400">Precio ($)</label><input type="number" id="regPrecioMoto" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="1420" readonly></div>
-                        <div><label class="font-bold text-xs text-slate-400">Abono Ant. ($)</label><input type="number" id="regAbonoAnt" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
+                        <div><label class="font-bold text-slate-400">Precio ($)</label><input type="number" id="regPrecioMoto" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-white" value="1420" readonly></div>
+                        <div><label class="font-bold text-slate-400">Abono Ant. ($)</label><input type="number" id="regAbonoAnt" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-white" value="0"></div>
                         <div>
-                            <label class="font-bold text-xs text-slate-400">Modalidad</label>
-                            <select id="regModalidad" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white">
+                            <label class="font-bold text-slate-400">Modalidad</label>
+                            <select id="regModalidad" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white">
                                 <option value="CONTADO">Contado</option>
                                 <option value="APARTADO">Apartado (CXC)</option>
                                 <option value="MOTOS_YES">Motos Yes</option>
@@ -311,151 +329,119 @@
                 </div>
 
                 <!-- GRUPO TALLER -->
-                <div id="grupoTallerCampos" class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700 hidden">
+                <div id="grupoTallerCampos" class="space-y-2 bg-slate-800/50 p-3 rounded-xl border border-slate-700 hidden">
                     <div>
-                        <label class="font-bold text-xs text-slate-400">Concepto / Servicio de Taller</label>
-                        <input type="text" id="regConceptoTaller" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white" placeholder="Ej. Cambio de aceite por garantía">
+                        <label class="font-bold text-slate-400">Concepto / Servicio de Taller</label>
+                        <input type="text" id="regConceptoTaller" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white" placeholder="Ej. Cambio de aceite por garantía">
                     </div>
                     <div>
-                        <label class="font-bold text-xs text-slate-400">Monto Total ($)</label>
-                        <input type="number" id="regMontoTaller" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0">
+                        <label class="font-bold text-slate-400">Monto Total ($)</label>
+                        <input type="number" id="regMontoTaller" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold text-white" value="0">
                     </div>
                 </div>
 
                 <!-- MEDIOS DE PAGO -->
-                <div class="border-t border-slate-800 pt-3 space-y-3">
-                    <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Medios de Pago</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div class="border-t border-slate-800 pt-2 space-y-2">
+                    <h4 class="font-bold uppercase text-slate-400">Desglose de Medios de Pago</h4>
+                    <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Divisas Efectivo ($)</label>
+                            <label class="text-slate-400 block mb-1">Efectivo ($)</label>
                             <div class="flex gap-1">
-                                <input type="text" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-emerald-400 text-center text-xs" value="$0.00" readonly>
-                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap"><i class="fa-solid fa-vault"></i> Arqueo</button>
+                                <input type="text" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-emerald-400 text-center text-xs" value="$0.00" readonly>
+                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs font-bold shadow">Arqueo</button>
                             </div>
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Zelle ($)</label>
+                            <label class="text-slate-400 block mb-1">Zelle ($)</label>
                             <div class="flex gap-1">
-                                <input type="text" id="pagoZelleDisp" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-blue-400 text-center text-xs" value="$0.00" readonly>
-                                <button type="button" onclick="abrirZelleModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap"><i class="fa-solid fa-bolt"></i> Zelle</button>
+                                <input type="text" id="pagoZelleDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-blue-400 text-center text-xs" value="$0.00" readonly>
+                                <button type="button" onclick="abrirZelleModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-bold shadow">Zelle</button>
                             </div>
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Binance / Tower ($)</label>
+                            <label class="text-slate-400 block mb-1">Binance ($)</label>
                             <div class="flex gap-1">
-                                <input type="text" id="pagoBinanceDisp" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-amber-400 text-center text-xs" value="$0.00" readonly>
-                                <button type="button" onclick="abrirBinanceModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap"><i class="fa-solid fa-globe"></i> Binance</button>
+                                <input type="text" id="pagoBinanceDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-amber-400 text-center text-xs" value="$0.00" readonly>
+                                <button type="button" onclick="abrirBinanceModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-xs font-bold shadow">Binance</button>
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2 border-t border-slate-800/60">
+                    <div class="grid grid-cols-3 gap-2 pt-1">
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Pago Móvil (Bs.)</label>
+                            <label class="text-slate-400 block mb-1">Pago Móvil (Bs.)</label>
                             <div class="flex gap-1">
-                                <input type="text" id="pagoMovilDisp" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
-                                <button type="button" onclick="abrirBsModal('PAGO_MOVIL')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap">Cargar Bs</button>
+                                <input type="text" id="pagoMovilDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
+                                <button type="button" onclick="abrirBsModal('PAGO_MOVIL')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs font-bold shadow">Bs</button>
                             </div>
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Transf. Nacional (Bs.)</label>
+                            <label class="text-slate-400 block mb-1">Transf. (Bs.)</label>
                             <div class="flex gap-1">
-                                <input type="text" id="pagoTransfDisp" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
-                                <button type="button" onclick="abrirBsModal('TRANSF')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap">Cargar Bs</button>
+                                <input type="text" id="pagoTransfDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
+                                <button type="button" onclick="abrirBsModal('TRANSF')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs font-bold shadow">Bs</button>
                             </div>
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Punto de Venta (Bs.)</label>
+                            <label class="text-slate-400 block mb-1">Punto (Bs.)</label>
                             <div class="flex gap-1">
-                                <input type="text" id="pagoPuntoDisp" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
-                                <button type="button" onclick="abrirBsModal('PUNTO')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap">Cargar Bs</button>
+                                <input type="text" id="pagoPuntoDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
+                                <button type="button" onclick="abrirBsModal('PUNTO')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs font-bold shadow">Bs</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="border-t border-slate-800 pt-3 flex justify-end gap-2">
-                <button onclick="cerrarModal()" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl font-bold text-sm">Cancelar</button>
-                <button onclick="procesarRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl font-bold text-sm shadow">Guardar Operación</button>
+                <button onclick="cerrarModal()" class="bg-slate-800 text-slate-300 px-4 py-1.5 rounded-lg font-bold text-xs">Cancelar</button>
+                <button onclick="procesarRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg font-bold text-xs shadow">Guardar en Cierre</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALES DE ARQUEO Y PAGOS -->
+    <!-- MODALES DE PAGOS (ARQUEO, ZELLE, BINANCE, BS) -->
     <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-base font-bold"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> Arqueo por Denominaciones ($)</h3>
-                <button onclick="cerrarArqueoModal(false)" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white">
+            <h3 class="text-sm font-bold border-b border-slate-800 pb-2">Arqueo por Denominaciones ($)</h3>
+            <div class="space-y-1.5 text-xs">
+                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$50</span><input type="number" id="arq50" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$20</span><input type="number" id="arq20" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$10</span><input type="number" id="arq10" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$5</span><input type="number" id="arq5" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$1</span><input type="number" id="arq1" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
             </div>
-            <div class="space-y-2 text-xs max-h-64 overflow-y-auto pr-1">
-                <div class="flex justify-between items-center bg-slate-800/50 p-1.5 rounded"><span>Billetes $100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
-                <div class="flex justify-between items-center bg-slate-800/50 p-1.5 rounded"><span>Billetes $50</span><input type="number" id="arq50" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
-                <div class="flex justify-between items-center bg-slate-800/50 p-1.5 rounded"><span>Billetes $20</span><input type="number" id="arq20" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
-                <div class="flex justify-between items-center bg-slate-800/50 p-1.5 rounded"><span>Billetes $10</span><input type="number" id="arq10" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
-                <div class="flex justify-between items-center bg-slate-800/50 p-1.5 rounded"><span>Billetes $5</span><input type="number" id="arq5" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
-                <div class="flex justify-between items-center bg-slate-800/50 p-1.5 rounded"><span>Billetes $1</span><input type="number" id="arq1" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
-            </div>
-            <div class="bg-slate-800 p-3 rounded-xl flex justify-between font-bold text-sm">
-                <span>Total Efectivo:</span>
-                <span id="lblArqTotal" class="text-emerald-400">$0.00</span>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="cerrarArqueoModal(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Aceptar y Cargar</button>
-            </div>
+            <div class="bg-slate-800 p-2 rounded flex justify-between font-bold text-xs"><span>Total:</span><span id="lblArqTotal" class="text-emerald-400">$0.00</span></div>
+            <div class="flex justify-end pt-2"><button onclick="cerrarArqueoModal(true)" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold">Aceptar</button></div>
         </div>
     </div>
 
     <div id="modalZelle" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-base font-bold"><i class="fa-solid fa-bolt text-blue-500 mr-2"></i> Registro Zelle</h3>
-                <button onclick="document.getElementById('modalZelle').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div><label class="font-bold text-slate-400 block mb-1">Referencia Zelle</label><input type="text" id="zelleRef" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" placeholder="Ej. EXOBBTEPT"></div>
-                <div><label class="font-bold text-slate-400 block mb-1">Titular de la Cuenta</label><input type="text" id="zelleTitular" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" placeholder="Nombre del titular"></div>
-                <div><label class="font-bold text-slate-400 block mb-1">Monto ($)</label><input type="number" id="zelleMonto" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" value="0"></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="guardarZelle()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Aceptar y Cargar</button>
-            </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white text-xs">
+            <h3 class="text-sm font-bold border-b border-slate-800 pb-2">Registro Zelle</h3>
+            <div><label class="block mb-1">Referencia</label><input type="text" id="zelleRef" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Ej. EXOBBTEPT"></div>
+            <div><label class="block mb-1">Titular</label><input type="text" id="zelleTitular" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Nombre"></div>
+            <div><label class="block mb-1">Monto ($)</label><input type="number" id="zelleMonto" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
+            <div class="flex justify-end pt-2"><button onclick="guardarZelle()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold">Aceptar</button></div>
         </div>
     </div>
 
     <div id="modalBinance" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-base font-bold"><i class="fa-solid fa-globe text-amber-500 mr-2"></i> Registro Binance / Towerbank</h3>
-                <button onclick="document.getElementById('modalBinance').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div><label class="font-bold text-slate-400 block mb-1">Referencia TX</label><input type="text" id="binRef" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" placeholder="Ej. 2624c290788a..."></div>
-                <div><label class="font-bold text-slate-400 block mb-1">Monto Pagado ($)</label><input type="number" id="binMontoPagado" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" value="0"></div>
-                <div><label class="font-bold text-slate-400 block mb-1">Monto Recibido en Cuenta ($)</label><input type="number" id="binMontoRecibido" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" value="0"></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="guardarBinance()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Aceptar y Cargar</button>
-            </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white text-xs">
+            <h3 class="text-sm font-bold border-b border-slate-800 pb-2">Registro Binance / Towerbank</h3>
+            <div><label class="block mb-1">Referencia TX</label><input type="text" id="binRef" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Ej. 2624c290..."></div>
+            <div><label class="block mb-1">Monto Pagado ($)</label><input type="number" id="binMontoPagado" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
+            <div><label class="block mb-1">Monto Recibido ($)</label><input type="number" id="binMontoRecibido" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
+            <div class="flex justify-end pt-2"><button onclick="guardarBinance()" class="bg-amber-600 text-white px-3 py-1.5 rounded text-xs font-bold">Aceptar</button></div>
         </div>
     </div>
 
     <div id="modalBs" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-base font-bold" id="tituloModalBs"><i class="fa-solid fa-credit-card text-purple-500 mr-2"></i> Carga en Bolívares</h3>
-                <button onclick="document.getElementById('modalBs').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div><label class="font-bold text-slate-400 block mb-1">Nro. Referencia / Lote</label><input type="text" id="bsRef" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" placeholder="Ej. 083 / 2026"></div>
-                <div><label class="font-bold text-slate-400 block mb-1">Monto en Bolívares (Bs.)</label><input type="number" id="bsMonto" oninput="calcularEquivalenteModalBs()" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white font-bold" value="0" placeholder="Ej. 20000"></div>
-                <div class="bg-slate-800 p-2.5 rounded-lg flex justify-between font-bold text-xs">
-                    <span>Equivalente USD ($):</span>
-                    <span id="lblBsEqUSD" class="text-purple-400">$0.00</span>
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="guardarBsModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Aceptar y Cargar</button>
-            </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white text-xs">
+            <h3 class="text-sm font-bold border-b border-slate-800 pb-2" id="tituloModalBs">Carga en Bolívares</h3>
+            <div><label class="block mb-1">Nro. Referencia / Lote</label><input type="text" id="bsRef" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Ej. 083"></div>
+            <div><label class="block mb-1">Monto en Bs.</label><input type="number" id="bsMonto" oninput="calcularEquivalenteModalBs()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
+            <div class="bg-slate-800 p-2 rounded flex justify-between font-bold"><span>Equiv. USD:</span><span id="lblBsEqUSD" class="text-purple-400">$0.00</span></div>
+            <div class="flex justify-end pt-2"><button onclick="guardarBsModal()" class="bg-purple-600 text-white px-3 py-1.5 rounded text-xs font-bold">Aceptar</button></div>
         </div>
     </div>
 
@@ -598,7 +584,7 @@
         function abrirBsModal(tipo) {
             tipoBsActual = tipo;
             let titulos = { 'PAGO_MOVIL': 'Pago Móvil', 'TRANSF': 'Transferencia Nacional', 'PUNTO': 'Punto de Venta' };
-            document.getElementById('tituloModalBs').innerHTML = `<i class="fa-solid fa-credit-card text-purple-500 mr-2"></i> Carga ${titulos[tipo]}`;
+            document.getElementById('tituloModalBs').innerText = `Carga ${titulos[tipo]}`;
             document.getElementById('bsRef').value = '';
             document.getElementById('bsMonto').value = '0';
             document.getElementById('lblBsEqUSD').innerText = '$0.00';
@@ -657,14 +643,14 @@
                 let cxc = facturado - abonoAnt - pagoDia;
                 if(cxc < 0) cxc = 0;
 
-                movimientosMotos.push({ cliente, modelo, factura, facturado, abonoAnt, pagoDia, cxc, efec, zelle, binance, bsList: [...bsDataList] });
+                movimientosMotos.push({ cliente, modelo, factura, facturado, abonoAnt, pagoDia, cxc, efec, zelle, binance, zelleRef: zelleData.ref, zelleTitular: zelleData.titular, binRef: binanceData.ref, binRecibido: binanceData.recibido, bsList: [...bsDataList] });
                 renderMotos();
             } else {
                 let concepto = document.getElementById('regConceptoTaller').value || 'Servicio General';
                 let total = parseFloat(document.getElementById('regMontoTaller').value) || 0;
                 let medio = `Efec:$${efec} / Zel:$${zelle} / Bin:$${binance} / BsUSD:$${totalBsUSD.toFixed(2)}`;
 
-                movimientosTaller.push({ cliente, factura, concepto, medio, total, efec, zelle, binance, bsList: [...bsDataList] });
+                movimientosTaller.push({ cliente, factura, concepto, medio, total, efec, zelle, binance, zelleRef: zelleData.ref, zelleTitular: zelleData.titular, binRef: binanceData.ref, binRecibido: binanceData.recibido, bsList: [...bsDataList] });
                 renderTaller();
             }
 
@@ -710,7 +696,7 @@
         function renderTaller() {
             let tbody = document.getElementById('tablaTallerBody');
             if(movimientosTaller.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Espacio en blanco)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Se imprimirá en blanco si no aplica)</td></tr>`;
                 return;
             }
             tbody.innerHTML = '';
@@ -737,11 +723,11 @@
                 if(op.efec > 0) totalEfec += op.efec;
                 if(op.zelle > 0) {
                     totalZelle += op.zelle;
-                    zelleLines.push(`<p>${op.cliente} | Monto: $${op.zelle.toFixed(2)}</p>`);
+                    zelleLines.push(`<p>${op.cliente} | Ref: ${op.zelleRef} | Titular: ${op.zelleTitular} | Monto: $${op.zelle.toFixed(2)}</p>`);
                 }
                 if(op.binance > 0) {
                     totalBinance += op.binance;
-                    binanceLines.push(`<p>${op.cliente} | Monto: $${op.binance.toFixed(2)}</p>`);
+                    binanceLines.push(`<p>${op.cliente} | Ref TX: ${op.binRef} | Pagado: $${op.binance.toFixed(2)} | Recibido: $${(op.binRecibido || op.binance).toFixed(2)}</p>`);
                 }
                 if(op.bsList) {
                     op.bsList.forEach(bs => {
@@ -751,7 +737,7 @@
                 }
             });
 
-            document.getElementById('resumenEfectivoList').innerHTML = totalEfec > 0 ? `<p>Efectivo Recaudado en Arqueo</p>` : `<p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p>`;
+            document.getElementById('resumenEfectivoList').innerHTML = totalEfec > 0 ? `<p>Total Efectivo Recaudado por Arqueo: <strong>$${totalEfec.toFixed(2)}</strong></p>` : `<p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p>`;
             document.getElementById('resumenEfectivoTotal').innerText = `$${totalEfec.toFixed(2)}`;
 
             document.getElementById('resumenZelleList').innerHTML = zelleLines.length > 0 ? zelleLines.join('') : `<p class="italic text-slate-500">Sin pagos por Zelle registrados.</p>`;
@@ -819,18 +805,6 @@
             document.getElementById('lblTotalSegurosCard').innerText = `$${total.toFixed(2)}`;
         }
 
-        function calcularArqueo() {
-            let efec = (parseFloat(document.getElementById('b100').value || 0) * 100) +
-                       (parseFloat(document.getElementById('b50').value || 0) * 50) +
-                       (parseFloat(document.getElementById('b20').value || 0) * 20) +
-                       (parseFloat(document.getElementById('b10').value || 0) * 10) +
-                       (parseFloat(document.getElementById('b5').value || 0) * 5) +
-                       (parseFloat(document.getElementById('b1').value || 0) * 1);
-            document.getElementById('lblArqueoTotal').innerText = `$${efec.toFixed(2)}`;
-            let bs = parseFloat(document.getElementById('montoBs').value || 0);
-            document.getElementById('lblArqueoBsUSD').innerText = tasaBCV > 0 ? `$${(bs / tasaBCV).toFixed(2)}` : "$0.00";
-        }
-
         function reiniciarCierreDia() {
             let claveIngresada = prompt("Ingrese la clave gerencial (MotosHiram) para reiniciar el cierre:");
             let claveConfig = document.getElementById('txtClaveAdmin').value || 'MotosHiram';
@@ -857,7 +831,7 @@
                 return;
             }
 
-            // 1. Guardar de forma automática en Firebase
+            // 1. Guardar automáticamente en Firebase
             try {
                 let sucursal = document.getElementById('sucursalActiva').value;
                 let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
@@ -874,18 +848,24 @@
                 console.error("Error al guardar en Firebase:", e);
             }
 
-            // 2. Descargar PDF automáticamente
+            // 2. Descargar PDF automáticamente y limpiar pantalla
             let element = document.getElementById('areaPDF');
             let opt = {
                 margin:       [10, 10, 10, 10],
                 filename:     `Cierre_Diario_MotosHiram_${document.getElementById('sucursalActiva').value}_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617' },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                alert('¡Cierre guardado en la nube y PDF descargado con éxito!');
+                alert('¡Cierre consolidado, guardado en la nube y PDF descargado con éxito!');
+                // Reiniciar el cierre para un nuevo día
+                movimientosMotos = [];
+                movimientosTaller = [];
+                renderMotos();
+                renderTaller();
+                actualizarResumenFinanciero();
             });
         }
 
