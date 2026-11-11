@@ -57,10 +57,10 @@
                         <option value="CABIMAS">Cabimas</option>
                     </select>
                 </div>
-                <!-- CALENDARIO DE FECHA DE CIERRE -->
+                <!-- CALENDARIO DE FECHA DE CIERRE OPERATIVO -->
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-slate-300">
-                    <i class="fa-solid fa-calendar text-red-500"></i> Fecha:
-                    <input type="date" id="inputFechaCierre" onchange="actualizarFechaGlobal()" class="bg-slate-900 border border-slate-600 rounded p-1 text-white font-bold text-xs">
+                    <i class="fa-solid fa-calendar text-red-500"></i> Fecha Cierre:
+                    <input type="date" id="inputFechaCierre" onchange="actualizarFechaGlobal()" class="bg-slate-900 border border-slate-600 rounded p-1 text-white font-bold text-xs cursor-pointer">
                 </div>
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-amber-400">
                     <i class="fa-solid fa-coins"></i> Tasa: 
@@ -487,7 +487,7 @@
         function actualizarTasaGlobal() {
             tasaBCV = parseFloat(document.getElementById('txtTasaBCV').value) || 0;
             let fechaVal = document.getElementById('inputFechaCierre').value;
-            let fechaTexto = fechaVal ? new Date(fechaVal + 'T00:00:00').toLocaleDateString() : new Date().toLocaleDateString();
+            let fechaTexto = fechaVal ? new Date(fechaVal + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }) : new Date().toLocaleDateString();
             document.getElementById('lblFechaHoy').innerText = fechaTexto;
             document.getElementById('lblFechaPDF').innerText = fechaTexto;
             document.getElementById('lblTasaPDF').innerText = tasaBCV.toFixed(2);
@@ -528,7 +528,7 @@
             document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
             document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
             
-            // Limpiar inputs del modal
+            // Limpiar inputs del modal para que entren totalmente en blanco
             document.getElementById('regFactura').value = '';
             document.getElementById('regCliente').value = '';
             document.getElementById('regAbonoAnt').value = '0';
@@ -867,7 +867,7 @@
                 let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
                 await db.collection("cierres").add({
                     sucursal: sucursal,
-                    fecha: new Date().toLocaleString(),
+                    fecha: document.getElementById('inputFechaCierre').value,
                     tasa: tasaBCV,
                     totalFacturado: totF,
                     motos: movimientosMotos,
@@ -882,7 +882,7 @@
             let element = document.getElementById('areaPDF');
             let opt = {
                 margin:       [10, 10, 10, 10],
-                filename:     `Cierre_Diario_MotosHiram_${document.getElementById('sucursalActiva').value}_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+                filename:     `Cierre_Diario_MotosHiram_${document.getElementById('sucursalActiva').value}_${document.getElementById('inputFechaCierre').value}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
