@@ -24,21 +24,19 @@
         window.db = db;
     </script>
     <style>
-        /* DISEÑO EJECUTIVO DE ALTA GERENCIA PARA IMPRESIÓN Y PDF */
+        /* ESTILO EJECUTIVO PROFESIONAL DE ALTA GERENCIA PARA PDF E IMPRESIÓN */
         @media print {
-            body { background: #ffffff !important; color: #1e293b !important; font-family: Arial, Helvetica, sans-serif; font-size: 10px; line-height: 1.3; }
+            body { background: #ffffff !important; color: #0f172a !important; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; }
             .print\:hidden { display: none !important; }
             .page-break { page-break-before: always; }
-            main { background: #ffffff !important; color: #1e293b !important; padding: 0 !important; max-width: 100% !important; border: none !important; box-shadow: none !important; }
+            main { background: #ffffff !important; color: #0f172a !important; padding: 10px !important; margin: 0 !important; max-width: 100% !important; border: none !important; box-shadow: none !important; }
             
-            /* Tarjetas y contenedores limpios para PDF */
-            .exec-box { background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; padding: 10px !important; margin-bottom: 10px !important; box-shadow: none !important; }
-            .exec-header { background: #0f172a !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 12px 15px !important; border-radius: 6px !important; }
+            .exec-box { background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; padding: 8px !important; margin-bottom: 8px !important; box-shadow: none !important; }
+            .exec-header { background: #0f172a !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 10px 12px !important; border-radius: 4px !important; }
             
-            /* Tablas formales corporativas */
-            table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 10px; }
-            th, td { border: 1px solid #cbd5e1; padding: 5px 7px; text-align: left; color: #1e293b !important; }
-            th { background-color: #e2e8f0 !important; color: #0f172a !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            table { width: 100%; border-collapse: collapse; margin-top: 4px; margin-bottom: 6px; }
+            th, td { border: 1px solid #cbd5e1; padding: 4px 6px; text-align: left; color: #1e293b !important; font-size: 9px; }
+            th { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -274,7 +272,7 @@
         </div>
 
         <!-- 5. INVENTARIO AL CIERRE -->
-        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800 card-exec">
+        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800 exec-box">
             <h3 class="text-xs font-bold uppercase tracking-wide text-slate-200 border-b border-slate-800 pb-2"><i class="fa-solid fa-boxes-stacked text-red-500 mr-1.5"></i> 5. Inventario de Motos al Cierre</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs" id="inventarioContainer"></div>
             <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-2.5 rounded-lg border border-slate-800">
@@ -524,7 +522,7 @@
 
             if(adminEl) adminEl.innerText = personalSedes[sede].admin;
             if(gerenteEl) gerenteEl.innerText = personalSedes[sede].gerente;
-            if(reporteTitEl) reporteTitEl.innerText = `INFORME DE ESTADO DE CIERRE - ${sede}`;
+            if(reporteTitEl) reporteTitEl.innerText = `INFORME EJECUTIVO DE CIERRE - ${sede}`;
         }
 
         function iniciarModalRegistro(tipo) {
@@ -915,18 +913,18 @@
                 console.error("Error al guardar en Firebase:", e);
             }
 
-            // 2. Descargar PDF automáticamente en formato gerencial blanco
+            // 2. Descargar PDF automáticamente en formato gerencial ejecutivo de alta gama
             let element = document.getElementById('areaPDF');
             let opt = {
-                margin:       [10, 10, 10, 10],
-                filename:     `Cierre_Diario_MotosHiram_${document.getElementById('sucursalActiva').value}_${document.getElementById('inputFechaCierre').value}.pdf`,
+                margin:       [8, 8, 8, 8],
+                filename:     `Cierre_Gerencial_MotosHiram_${document.getElementById('sucursalActiva').value}_${document.getElementById('inputFechaCierre').value}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                alert('¡Cierre consolidado, guardado en la nube y PDF descargado con éxito!');
+                alert('¡Informe ejecutivo consolidado, guardado en la nube y PDF descargado con éxito!');
             });
         }
 
