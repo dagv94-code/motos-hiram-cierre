@@ -824,16 +824,18 @@
             }
         }
 
-        async function guardarCierreGlobal() {
+        async function totalizarYDescargarPDF() {
             actualizarTasaGlobal();
             if(tasaBCV <= 0) {
-                alert('Por favor, ingrese la Tasa del Día antes de sincronizar.');
+                alert('Atención: Debe ingresar la Tasa del Día antes de totalizar y generar el reporte PDF.');
                 return;
             }
             if(movimientosMotos.length === 0 && movimientosTaller.length === 0) {
-                alert('No hay transacciones para sincronizar.');
+                alert('Atención: No hay operaciones registradas para totalizar el cierre.');
                 return;
             }
+
+            // 1. Guardar de forma automática en Firebase
             try {
                 let sucursal = document.getElementById('sucursalActiva').value;
                 let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
@@ -846,66 +848,11 @@
                     taller: movimientosTaller,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert('¡Cierre sincronizado con éxito en Firebase para la sede ' + sucursal + '!');
             } catch(e) {
-                console.error(e);
-                alert('Error al sincronizar con la nube.');
-            }
-        }
-
-        async function cargarHistoricoNube() {
-            let tbody = document.getElementById('tablaHistoricoBody');
-            try {
-                let snap = await db.collection("cierres").orderBy("timestamp", "desc").get();
-                if(snap.empty) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No hay registros previos en la nube.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = '';
-                snap.forEach(doc => {
-                    let d = doc.data();
-                    tbody.innerHTML += `
-                        <tr class="border-b border-slate-800 hover:bg-slate-800/40">
-                            <td class="p-3">${d.fecha}</td>
-                            <td class="p-3 font-bold text-red-400">${d.sucursal}</td>
-                            <td class="p-3 font-bold text-emerald-400">$${(d.totalFacturado || 0).toFixed(2)}</td>
-                            <td class="p-3">${(d.motos?.length || 0) + (d.taller?.length || 0)} operaciones</td>
-                        </tr>
-                    `;
-                });
-            } catch(e) {
-                console.error(e);
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-400">Error cargando histórico.</td></tr>`;
-            }
-        }
-
-        async function totalizarYDescargarPDF() {
-            actualizarTasaGlobal();
-            if(tasaBCV <= 0) {
-                alert('Atención: Debe ingresar la Tasa del Día en la parte superior antes de totalizar y generar el reporte PDF.');
-                return;
-            }
-            
-            // 1. Sincronizar automáticamente a Firebase antes de descargar
-            if(movimientosMotos.length > 0 || movimientosTaller.length > 0) {
-                try {
-                    let sucursal = document.getElementById('sucursalActiva').value;
-                    let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
-                    await db.collection("cierres").add({
-                        sucursal: sucursal,
-                        fecha: new Date().toLocaleString(),
-                        tasa: tasaBCV,
-                        totalFacturado: totF,
-                        motos: movimientosMotos,
-                        taller: movimientosTaller,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch(e) {
-                    console.error("Error guardando en Firebase al totalizar:", e);
-                }
+                console.error("Error al guardar en Firebase:", e);
             }
 
-            // 2. Generar y descargar el PDF automáticamente con html2pdf
+            // 2. Descargar PDF automáticamente
             let element = document.getElementById('areaPDF');
             let opt = {
                 margin:       [10, 10, 10, 10],
@@ -916,7 +863,7 @@
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                alert('¡Cierre totalizado, guardado en la nube y PDF descargado con éxito!');
+                alert('¡Cierre guardado en la nube y PDF descargado con éxito!');
             });
         }
 
