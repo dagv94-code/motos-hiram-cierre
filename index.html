@@ -340,16 +340,16 @@
                     </div>
                 </div>
 
-                <!-- MEDIOS DE PAGO CON ARQUEO DE EFECTIVO -->
+                <!-- MEDIOS DE PAGO -->
                 <div class="border-t border-slate-800 pt-3 space-y-2">
                     <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Pago</h4>
                     <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <label class="text-xs text-slate-400 flex justify-between">Efectivo ($) <button type="button" onclick="abrirArqueoModal()" class="text-red-400 underline text-[10px]">Arqueo</button></label>
-                            <input type="number" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400" value="0" readonly>
+                            <label class="text-xs text-slate-400 block mb-1">Efectivo ($)</label>
+                            <input type="number" id="pagoEfec" onclick="abrirArqueoModal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400 cursor-pointer" value="0" readonly title="Haga clic para abrir el arqueo por denominaciones">
                         </div>
-                        <div><label class="text-xs text-slate-400">Zelle ($)</label><input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0"></div>
-                        <div><label class="text-xs text-slate-400">Binance/Tower ($)</label><input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0"></div>
+                        <div><label class="text-xs text-slate-400 block mb-1">Zelle ($)</label><input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0"></div>
+                        <div><label class="text-xs text-slate-400 block mb-1">Binance/Tower ($)</label><input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0"></div>
                     </div>
                 </div>
             </div>
@@ -360,22 +360,22 @@
         </div>
     </div>
 
-    <!-- MODAL SECUNDARIO DE ARQUEO DE EFECTIVO -->
+    <!-- MODAL DE ARQUEO DE EFECTIVO -->
     <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-60 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-white">
-            <h3 class="text-base font-bold border-b border-slate-800 pb-2">Arqueo Rápido de Efectivo ($)</h3>
+            <h3 class="text-base font-bold border-b border-slate-800 pb-2"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> Arqueo por Denominaciones ($)</h3>
             <div class="space-y-2 text-xs">
-                <div class="flex justify-between items-center"><span>Billetes $100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center"><span>Billetes $50</span><input type="number" id="arq50" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center"><span>Billetes $20</span><input type="number" id="arq20" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center"><span>Billetes $10 / $5 / $1</span><input type="number" id="arq10" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold"></div>
+                <div class="flex justify-between items-center"><span>Billetes $100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
+                <div class="flex justify-between items-center"><span>Billetes $50</span><input type="number" id="arq50" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
+                <div class="flex justify-between items-center"><span>Billetes $20</span><input type="number" id="arq20" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
+                <div class="flex justify-between items-center"><span>Billetes $10 / $5 / $1</span><input type="number" id="arq10" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
             </div>
             <div class="bg-slate-800 p-3 rounded-xl flex justify-between font-bold text-sm">
                 <span>Total Efectivo:</span>
                 <span id="lblArqTotal" class="text-emerald-400">$0.00</span>
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="cerrarArqueoModal()" class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold">Aceptar y Cargar</button>
+                <button onclick="cerrarArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow">Aceptar y Cargar</button>
             </div>
         </div>
     </div>
@@ -471,7 +471,7 @@
 
                 let pendienteRequerido = facturado - abonoAnt;
 
-                // VALIDACIÓN ESTRICTA: SI ES CONTADO, EL PAGO DEBE CUBRID EL TOTAL
+                // VALIDACIÓN ESTRICTA: SI ES CONTADO, EL PAGO DEBE CUBRIR EL TOTAL EXACTO
                 if(modalidad === 'CONTADO' && Math.abs(pagoDia - pendienteRequerido) > 0.01) {
                     alert(`Error: La modalidad es de CONTADO. El pago del día ($${pagoDia.toFixed(2)}) debe cubrir exactamente el monto pendiente de la factura ($${pendienteRequerido.toFixed(2)}). Si es pago parcial, seleccione Apartado o Motos Yes.`);
                     return;
@@ -498,6 +498,10 @@
             document.getElementById('pagoEfec').value = 0;
             document.getElementById('pagoZelle').value = 0;
             document.getElementById('pagoBinance').value = 0;
+            document.getElementById('arq100').value = 0;
+            document.getElementById('arq50').value = 0;
+            document.getElementById('arq20').value = 0;
+            document.getElementById('arq10').value = 0;
         }
 
         function renderMotos() {
