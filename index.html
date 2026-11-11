@@ -24,7 +24,7 @@
         window.db = db;
     </script>
     <style>
-        /* ESTILO GERENCIAL PROFESIONAL PARA PDF Y IMPRESIÓN */
+        /* ESTILO GERENCIAL PROFESIONAL PARA PDF Y IMPRESIÓN (FONDO BLANCO Y FORMAL) */
         @media print {
             body { background: #ffffff !important; color: #000000 !important; font-family: Arial, sans-serif; font-size: 11px; }
             .print\:hidden { display: none !important; }
@@ -120,13 +120,16 @@
 
         <!-- 1. TABLA DE MOTOS -->
         <div class="space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-motorcycle text-red-500 mr-1.5"></i> 1. Ventas y Abonos de Motocicletas</h3>
+            <div class="flex justify-between items-center flex-wrap gap-2">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-motorcycle text-red-500 mr-1.5"></i> 1. Ventas y Abonos de Motocicletas</h3>
+                    <label class="text-xs text-amber-400 flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" id="checkSinMotos" onchange="toggleSinMovimiento('motos')" class="rounded bg-slate-800 border-slate-700"> Sin Movimientos</label>
+                </div>
                 <button onclick="iniciarModalRegistro('MOTO')" class="bg-red-600 hover:bg-red-700 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1 print:hidden">
                     <i class="fa-solid fa-plus"></i> Cargar Venta Moto
                 </button>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" id="contenedorTablaMotos">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800 text-[10px]">
@@ -149,13 +152,16 @@
 
         <!-- 2. TABLA DE TALLER -->
         <div class="space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-1.5"></i> 2. Movimientos y Servicios de Taller</h3>
+            <div class="flex justify-between items-center flex-wrap gap-2">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-1.5"></i> 2. Movimientos y Servicios de Taller</h3>
+                    <label class="text-xs text-amber-400 flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" id="checkSinTaller" onchange="toggleSinMovimiento('taller')" class="rounded bg-slate-800 border-slate-700"> Sin Movimientos</label>
+                </div>
                 <button onclick="iniciarModalRegistro('TALLER')" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1 print:hidden">
                     <i class="fa-solid fa-plus"></i> Cargar Taller
                 </button>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" id="contenedorTablaTaller">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800 text-[10px]">
@@ -168,7 +174,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaTallerBody" class="divide-y divide-slate-800/60">
-                        <tr><td colspan="6" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Se imprimirá en blanco si no aplica)</td></tr>
+                        <tr><td colspan="6" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -176,16 +182,21 @@
 
         <!-- 3. PÓLIZAS SEGURO CARACAS -->
         <div class="space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-shield-cat text-red-500 mr-1.5"></i> 3. Pólizas Pendientes Seguros Caracas</h3>
+            <div class="flex justify-between items-center flex-wrap gap-2">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-shield-cat text-red-500 mr-1.5"></i> 3. Pólizas Pendientes Seguros Caracas</h3>
+                    <label class="text-xs text-amber-400 flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" id="checkSinSeguros" onchange="toggleSinMovimiento('seguros')" class="rounded bg-slate-800 border-slate-700"> 0 Pólizas</label>
+                </div>
                 <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-[11px] px-3 py-1 rounded font-bold border border-slate-700 print:hidden"><i class="fa-solid fa-plus mr-1"></i> Agregar Línea (+)</button>
             </div>
-            <div id="contenedorSeguros" class="space-y-2 text-xs">
-                <div class="grid grid-cols-4 gap-2 items-center bg-slate-900 p-2 rounded-lg border border-slate-800 linea-seguro">
-                    <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-cant font-bold text-xs" value="1" oninput="calcularSeguros()"></div>
-                    <div><label class="text-[10px] text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-precio font-bold text-xs" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
-                    <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 seg-sub text-xs">$0.00</p></div>
-                    <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+            <div id="contenedorSegurosArea" class="space-y-2">
+                <div id="contenedorSeguros" class="space-y-2 text-xs">
+                    <div class="grid grid-cols-4 gap-2 items-center bg-slate-900 p-2 rounded-lg border border-slate-800 linea-seguro">
+                        <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-cant font-bold text-xs" value="1" oninput="calcularSeguros()"></div>
+                        <div><label class="text-[10px] text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-precio font-bold text-xs" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
+                        <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 seg-sub text-xs">$0.00</p></div>
+                        <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+                    </div>
                 </div>
             </div>
             <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-2.5 rounded-lg border border-slate-800">
@@ -398,7 +409,7 @@
         </div>
     </div>
 
-    <!-- MODALES DE PAGOS (ARQUEO, ZELLE, BINANCE, BS) -->
+    <!-- MODALES DE PAGOS -->
     <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white">
             <h3 class="text-sm font-bold border-b border-slate-800 pb-2">Arqueo por Denominaciones ($)</h3>
@@ -511,6 +522,12 @@
             document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
             document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
             
+            // Limpiar inputs del modal para que entren en blanco
+            document.getElementById('regFactura').value = '';
+            document.getElementById('regCliente').value = '';
+            document.getElementById('regAbonoAnt').value = '0';
+            document.getElementById('regMontoTaller').value = '0';
+
             efectivoCalculado = 0;
             zelleData = { monto: 0, ref: '', titular: '' };
             binanceData = { monto: 0, recibido: 0, ref: '' };
@@ -656,14 +673,36 @@
 
             actualizarResumenFinanciero();
             cerrarModal();
-            document.getElementById('regCliente').value = '';
-            document.getElementById('regFactura').value = '';
+        }
+
+        function toggleSinMovimiento(seccion) {
+            if(seccion === 'motos') {
+                let chk = document.getElementById('checkSinMotos').checked;
+                document.getElementById('contenedorTablaMotos').style.display = chk ? 'none' : 'block';
+                if(chk) movimientosMotos = [];
+                renderMotos();
+            } else if(seccion === 'taller') {
+                let chk = document.getElementById('checkSinTaller').checked;
+                document.getElementById('contenedorTablaTaller').style.display = chk ? 'none' : 'block';
+                if(chk) movimientosTaller = [];
+                renderTaller();
+            } else if(seccion === 'seguros') {
+                let chk = document.getElementById('checkSinSeguros').checked;
+                document.getElementById('contenedorSegurosArea').style.display = chk ? 'none' : 'block';
+                if(chk) {
+                    document.getElementById('lblTotalSeguroCaracas').innerText = '$0.00';
+                    document.getElementById('lblTotalSegurosCard').innerText = '$0.00';
+                } else {
+                    calcularSeguros();
+                }
+            }
+            actualizarResumenFinanciero();
         }
 
         function renderMotos() {
             let tbody = document.getElementById('tablaMotosBody');
             if(movimientosMotos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
                 document.getElementById('lblTotalFacturado').innerText = '$0.00';
                 document.getElementById('lblTotalAbonos').innerText = '$0.00';
                 document.getElementById('lblTotalCXC').innerText = '$0.00';
@@ -696,7 +735,7 @@
         function renderTaller() {
             let tbody = document.getElementById('tablaTallerBody');
             if(movimientosTaller.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Se imprimirá en blanco si no aplica)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
                 return;
             }
             tbody.innerHTML = '';
@@ -794,61 +833,27 @@
 
         function calcularSeguros() {
             let total = 0;
-            document.querySelectorAll('.linea-seguro').forEach(l => {
-                let c = parseFloat(l.querySelector('.seg-cant').value || 0);
-                let p = parseFloat(l.querySelector('.seg-precio').value || 0);
-                let sub = c * p;
-                l.querySelector('.seg-sub').innerText = `$${sub.toFixed(2)}`;
-                total += sub;
-            });
+            if(!document.getElementById('checkSinSeguros').checked) {
+                document.querySelectorAll('.linea-seguro').forEach(l => {
+                    let c = parseFloat(l.querySelector('.seg-cant').value || 0);
+                    let p = parseFloat(l.querySelector('.seg-precio').value || 0);
+                    let sub = c * p;
+                    l.querySelector('.seg-sub').innerText = `$${sub.toFixed(2)}`;
+                    total += sub;
+                });
+            }
             document.getElementById('lblTotalSeguroCaracas').innerText = `$${total.toFixed(2)}`;
             document.getElementById('lblTotalSegurosCard').innerText = `$${total.toFixed(2)}`;
         }
 
-        function reiniciarCierreDia() {
-            let claveIngresada = prompt("Ingrese la clave gerencial (MotosHiram) para reiniciar el cierre:");
-            let claveConfig = document.getElementById('txtClaveAdmin').value || 'MotosHiram';
-            if(claveIngresada === claveConfig) {
-                movimientosMotos = [];
-                movimientosTaller = [];
-                renderMotos();
-                renderTaller();
-                actualizarResumenFinanciero();
-                alert('Cierre reiniciado.');
-            } else if(claveIngresada !== null) {
-                alert('Clave incorrecta.');
-            }
-        }
-
-        async function totalizarYDescargarPDF() {
+        function totalizarYDescargarPDF() {
             actualizarTasaGlobal();
             if(tasaBCV <= 0) {
                 alert('Atención: Debe ingresar la Tasa del Día antes de totalizar y generar el reporte PDF.');
                 return;
             }
-            if(movimientosMotos.length === 0 && movimientosTaller.length === 0) {
-                alert('Atención: No hay operaciones registradas para totalizar el cierre.');
-                return;
-            }
 
-            // 1. Guardar automáticamente en Firebase
-            try {
-                let sucursal = document.getElementById('sucursalActiva').value;
-                let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
-                await db.collection("cierres").add({
-                    sucursal: sucursal,
-                    fecha: new Date().toLocaleString(),
-                    tasa: tasaBCV,
-                    totalFacturado: totF,
-                    motos: movimientosMotos,
-                    taller: movimientosTaller,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch(e) {
-                console.error("Error al guardar en Firebase:", e);
-            }
-
-            // 2. Descargar PDF automáticamente y limpiar pantalla
+            // Descargar PDF automáticamente en formato corporativo gerencial blanco
             let element = document.getElementById('areaPDF');
             let opt = {
                 margin:       [10, 10, 10, 10],
@@ -859,13 +864,7 @@
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                alert('¡Cierre consolidado, guardado en la nube y PDF descargado con éxito!');
-                // Reiniciar el cierre para un nuevo día
-                movimientosMotos = [];
-                movimientosTaller = [];
-                renderMotos();
-                renderTaller();
-                actualizarResumenFinanciero();
+                alert('¡Cierre consolidado y PDF gerencial descargado con éxito!');
             });
         }
 
