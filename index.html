@@ -48,13 +48,13 @@
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-slate-300">
                     <i class="fa-solid fa-calendar text-red-500 mr-1"></i> Miércoles, 11 de nov. de 2026
                 </div>
-                <!-- TASA LIBRE Y MANUAL -->
+                <!-- TASA EN BLANCO Y MANUAL -->
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-amber-400">
                     <i class="fa-solid fa-coins"></i> Tasa: 
                     <input type="number" id="txtTasaBCV" value="" placeholder="Ej. 997.92" oninput="actualizarTasaGlobal()" class="w-20 bg-slate-900 border border-amber-500 rounded p-1 text-center font-bold text-white text-xs"> Bs/$
                 </div>
-                <button onclick="guardarCierreGlobal()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Nube
+                <button onclick="totalizarYDescargarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-pdf"></i> Totalizar y Descargar PDF
                 </button>
             </div>
         </div>
@@ -65,30 +65,28 @@
         <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto text-sm">
             <button onclick="cambiarPestana('cierre')" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
             <button onclick="cambiarPestana('arqueo')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-vault"></i> Arqueo & Divisas</button>
-            <button onclick="cambiarPestana('seguros')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Seguro Caracas</button>
-            <button onclick="cambiarPestana('inventario')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-boxes-stacked"></i> Inventario Motos</button>
             <button onclick="cambiarPestana('historico')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Histórico Nube</button>
             <button onclick="cambiarPestana('config')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-gear"></i> Configuración</button>
         </div>
     </nav>
 
-    <!-- CONTENIDO -->
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <!-- CONTENIDO PRINCIPAL IMPRIMIBLE -->
+    <main id="areaImpresion" class="max-w-7xl mx-auto px-4 py-6 space-y-6 bg-slate-950">
 
         <!-- 1. CIERRE DIARIO -->
         <section id="seccion-cierre" class="space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex justify-between items-center flex-wrap gap-4 print:hidden">
                 <div>
-                    <h2 class="text-lg font-bold text-white">Cierre Diario Activo</h2>
+                    <h2 class="text-lg font-bold text-white">Cierre Diario Activo[cite: 12]</h2>
                     <p class="text-xs text-slate-400" id="txtSedeInfo">Sede: Maracaibo (Principal) • Adm: Jennmary Parra • Gerente: Lic. David García[cite: 12]</p>
                 </div>
-                <button onclick="generarReportePDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-2 text-sm">
-                    <i class="fa-solid fa-print"></i> Totalizar y Generar PDF[cite: 12]
+                <button onclick="guardarCierreGlobal()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-2 text-sm border border-slate-700">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar con Firebase[cite: 12]
                 </button>
             </div>
 
             <!-- TARJETAS -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 print:grid-cols-2">
                 <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
                     <p class="text-xs font-bold text-slate-400 uppercase">Total Facturado</p>
                     <p class="text-2xl font-black text-white" id="lblTotalFacturado">$0.00</p>
@@ -163,6 +161,36 @@
                 </div>
             </div>
 
+            <!-- PÓLIZAS PENDIENTES SEGURO CARACAS (EN PANTALLA PRINCIPAL ANTES DE TOTALIZAR) -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="text-base font-bold text-white"><i class="fa-solid fa-shield-cat text-red-500 mr-2"></i> Pólizas Pendientes Seguros Caracas[cite: 12]</h3>
+                    <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold border border-slate-700 print:hidden"><i class="fa-solid fa-plus mr-1"></i> Agregar Línea (+)</button>
+                </div>
+                <div id="contenedorSeguros" class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
+                        <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
+                        <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="" placeholder="Ej. 10 o 15" oninput="calcularSeguros()"></div>
+                        <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$0.00</p></div>
+                        <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+                    </div>
+                </div>
+                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center font-black text-base">
+                    <span class="text-slate-200">Total Pólizas Seguro Caracas:</span>
+                    <span id="lblTotalSeguroCaracas" class="text-white">$0.00</span>
+                </div>
+            </div>
+
+            <!-- INVENTARIO DE MOTOS AL CIERRE -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+                <h3 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-boxes-stacked text-red-500 mr-2"></i> Inventario de Motos al Cierre (Confirmación Diaria)[cite: 12]</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3" id="inventarioContainer"></div>
+                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center font-black text-base">
+                    <span class="text-slate-200">Total Unidades en Existencia:</span>
+                    <span id="lblTotalInventario" class="text-emerald-400">0</span>
+                </div>
+            </div>
+
             <!-- FIRMAS -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
                 <div class="text-center space-y-3">
@@ -215,37 +243,7 @@
             </div>
         </section>
 
-        <!-- 3. SEGUROS -->
-        <section id="seccion-seguros" class="hidden space-y-6">
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-3xl mx-auto space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-shield-cat text-red-500 mr-2"></i> Pólizas Pendientes con Seguro Caracas[cite: 12]</h2>
-                    <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-2 rounded-xl font-bold border border-slate-700">Agregar Línea</button>
-                </div>
-                <div id="contenedorSeguros" class="space-y-3">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
-                        <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
-                        <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="17.40" oninput="calcularSeguros()"></div>
-                        <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$17.40</p></div>
-                        <div class="text-right"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
-                    </div>
-                </div>
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center font-black text-lg">
-                    <span class="text-slate-200">Total Pólizas Seguro Caracas:</span>
-                    <span id="lblTotalSeguroCaracas" class="text-white">$17.40</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. INVENTARIO -->
-        <section id="seccion-inventario" class="hidden space-y-6">
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-4xl mx-auto space-y-4">
-                <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-boxes-stacked text-red-500 mr-2"></i> Inventario de Motos al Cierre[cite: 12]</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="inventarioContainer"></div>
-            </div>
-        </section>
-
-        <!-- 5. HISTÓRICO -->
+        <!-- 3. HISTÓRICO -->
         <section id="seccion-historico" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
                 <h2 class="text-xl font-bold text-white mb-4">Cierres Históricos Sincronizados (Maracaibo y Cabimas)[cite: 12]</h2>
@@ -267,7 +265,7 @@
             </div>
         </section>
 
-        <!-- 6. CONFIGURACIÓN -->
+        <!-- 4. CONFIGURACIÓN -->
         <section id="seccion-config" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-xl space-y-4">
                 <h2 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Configuración y Seguridad[cite: 12]</h2>
@@ -340,12 +338,11 @@
                     </div>
                 </div>
 
-                <!-- MEDIOS DE PAGO (BOTONES FLOTANTES PARA ZELLE, BINANCE, BS) -->
+                <!-- MEDIOS DE PAGO -->
                 <div class="border-t border-slate-800 pt-3 space-y-3">
                     <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Medios de Pago[cite: 12]</h4>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        <!-- EFECTIVO CON ARQUEO -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Divisas Efectivo ($)</label>
                             <div class="flex gap-1">
@@ -353,7 +350,6 @@
                                 <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap"><i class="fa-solid fa-vault"></i> Arqueo[cite: 12]</button>
                             </div>
                         </div>
-                        <!-- ZELLE FLOTANTE -->
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Zelle ($)</label>
                             <div class="flex gap-1">
@@ -361,7 +357,6 @@
                                 <button type="button" onclick="abrirZelleModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap"><i class="fa-solid fa-bolt"></i> Zelle[cite: 12]</button>
                             </div>
                         </div>
-                        <!-- BINANCE FLOTANTE -->
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Binance / Tower ($)</label>
                             <div class="flex gap-1">
@@ -372,7 +367,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2 border-t border-slate-800/60">
-                        <!-- PAGO MÓVIL FLOTANTE -->
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Pago Móvil (Bs.)</label>
                             <div class="flex gap-1">
@@ -380,7 +374,6 @@
                                 <button type="button" onclick="abrirBsModal('PAGO_MOVIL')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap">Cargar Bs[cite: 12]</button>
                             </div>
                         </div>
-                        <!-- TRANSFERENCIA NACIONAL FLOTANTE -->
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Transf. Nacional (Bs.)</label>
                             <div class="flex gap-1">
@@ -388,7 +381,6 @@
                                 <button type="button" onclick="abrirBsModal('TRANSF')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap">Cargar Bs[cite: 12]</button>
                             </div>
                         </div>
-                        <!-- PUNTO DE VENTA FLOTANTE -->
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Punto de Venta (Bs.)</label>
                             <div class="flex gap-1">
@@ -406,7 +398,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE ARQUEO DE EFECTIVO ($1, $5, $10, $20, $50, $100) -->
+    <!-- MODAL DE ARQUEO DE EFECTIVO -->
     <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -449,7 +441,7 @@
         </div>
     </div>
 
-    <!-- MODAL FLOTANTE BINANCE / TOWERBANK -->
+    <!-- MODAL FLOTANTE BINANCE -->
     <div id="modalBinance" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -467,7 +459,7 @@
         </div>
     </div>
 
-    <!-- MODAL FLOTANTE BOLÍVARES (PAGO MÓVIL, TRANSF, PUNTO) -->
+    <!-- MODAL FLOTANTE BS -->
     <div id="modalBs" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -497,7 +489,7 @@
         let efectivoCalculado = 0;
         let zelleData = { monto: 0, ref: '', titular: '' };
         let binanceData = { monto: 0, recibido: 0, ref: '' };
-        let bsData = { tipo: '', montoBs: 0, ref: '', usd: 0 };
+        let bsDataList = [];
         
         let inventario = {
             "BOXER CT100": 3,
@@ -517,7 +509,6 @@
 
         function actualizarTasaGlobal() {
             tasaBCV = parseFloat(document.getElementById('txtTasaBCV').value) || 0;
-            document.getElementById('lblTasaHeader').innerText = tasaBCV > 0 ? tasaBCV : "0.00";
         }
 
         function cambiarPestana(p) {
@@ -529,7 +520,6 @@
             document.getElementById(`seccion-${p}`).classList.remove('hidden');
             event.currentTarget.classList.add('text-red-500', 'border-red-500', 'font-bold');
             event.currentTarget.classList.remove('text-slate-400', 'border-transparent', 'font-semibold');
-            if(p === 'inventario') renderInventario();
             if(p === 'historico') cargarHistoricoNube();
         }
 
@@ -554,7 +544,7 @@
             efectivoCalculado = 0;
             zelleData = { monto: 0, ref: '', titular: '' };
             binanceData = { monto: 0, recibido: 0, ref: '' };
-            bsData = { tipo: '', montoBs: 0, ref: '', usd: 0 };
+            bsDataList = [];
 
             document.getElementById('pagoEfec').value = "$0.00";
             document.getElementById('pagoZelleDisp').value = "$0.00";
@@ -639,7 +629,9 @@
             let bs = parseFloat(document.getElementById('bsMonto').value || 0);
             let ref = document.getElementById('bsRef').value || '';
             let usd = tasaBCV > 0 ? (bs / tasaBCV) : 0;
-            bsData = { tipo: tipoBsActual, montoBs: bs, ref, usd };
+            
+            bsDataList = bsDataList.filter(item => item.tipo !== tipoBsActual);
+            bsDataList.push({ tipo: tipoBsActual, montoBs: bs, ref, usd });
             
             if(tipoBsActual === 'PAGO_MOVIL') document.getElementById('pagoMovilDisp').value = `${bs} Bs.`;
             if(tipoBsActual === 'TRANSF') document.getElementById('pagoTransfDisp').value = `${bs} Bs.`;
@@ -660,9 +652,9 @@
             let efec = efectivoCalculado;
             let zelle = zelleData.monto;
             let binance = binanceData.monto;
-            let bsUSD = bsData.usd;
+            let totalBsUSD = bsDataList.reduce((acc, item) => acc + item.usd, 0);
             
-            let pagoDia = efec + zelle + binance + bsUSD;
+            let pagoDia = efec + zelle + binance + totalBsUSD;
 
             if(tipoActual === 'MOTO') {
                 let mData = document.getElementById('regModeloMoto').value.split('|');
@@ -682,12 +674,11 @@
                 if(cxc < 0) cxc = 0;
 
                 movimientosMotos.push({ cliente, modelo, factura, facturado, abonoAnt, pagoDia, cxc });
-                if(inventario[modelo] > 0) inventario[modelo]--;
                 renderMotos();
             } else {
                 let concepto = document.getElementById('regConceptoTaller').value || 'Servicio General';
                 let total = parseFloat(document.getElementById('regMontoTaller').value) || 0;
-                let medio = `Efec:$${efec} / Zel:$${zelle} / Bin:$${binance} / BsUSD:$${bsUSD.toFixed(2)}`;
+                let medio = `Efec:$${efec} / Zel:$${zelle} / Bin:$${binance} / BsUSD:$${totalBsUSD.toFixed(2)}`;
 
                 movimientosTaller.push({ cliente, factura, concepto, medio, total });
                 renderTaller();
@@ -767,35 +758,31 @@
         function renderInventario() {
             let container = document.getElementById('inventarioContainer');
             container.innerHTML = '';
+            let totalUnidades = 0;
             for (let [mod, cant] of Object.entries(inventario)) {
+                totalUnidades += cant;
                 container.innerHTML += `
-                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center">
+                    <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 flex justify-between items-center">
                         <span class="text-xs font-bold text-slate-200">${mod}</span>
-                        <input type="number" value="${cant}" onchange="inventario['${mod}'] = parseInt(this.value)" class="w-20 bg-slate-900 border border-slate-600 rounded-lg p-1 text-center font-bold text-sm text-white">
+                        <input type="number" value="${cant}" onchange="actualizarInventario('${mod}', this.value)" class="w-16 bg-slate-900 border border-slate-600 rounded-lg p-1 text-center font-bold text-sm text-white">
                     </div>
                 `;
             }
+            document.getElementById('lblTotalInventario').innerText = totalUnidades;
         }
 
-        function calcularArqueo() {
-            let efec = (parseFloat(document.getElementById('b100').value || 0) * 100) +
-                       (parseFloat(document.getElementById('b50').value || 0) * 50) +
-                       (parseFloat(document.getElementById('b20').value || 0) * 20) +
-                       (parseFloat(document.getElementById('b10').value || 0) * 10) +
-                       (parseFloat(document.getElementById('b5').value || 0) * 5) +
-                       (parseFloat(document.getElementById('b1').value || 0) * 1);
-            document.getElementById('lblArqueoTotal').innerText = `$${efec.toFixed(2)}`;
-            let bs = parseFloat(document.getElementById('montoBs').value || 0);
-            document.getElementById('lblArqueoBsUSD').innerText = tasaBCV > 0 ? `$${(bs / tasaBCV).toFixed(2)}` : "$0.00";
+        function actualizarInventario(mod, val) {
+            inventario[mod] = parseInt(val) || 0;
+            renderInventario();
         }
 
         function agregarLineaSeguro() {
             let html = `
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
                     <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="17.40" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$17.40</p></div>
-                    <div class="text-right"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+                    <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="" placeholder="Ej. 10 o 15" oninput="calcularSeguros()"></div>
+                    <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$0.00</p></div>
+                    <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
                 </div>
             `;
             document.getElementById('contenedorSeguros').insertAdjacentHTML('beforeend', html);
@@ -815,8 +802,16 @@
             document.getElementById('lblTotalSegurosCard').innerText = `$${total.toFixed(2)}`;
         }
 
-        function guardarConfiguracion() {
-            alert('Configuración guardada exitosamente.');
+        function calcularArqueo() {
+            let efec = (parseFloat(document.getElementById('b100').value || 0) * 100) +
+                       (parseFloat(document.getElementById('b50').value || 0) * 50) +
+                       (parseFloat(document.getElementById('b20').value || 0) * 20) +
+                       (parseFloat(document.getElementById('b10').value || 0) * 10) +
+                       (parseFloat(document.getElementById('b5').value || 0) * 5) +
+                       (parseFloat(document.getElementById('b1').value || 0) * 1);
+            document.getElementById('lblArqueoTotal').innerText = `$${efec.toFixed(2)}`;
+            let bs = parseFloat(document.getElementById('montoBs').value || 0);
+            document.getElementById('lblArqueoBsUSD').innerText = tasaBCV > 0 ? `$${(bs / tasaBCV).toFixed(2)}` : "$0.00";
         }
 
         function reiniciarCierreDia() {
@@ -834,6 +829,11 @@
         }
 
         async function guardarCierreGlobal() {
+            actualizarTasaGlobal();
+            if(tasaBCV <= 0) {
+                alert('Por favor, ingrese la Tasa del Día antes de sincronizar.');
+                return;
+            }
             if(movimientosMotos.length === 0 && movimientosTaller.length === 0) {
                 alert('No hay transacciones para sincronizar.');
                 return;
@@ -883,8 +883,16 @@
             }
         }
 
-        function generarReportePDF() { window.print(); }
-        window.onload = () => { renderInventario(); };
+        function totalizarYDescargarPDF() {
+            actualizarTasaGlobal();
+            if(tasaBCV <= 0) {
+                alert('Atención: Debe ingresar la Tasa del Día antes de totalizar y generar el reporte PDF.');
+                return;
+            }
+            window.print();
+        }
+
+        window.onload = () => { renderInventario(); calcularSeguros(); };
     </script>
 </body>
 </html>
