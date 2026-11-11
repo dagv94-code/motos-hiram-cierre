@@ -346,7 +346,7 @@
                     <div class="grid grid-cols-3 gap-2">
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Efectivo ($)</label>
-                            <input type="number" id="pagoEfec" onclick="abrirArqueoModal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400 cursor-pointer" value="0" readonly title="Haga clic para abrir el arqueo por denominaciones">
+                            <input type="text" id="pagoEfec" onclick="abrirArqueoModal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400 cursor-pointer text-center" value="$0.00" readonly title="Haga clic para abrir el arqueo por denominaciones">
                         </div>
                         <div><label class="text-xs text-slate-400 block mb-1">Zelle ($)</label><input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0"></div>
                         <div><label class="text-xs text-slate-400 block mb-1">Binance/Tower ($)</label><input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0"></div>
@@ -386,6 +386,7 @@
         let movimientosMotos = [];
         let movimientosTaller = [];
         let tasaBCV = 997.92;
+        let efectivoCalculado = 0;
         let inventario = {
             "BOXER CT100": 3,
             "BOXER BM150": 3,
@@ -427,6 +428,10 @@
             document.getElementById('modalTitulo').innerText = tipo === 'MOTO' ? 'Registrar Venta de Motocicleta o Abono' : 'Registrar Servicio de Taller';
             document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
             document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
+            efectivoCalculado = 0;
+            document.getElementById('pagoEfec').value = "$0.00";
+            document.getElementById('pagoZelle').value = 0;
+            document.getElementById('pagoBinance').value = 0;
             document.getElementById('modalRegistro').classList.remove('hidden');
         }
 
@@ -438,7 +443,8 @@
                     (parseFloat(document.getElementById('arq50').value || 0) * 50) +
                     (parseFloat(document.getElementById('arq20').value || 0) * 20) +
                     (parseFloat(document.getElementById('arq10').value || 0) * 10);
-            document.getElementById('pagoEfec').value = t;
+            efectivoCalculado = t;
+            document.getElementById('pagoEfec').value = `$${t.toFixed(2)}`;
             document.getElementById('modalArqueo').classList.add('hidden');
         }
         function calcularArqueoModal() {
@@ -457,7 +463,7 @@
         function procesarRegistro() {
             let cliente = document.getElementById('regCliente').value || 'Cliente General';
             let factura = document.getElementById('regFactura').value || 'S/N';
-            let efec = parseFloat(document.getElementById('pagoEfec').value || 0);
+            let efec = efectivoCalculado;
             let zelle = parseFloat(document.getElementById('pagoZelle').value || 0);
             let binance = parseFloat(document.getElementById('pagoBinance').value || 0);
             let pagoDia = efec + zelle + binance;
@@ -495,9 +501,6 @@
             cerrarModal();
             document.getElementById('regCliente').value = '';
             document.getElementById('regFactura').value = '';
-            document.getElementById('pagoEfec').value = 0;
-            document.getElementById('pagoZelle').value = 0;
-            document.getElementById('pagoBinance').value = 0;
             document.getElementById('arq100').value = 0;
             document.getElementById('arq50').value = 0;
             document.getElementById('arq20').value = 0;
