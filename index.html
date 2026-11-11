@@ -485,12 +485,20 @@
         };
 
         function actualizarValoresGlobales() {
-            tasaBCV = parseFloat(document.getElementById('txtTasaBCV').value) || 0;
-            let fechaVal = document.getElementById('inputFechaCierre').value;
+            let tasaInput = document.getElementById('txtTasaBCV');
+            tasaBCV = tasaInput ? parseFloat(tasaInput.value) || 0 : 0;
+            
+            let fechaEl = document.getElementById('inputFechaCierre');
+            let fechaVal = fechaEl ? fechaEl.value : '';
             let fechaTexto = fechaVal ? new Date(fechaVal + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }) : new Date().toLocaleDateString();
-            document.getElementById('lblFechaHoy').innerText = fechaTexto;
-            document.getElementById('lblFechaPDF').innerText = fechaTexto;
-            document.getElementById('lblTasaPDF').innerText = tasaBCV.toFixed(2);
+            
+            let lblFechaHoy = document.getElementById('lblFechaHoy');
+            let lblFechaPDF = document.getElementById('lblFechaPDF');
+            let lblTasaPDF = document.getElementById('lblTasaPDF');
+
+            if(lblFechaHoy) lblFechaHoy.innerText = fechaTexto;
+            if(lblFechaPDF) lblFechaPDF.innerText = fechaTexto;
+            if(lblTasaPDF) lblTasaPDF.innerText = tasaBCV.toFixed(2);
         }
 
         function cambiarPestana(p) {
@@ -499,9 +507,12 @@
                 b.classList.remove('text-red-500', 'border-red-500', 'font-bold');
                 b.classList.add('text-slate-400', 'border-transparent', 'font-semibold');
             });
-            document.getElementById(`seccion-${p}`).classList.remove('hidden');
-            event.currentTarget.classList.add('text-red-500', 'border-red-500', 'font-bold');
-            event.currentTarget.classList.remove('text-slate-400', 'border-transparent', 'font-semibold');
+            let sec = document.getElementById(`seccion-${p}`);
+            if(sec) sec.classList.remove('hidden');
+            if(event && event.currentTarget) {
+                event.currentTarget.classList.add('text-red-500', 'border-red-500', 'font-bold');
+                event.currentTarget.classList.remove('text-slate-400', 'border-transparent', 'font-semibold');
+            }
             if(p === 'historico') cargarHistoricoNube();
         }
 
@@ -524,7 +535,6 @@
             document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
             document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
             
-            // Limpiar inputs
             document.getElementById('regFactura').value = '';
             document.getElementById('regCliente').value = '';
             document.getElementById('regAbonoAnt').value = '0';
@@ -702,6 +712,7 @@
 
         function renderMotos() {
             let tbody = document.getElementById('tablaMotosBody');
+            if(!tbody) return;
             if(movimientosMotos.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
                 document.getElementById('lblTotalFacturado').innerText = '$0.00';
@@ -737,6 +748,7 @@
 
         function renderTaller() {
             let tbody = document.getElementById('tablaTallerBody');
+            if(!tbody) return;
             if(movimientosTaller.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
                 actualizarResumenFinanciero();
@@ -781,25 +793,36 @@
                 }
             });
 
-            document.getElementById('resumenEfectivoList').innerHTML = totalEfec > 0 ? `<p>Total Efectivo Recaudado por Arqueo: <strong>$${totalEfec.toFixed(2)}</strong></p>` : `<p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p>`;
-            document.getElementById('resumenEfectivoTotal').innerText = `$${totalEfec.toFixed(2)}`;
+            let efecListEl = document.getElementById('resumenEfectivoList');
+            let efecTotEl = document.getElementById('resumenEfectivoTotal');
+            if(efecListEl) efecListEl.innerHTML = totalEfec > 0 ? `<p>Total Efectivo Recaudado por Arqueo: <strong>$${totalEfec.toFixed(2)}</strong></p>` : `<p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p>`;
+            if(efecTotEl) efecTotEl.innerText = `$${totalEfec.toFixed(2)}`;
 
-            document.getElementById('resumenZelleList').innerHTML = zelleLines.length > 0 ? zelleLines.join('') : `<p class="italic text-slate-500">Sin pagos por Zelle registrados.</p>`;
-            document.getElementById('resumenZelleTotal').innerText = `$${totalZelle.toFixed(2)}`;
+            let zelleListEl = document.getElementById('resumenZelleList');
+            let zelleTotEl = document.getElementById('resumenZelleTotal');
+            if(zelleListEl) zelleListEl.innerHTML = zelleLines.length > 0 ? zelleLines.join('') : `<p class="italic text-slate-500">Sin pagos por Zelle registrados.</p>`;
+            if(zelleTotEl) zelleTotEl.innerText = `$${totalZelle.toFixed(2)}`;
 
-            document.getElementById('resumenBinanceList').innerHTML = binanceLines.length > 0 ? binanceLines.join('') : `<p class="italic text-slate-500">Sin pagos por Binance registrados.</p>`;
-            document.getElementById('resumenBinanceTotal').innerText = `$${totalBinance.toFixed(2)}`;
+            let binListEl = document.getElementById('resumenBinanceList');
+            let binTotEl = document.getElementById('resumenBinanceTotal');
+            if(binListEl) binListEl.innerHTML = binanceLines.length > 0 ? binanceLines.join('') : `<p class="italic text-slate-500">Sin pagos por Binance registrados.</p>`;
+            if(binTotEl) binTotEl.innerText = `$${totalBinance.toFixed(2)}`;
 
-            document.getElementById('resumenBsList').innerHTML = bsLines.length > 0 ? bsLines.join('') : `<p class="italic text-slate-500">Sin pagos en Bolívares registrados.</p>`;
-            document.getElementById('resumenBsTotal').innerText = `$${totalBs.toFixed(2)}`;
+            let bsListEl = document.getElementById('resumenBsList');
+            let bsTotEl = document.getElementById('resumenBsTotal');
+            if(bsListEl) bsListEl.innerHTML = bsLines.length > 0 ? bsLines.join('') : `<p class="italic text-slate-500">Sin pagos en Bolívares registrados.</p>`;
+            if(bsTotEl) bsTotEl.innerText = `$${totalBs.toFixed(2)}`;
 
             let totalIngresos = totalEfec + totalZelle + totalBinance + totalBs;
             let totalVentas = movimientosMotos.reduce((a,b) => a + b.pagoDia, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
             let diferencia = totalIngresos - totalVentas;
 
-            document.getElementById('cuadreIngresos').innerText = `$${totalIngresos.toFixed(2)}`;
-            document.getElementById('cuadreVentas').innerText = `$${totalVentas.toFixed(2)}`;
-            document.getElementById('cuadreDiferencia').innerText = `$${diferencia.toFixed(2)}`;
+            let cIng = document.getElementById('cuadreIngresos');
+            let cVen = document.getElementById('cuadreVentas');
+            let cDif = document.getElementById('cuadreDiferencia');
+            if(cIng) cIng.innerText = `$${totalIngresos.toFixed(2)}`;
+            if(cVen) cVen.innerText = `$${totalVentas.toFixed(2)}`;
+            if(cDif) cDif.innerText = `$${diferencia.toFixed(2)}`;
         }
 
         function renderInventario() {
@@ -816,7 +839,8 @@
                     </div>
                 `;
             }
-            document.getElementById('lblTotalInventario').innerText = totalUnidades;
+            let lblInv = document.getElementById('lblTotalInventario');
+            if(lblInv) lblInv.innerText = totalUnidades;
         }
 
         function actualizarInventario(mod, val) {
@@ -833,23 +857,28 @@
                     <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold cursor-pointer">Eliminar</button></div>
                 </div>
             `;
-            document.getElementById('contenedorSeguros').insertAdjacentHTML('beforeend', html);
+            let cont = document.getElementById('contenedorSeguros');
+            if(cont) cont.insertAdjacentHTML('beforeend', html);
             calcularSeguros();
         }
 
         function calcularSeguros() {
             let total = 0;
-            if(!document.getElementById('checkSinSeguros').checked) {
+            let chk = document.getElementById('checkSinSeguros');
+            if(chk && !chk.checked) {
                 document.querySelectorAll('.linea-seguro').forEach(l => {
                     let c = parseFloat(l.querySelector('.seg-cant').value || 0);
                     let p = parseFloat(l.querySelector('.seg-precio').value || 0);
                     let sub = c * p;
-                    l.querySelector('.seg-sub').innerText = `$${sub.toFixed(2)}`;
+                    let subEl = l.querySelector('.seg-sub');
+                    if(subEl) subEl.innerText = `$${sub.toFixed(2)}`;
                     total += sub;
                 });
             }
-            document.getElementById('lblTotalSeguroCaracas').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('lblTotalSegurosCard').innerText = `$${total.toFixed(2)}`;
+            let lblSeg = document.getElementById('lblTotalSeguroCaracas');
+            let lblSegCard = document.getElementById('lblTotalSegurosCard');
+            if(lblSeg) lblSeg.innerText = `$${total.toFixed(2)}`;
+            if(lblSegCard) lblSegCard.innerText = `$${total.toFixed(2)}`;
         }
 
         async function totalizarYDescargarPDF() {
@@ -893,7 +922,8 @@
 
         window.onload = () => { 
             let hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('inputFechaCierre').value = hoy;
+            let inputF = document.getElementById('inputFechaCierre');
+            if(inputF) inputF.value = hoy;
             actualizarValoresGlobales(); 
             renderInventario(); 
             calcularSeguros(); 
