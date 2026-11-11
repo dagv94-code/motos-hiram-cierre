@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cierre Operativo Integral - Motos Hiram, C.A.</title>
+    <title>Motos Hiram C.A. - Sistema Integral de Cierres</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -28,331 +28,342 @@
         window.dispatchEvent(new Event('firebase-ready'));
     </script>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased">
 
     <!-- HEADER INSTITUCIONAL -->
-    <header class="bg-slate-900 text-white shadow-lg border-b-4 border-red-600 print:hidden">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <header class="bg-slate-900 border-b border-slate-800 shadow-xl print:hidden">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
-                <div class="bg-red-600 text-white p-2.5 rounded-xl font-black text-xl tracking-wider shadow">MH</div>
+                <div class="bg-red-600 text-white p-2.5 rounded-xl font-black text-xl shadow-lg">MH</div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight">MOTOS HIRAM, C.A.</h1>
-                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Oficial de Cierre Operativo Multisede</p>
+                    <h1 class="text-lg font-extrabold tracking-tight text-white">MOTOS HIRAM, C.A.</h1>
+                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Integral de Cierres Multisede</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-3 bg-slate-800 p-2 rounded-xl border border-slate-700 shadow-inner">
-                <span class="text-xs font-semibold uppercase text-slate-400"><i class="fa-solid fa-store mr-1 text-red-500"></i> Sucursal:</span>
-                <select id="sucursalActiva" onchange="actualizarPersonalSede()" class="bg-slate-900 text-white font-bold text-sm px-3 py-1.5 rounded-lg border border-red-500 focus:outline-none">
-                    <option value="MARACAIBO">Maracaibo (Principal)</option>
-                    <option value="CABIMAS">Cabimas</option>
-                </select>
+            
+            <div class="flex items-center gap-3 flex-wrap">
+                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2">
+                    <span class="text-xs text-slate-400 font-semibold"><i class="fa-solid fa-store text-red-500 mr-1"></i> Sede:</span>
+                    <select id="sucursalActiva" onchange="actualizarPersonalSede()" class="bg-slate-900 text-white font-bold text-xs px-2.5 py-1 rounded-lg border border-red-500 focus:outline-none">
+                        <option value="MARACAIBO">Maracaibo (Principal)</option>
+                        <option value="CABIMAS">Cabimas</option>
+                    </select>
+                </div>
+                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-slate-300">
+                    <i class="fa-solid fa-calendar text-red-500 mr-1"></i> 11/11/2026
+                </div>
+                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-amber-400">
+                    <i class="fa-solid fa-coins mr-1"></i> Tasa: <span id="lblTasaHeader">997.92</span> Bs/$
+                </div>
+                <button onclick="guardarCierreGlobal()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Nube
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- NAVEGACIÓN -->
-    <nav class="bg-white shadow border-b print:hidden">
-        <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto">
-            <button onclick="cambiarPestana('cierre')" class="tab-btn py-4 px-3 border-b-2 font-bold text-sm text-red-600 border-red-600 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
-            <button onclick="cambiarPestana('arqueo')" class="tab-btn py-4 px-3 border-b-2 font-semibold text-sm text-slate-500 border-transparent hover:text-red-600 flex items-center gap-2"><i class="fa-solid fa-vault"></i> Arqueo de Divisas & Bolívares</button>
-            <button onclick="cambiarPestana('seguros')" class="tab-btn py-4 px-3 border-b-2 font-semibold text-sm text-slate-500 border-transparent hover:text-red-600 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Pólizas Seguro Caracas</button>
-            <button onclick="cambiarPestana('historico')" class="tab-btn py-4 px-3 border-b-2 font-semibold text-sm text-slate-500 border-transparent hover:text-red-600 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-down"></i> Histórico Nube</button>
-            <button onclick="cambiarPestana('config')" class="tab-btn py-4 px-3 border-b-2 font-semibold text-sm text-slate-500 border-transparent hover:text-red-600 flex items-center gap-2"><i class="fa-solid fa-gear"></i> Configuración</button>
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <nav class="bg-slate-900/80 backdrop-blur border-b border-slate-800 print:hidden">
+        <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto text-sm">
+            <button onclick="cambiarPestana('cierre')" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
+            <button onclick="cambiarPestana('arqueo')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-vault"></i> Arqueo & Divisas</button>
+            <button onclick="cambiarPestana('seguros')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Seguro Caracas</button>
+            <button onclick="cambiarPestana('inventario')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-boxes-stacked"></i> Inventario Motos</button>
+            <button onclick="cambiarPestana('historico')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Histórico Nube</button>
+            <button onclick="cambiarPestana('config')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-gear"></i> Configuración</button>
         </div>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- CONTENIDO -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- 1. SECCIÓN CIERRE DIARIO -->
+        <!-- 1. CIERRE DIARIO -->
         <section id="seccion-cierre" class="space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center flex-wrap gap-4 print:hidden">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex justify-between items-center flex-wrap gap-4 print:hidden">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900">Control Operativo, Facturación y CXC</h2>
-                    <p class="text-xs text-slate-500" id="txtFechaActual">Fecha: Miércoles, 11 de noviembre de 2026 | Tasa BCV: 997.92 Bs/$</p>
+                    <h2 class="text-lg font-bold text-white">Cierre Diario Activo</h2>
+                    <p class="text-xs text-slate-400" id="txtSedeInfo">Sede: Maracaibo (Principal) • Adm: Jennmary Parra • Gerente: Lic. David García</p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="iniciarNuevoRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-2 text-sm">
-                        <i class="fa-solid fa-plus-circle"></i> Nueva Operación
-                    </button>
-                    <button onclick="guardarCierreGlobal()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-2 text-sm">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Cierre
-                    </button>
-                </div>
+                <button onclick="generarReportePDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-print"></i> Totalizar y Imprimir / PDF
+                </button>
             </div>
 
-            <!-- TARJETAS DE RESUMEN EN VIVO -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Total Facturación del Día</p>
-                    <p class="text-2xl font-black text-slate-900" id="lblTotalFacturado">$0.00</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Total Abonos / Pagos Hoy</p>
-                    <p class="text-2xl font-black text-emerald-600" id="lblTotalAbonos">$0.00</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Cuentas por Cobrar (CXC)</p>
-                    <p class="text-2xl font-black text-amber-600" id="lblTotalCXC">$0.00</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguro Caracas</p>
-                    <p class="text-2xl font-black text-blue-600" id="lblTotalSeguros">$0.00</p>
-                </div>
-            </div>
-
-            <!-- TABLA DE MOVIMIENTOS OFICIAL -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-4 bg-slate-50 border-b font-bold text-slate-700 flex justify-between items-center flex-wrap gap-3">
-                    <span class="text-sm"><i class="fa-solid fa-table mr-2 text-red-600"></i> Relación de Operaciones - Motos Hiram, C.A.</span>
-                    <button onclick="generarReportePDF()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2 print:hidden">
-                        <i class="fa-solid fa-file-pdf"></i> Generar Reporte PDF Profesional
+            <!-- TABLA DE VENTAS Y ABONOS (CXC) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
+                    <span class="font-bold text-sm text-white"><i class="fa-solid fa-motorcycle text-red-500 mr-2"></i> Registro de Ventas de Motos y Abonos (CXC)</span>
+                    <button onclick="iniciarModalRegistro('MOTO')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5 print:hidden">
+                        <i class="fa-solid fa-plus"></i> Cargar Venta / Abono Moto
                     </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
+                            <tr class="bg-slate-800/60 text-slate-400 text-xs uppercase border-b border-slate-800">
                                 <th class="p-3">Cliente</th>
-                                <th class="p-3">Descripción / Modelo</th>
+                                <th class="p-3">Modelo</th>
                                 <th class="p-3">Factura</th>
-                                <th class="p-3">Facturación ($)</th>
+                                <th class="p-3">Facturado ($)</th>
                                 <th class="p-3">Abonos Ant. ($)</th>
-                                <th class="p-3">Pago del Día ($)</th>
-                                <th class="p-3">CXC Pendiente ($)</th>
+                                <th class="p-3">Pago Día ($)</th>
+                                <th class="p-3">CXC ($)</th>
                                 <th class="p-3 text-center print:hidden">Acción</th>
                             </tr>
                         </thead>
-                        <tbody id="tablaMovimientosBody" class="divide-y divide-slate-200">
-                            <tr><td colspan="8" class="p-6 text-center text-slate-400 italic">No hay transacciones cargadas para hoy. Haga clic en "Nueva Operación".</td></tr>
+                        <tbody id="tablaMotosBody" class="divide-y divide-slate-800">
+                            <tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- BLOQUE DE FIRMAS INSTITUCIONALES PARA REPORTE -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-                <div class="text-center space-y-4 border-b md:border-b-0 md:border-r pb-4 md:pb-0">
+            <!-- TABLA DE MOVIMIENTOS Y TALLER -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
+                    <span class="font-bold text-sm text-white"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-2"></i> Movimientos y Servicios de Taller</span>
+                    <button onclick="iniciarModalRegistro('TALLER')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5 print:hidden">
+                        <i class="fa-solid fa-plus"></i> Cargar Servicio Taller
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-800/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+                                <th class="p-3">Cliente</th>
+                                <th class="p-3">N° Factura</th>
+                                <th class="p-3">Concepto / Descripción</th>
+                                <th class="p-3">Medio de Pago</th>
+                                <th class="p-3">Total ($)</th>
+                                <th class="p-3 text-center print:hidden">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaTallerBody" class="divide-y divide-slate-800">
+                            <tr><td colspan="6" class="p-6 text-center text-slate-500 italic">No hay servicios de taller cargados.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- BLOQUE DE FIRMAS INSTITUCIONALES -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                <div class="text-center space-y-3">
                     <p class="text-xs uppercase font-bold text-slate-400">Preparado por (Administración)</p>
-                    <div class="pt-8 border-b border-slate-400 w-3/4 mx-auto"></div>
-                    <p class="font-bold text-slate-800 text-sm" id="lblAdminNombre">Jennmary Parra</p>
+                    <div class="pt-8 border-b border-slate-700 w-3/4 mx-auto"></div>
+                    <p class="font-bold text-white text-sm" id="lblAdminNombre">Jennmary Parra</p>
                     <p class="text-xs text-slate-500">Analista Administrativo</p>
                 </div>
-                <div class="text-center space-y-4">
+                <div class="text-center space-y-3">
                     <p class="text-xs uppercase font-bold text-slate-400">Revisado por (Gerencia)</p>
-                    <div class="pt-8 border-b border-slate-400 w-3/4 mx-auto"></div>
-                    <p class="font-bold text-slate-800 text-sm" id="lblGerenteNombre">Lic. David A. García V. (CI: 22.362.833)</p>
+                    <div class="pt-8 border-b border-slate-700 w-3/4 mx-auto"></div>
+                    <p class="font-bold text-white text-sm" id="lblGerenteNombre">Lic. David A. García V. (CI: 22.362.833)</p>
                     <p class="text-xs text-slate-500">Gerente de Concesionario</p>
                 </div>
             </div>
         </section>
 
-        <!-- 2. SECCIÓN ARQUEO DE DIVISAS Y BS -->
+        <!-- 2. ARQUEO & DIVISAS -->
         <section id="seccion-arqueo" class="hidden space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                    <h2 class="text-lg font-bold text-slate-900 border-b pb-3"><i class="fa-solid fa-money-bill-wave text-emerald-600 mr-2"></i> Arqueo de Divisas en Efectivo ($)</h2>
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+                    <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-money-bill-wave text-emerald-500 mr-2"></i> Arqueo de Divisas en Efectivo ($)</h2>
                     <div class="grid grid-cols-2 gap-3 text-sm">
-                        <div><label class="font-bold text-xs">Billetes de $100</label><input type="number" id="b100" oninput="calcularArqueo()" class="w-full border rounded-xl p-2 font-bold" value="0"></div>
-                        <div><label class="font-bold text-xs">Billetes de $50</label><input type="number" id="b50" oninput="calcularArqueo()" class="w-full border rounded-xl p-2 font-bold" value="0"></div>
-                        <div><label class="font-bold text-xs">Billetes de $20</label><input type="number" id="b20" oninput="calcularArqueo()" class="w-full border rounded-xl p-2 font-bold" value="0"></div>
-                        <div><label class="font-bold text-xs">Billetes de $10 / $5 / $1</label><input type="number" id="b10" oninput="calcularArqueo()" class="w-full border rounded-xl p-2 font-bold" value="0"></div>
+                        <div><label class="font-bold text-xs text-slate-400">Billetes de $100</label><input type="number" id="b100" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
+                        <div><label class="font-bold text-xs text-slate-400">Billetes de $50</label><input type="number" id="b50" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
+                        <div><label class="font-bold text-xs text-slate-400">Billetes de $20</label><input type="number" id="b20" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
+                        <div><label class="font-bold text-xs text-slate-400">Billetes de $10 / $5 / $1</label><input type="number" id="b10" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
                     </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border flex justify-between items-center text-lg font-black">
-                        <span>Total Efectivo Divisas:</span>
-                        <span id="lblArqueoTotal" class="text-emerald-600">$0.00</span>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center text-lg font-black">
+                        <span class="text-slate-300">Total Efectivo Divisas:</span>
+                        <span id="lblArqueoTotal" class="text-emerald-400">$0.00</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                    <h2 class="text-lg font-bold text-slate-900 border-b pb-3"><i class="fa-solid fa-credit-card text-blue-600 mr-2"></i> Ingresos en Bolívares (Punto / Transf.)</h2>
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+                    <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-credit-card text-blue-500 mr-2"></i> Ingresos en Bolívares (Punto / Transf.)</h2>
                     <div class="space-y-3 text-sm">
                         <div>
-                            <label class="font-bold text-xs">Monto Total en Bolívares (Bs.)</label>
-                            <input type="number" id="montoBs" oninput="calcularArqueo()" class="w-full border rounded-xl p-2 font-bold" value="0" placeholder="Ej. 26025.81">
+                            <label class="font-bold text-xs text-slate-400">Monto Total en Bolívares (Bs.)</label>
+                            <input type="number" id="montoBs" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0" placeholder="Ej. 26025.81">
                         </div>
-                        <p class="text-xs text-slate-500">Tasa BCV oficial aplicada automáticamente: <span id="lblTasaDisplay" class="font-bold">997.92</span> Bs/$</p>
+                        <p class="text-xs text-slate-400">Tasa BCV oficial: <span id="lblTasaArqueo" class="font-bold text-amber-400">997.92</span> Bs/$</p>
                     </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border flex justify-between items-center text-lg font-black">
-                        <span>Equivalente en USD ($):</span>
-                        <span id="lblArqueoBsUSD" class="text-blue-600">$0.00</span>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center text-lg font-black">
+                        <span class="text-slate-300">Equivalente en USD ($):</span>
+                        <span id="lblArqueoBsUSD" class="text-blue-400">$0.00</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. SECCIÓN PÓLIZAS SEGURO CARACAS -->
+        <!-- 3. SEGURO CARACAS -->
         <section id="seccion-seguros" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-3xl mx-auto space-y-4">
-                <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-shield-cat text-red-600 mr-2"></i> Pólizas Pendientes con Seguro Caracas</h2>
-                    <button onclick="agregarLineaSeguro()" class="bg-slate-900 text-white text-xs px-3 py-2 rounded-xl font-bold">Agregar Línea</button>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-3xl mx-auto space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-shield-cat text-red-500 mr-2"></i> Pólizas Pendientes con Seguro Caracas</h2>
+                    <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-2 rounded-xl font-bold border border-slate-700">Agregar Línea</button>
                 </div>
                 <div id="contenedorSeguros" class="space-y-3">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-50 p-3 rounded-xl border linea-seguro">
-                        <div><label class="text-xs font-bold">Cantidad</label><input type="number" class="w-full border rounded-lg p-1.5 seg-cant" value="1" oninput="calcularSeguros()"></div>
-                        <div><label class="text-xs font-bold">Precio Unitario ($)</label><input type="number" class="w-full border rounded-lg p-1.5 seg-precio" value="17.40" oninput="calcularSeguros()"></div>
-                        <div><label class="text-xs font-bold">Subtotal</label><p class="font-black text-slate-700 py-1.5 seg-sub">$17.40</p></div>
-                        <div class="text-right"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-500 text-xs font-bold">Eliminar</button></div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
+                        <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
+                        <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="17.40" oninput="calcularSeguros()"></div>
+                        <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$17.40</p></div>
+                        <div class="text-right"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
                     </div>
                 </div>
-                <div class="bg-slate-900 text-white p-4 rounded-xl flex justify-between items-center font-black text-lg">
-                    <span>Total Pólizas Seguro Caracas:</span>
-                    <span id="lblTotalSeguroCaracas">$17.40</span>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center font-black text-lg">
+                    <span class="text-slate-200">Total Pólizas Seguro Caracas:</span>
+                    <span id="lblTotalSeguroCaracas" class="text-white">$17.40</span>
                 </div>
             </div>
         </section>
 
-        <!-- 4. SECCIÓN HISTÓRICO NUBE -->
+        <!-- 4. INVENTARIO -->
+        <section id="seccion-inventario" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-4xl mx-auto space-y-4">
+                <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid boxes-stacked text-red-500 mr-2"></i> Inventario de Motos al Cierre</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="inventarioContainer"></div>
+            </div>
+        </section>
+
+        <!-- 5. HISTÓRICO NUBE -->
         <section id="seccion-historico" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-xl font-bold text-slate-900 mb-4">Cierres Históricos Sincronizados (Maracaibo y Cabimas)</h2>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <h2 class="text-xl font-bold text-white mb-4">Cierres Históricos Sincronizados (Maracaibo y Cabimas)</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-100 text-slate-600 text-xs uppercase">
+                            <tr class="bg-slate-800 text-slate-400 text-xs uppercase border-b border-slate-800">
                                 <th class="p-3">Fecha y Hora</th>
                                 <th class="p-3">Sucursal</th>
                                 <th class="p-3">Facturado ($)</th>
-                                <th class="p-3">Abonos ($)</th>
                                 <th class="p-3">Operaciones</th>
                             </tr>
                         </thead>
                         <tbody id="tablaHistoricoBody">
-                            <tr><td colspan="5" class="p-4 text-center text-slate-400">Consultando base de datos en la nube...</td></tr>
+                            <tr><td colspan="4" class="p-4 text-center text-slate-500">Consultando base de datos en la nube...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- 5. SECCIÓN CONFIGURACIÓN -->
+        <!-- 6. CONFIGURACIÓN -->
         <section id="seccion-config" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl space-y-4">
-                <h2 class="text-xl font-bold text-slate-900 border-b pb-3">Configuración del Sistema y Clave</h2>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-xl space-y-4">
+                <h2 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Configuración y Seguridad</h2>
                 <div class="space-y-3 text-sm">
-                    <div><label class="font-bold text-xs">Clave Gerencial Actual</label><input type="password" id="txtClaveAdmin" value="MotosHiram" class="w-full border rounded-xl p-2 font-bold"></div>
-                    <div><label class="font-bold text-xs">Tasa BCV Oficial (Bs/$)</label><input type="number" id="txtTasaBCV" value="997.92" class="w-full border rounded-xl p-2 font-bold"></div>
-                    <button onclick="guardarConfiguracion()" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow">Guardar Cambios</button>
-                    <hr class="my-4">
-                    <button onclick="reiniciarCierreDia()" class="bg-amber-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow">Reiniciar Cierre del Día (Borrar notas emitidas)</button>
+                    <div><label class="font-bold text-xs text-slate-400">Clave Gerencial Actual</label><input type="password" id="txtClaveAdmin" value="MotosHiram" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white"></div>
+                    <div><label class="font-bold text-xs text-slate-400">Tasa BCV Oficial (Bs/$)</label><input type="number" id="txtTasaBCV" value="997.92" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white"></div>
+                    <button onclick="guardarConfiguracion()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold text-sm shadow">Guardar Cambios</button>
+                    <hr class="border-slate-800 my-4">
+                    <button onclick="reiniciarCierreDia()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl font-bold text-sm shadow">Reiniciar Cierre del Día (Borrar notas emitidas)</button>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- MODAL DE REGISTRO DE OPERACIÓN -->
-    <div id="modalRegistro" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 my-8">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-900">Registrar Venta de Moto o Servicio de Taller</h3>
-                <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+    <!-- MODAL DE REGISTRO UNIFICADO -->
+    <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-8 text-white">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold" id="modalTitulo">Registrar Operación</h3>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="font-bold text-xs text-slate-600">Tipo de Ingreso</label>
-                        <select id="regTipo" onchange="toggleTipoIngreso()" class="w-full border rounded-xl p-2">
-                            <option value="MOTO">Venta de Motocicleta</option>
-                            <option value="TALLER">Servicio de Taller / Repuestos</option>
-                        </select>
+                        <label class="font-bold text-xs text-slate-400">Nro. de Factura</label>
+                        <input type="text" id="regFactura" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white" placeholder="Ej. 00151">
                     </div>
                     <div>
-                        <label class="font-bold text-xs text-slate-600">Nro. Factura</label>
-                        <input type="text" id="regFactura" class="w-full border rounded-xl p-2" placeholder="Ej. 00151">
+                        <label class="font-bold text-xs text-slate-400">Nombre del Cliente</label>
+                        <input type="text" id="regCliente" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white" placeholder="Nombre completo">
                     </div>
-                </div>
-                <div>
-                    <label class="font-bold text-xs text-slate-600">Nombre del Cliente</label>
-                    <input type="text" id="regCliente" class="w-full border rounded-xl p-2" placeholder="Nombre completo del cliente">
                 </div>
 
-                <!-- BLOQUE MOTO -->
-                <div id="grupoMoto" class="space-y-3 bg-slate-50 p-4 rounded-xl border">
+                <!-- GRUPO MOTO -->
+                <div id="grupoMotoCampos" class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
                     <div>
-                        <label class="font-bold text-xs text-slate-600">Modelo de Moto (Precio Automático con Clave)</label>
-                        <select id="regModeloMoto" onchange="actualizarPrecioMoto()" class="w-full border rounded-xl p-2 font-bold">
-                            <option value="BOXER CT 100|1420">Boxer CT 100 - $1,420</option>
-                            <option value="BOXER BM 150|1890">Boxer BM 150 - $1,890</option>
+                        <label class="font-bold text-xs text-slate-400">Modelo de Motocicleta</label>
+                        <select id="regModeloMoto" onchange="actualizarPrecioMoto()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white">
+                            <option value="BOXER CT100|1420">Boxer CT100 - $1,420</option>
+                            <option value="BOXER BM150|1890">Boxer BM150 - $1,890</option>
                             <option value="PULSAR NEON 150|2500">Pulsar Neon 150 - $2,500</option>
-                            <option value="PULSAR N 160|3100">Pulsar N 160 (Carburada) - $3,100</option>
-                            <option value="PULSAR NS 200|3700">Pulsar NS 200 - $3,700</option>
-                            <option value="PULSAR N 250|4700">Pulsar N 250 - $4,700</option>
+                            <option value="PULSAR N160|3100">Pulsar N160 (Carburada) - $3,100</option>
+                            <option value="PULSAR NS200|3700">Pulsar NS200 - $3,700</option>
+                            <option value="PULSAR N250|4700">Pulsar N250 - $4,700</option>
                             <option value="KTM DUKE 200|5200">KTM Duke 200 - $5,200</option>
                             <option value="KTM DUKE 390|8540">KTM Duke 390 - $8,540</option>
                         </select>
                     </div>
-                    <div class="grid grid-cols-3 gap-3">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div><label class="font-bold text-xs text-slate-400">Precio ($)</label><input type="number" id="regPrecioMoto" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="1420" readonly></div>
+                        <div><label class="font-bold text-xs text-slate-400">Abono Ant. ($)</label><input type="number" id="regAbonoAnt" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
                         <div>
-                            <label class="font-bold text-xs text-slate-600">Precio Factura ($)</label>
-                            <input type="number" id="regPrecioMoto" class="w-full border rounded-xl p-2 font-bold" value="1420" readonly>
-                        </div>
-                        <div>
-                            <label class="font-bold text-xs text-slate-600">Abonos Anteriores ($)</label>
-                            <input type="number" id="regAbonoAnt" class="w-full border rounded-xl p-2 font-bold" value="0">
-                        </div>
-                        <div>
-                            <label class="font-bold text-xs text-slate-600">Modalidad / Estado</label>
-                            <select id="regModalidad" class="w-full border rounded-xl p-2">
-                                <option value="CONTADO">Contado / Pagado</option>
-                                <option value="APARTADO">Apartado (Crea CXC)</option>
-                                <option value="MOTOS_YES">Financiamiento Motos Yes</option>
+                            <label class="font-bold text-xs text-slate-400">Modalidad</label>
+                            <select id="regModalidad" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white">
+                                <option value="CONTADO">Contado</option>
+                                <option value="APARTADO">Apartado (CXC)</option>
+                                <option value="MOTOS_YES">Motos Yes</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- BLOQUE TALLER -->
-                <div id="grupoTaller" class="space-y-3 bg-slate-50 p-4 rounded-xl border hidden">
+                <!-- GRUPO TALLER -->
+                <div id="grupoTallerCampos" class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700 hidden">
                     <div>
-                        <label class="font-bold text-xs text-slate-600">Descripción del Servicio / Taller</label>
-                        <input type="text" id="regDescTaller" class="w-full border rounded-xl p-2" placeholder="Ej. Cambio de aceite por garantía / Repuestos">
+                        <label class="font-bold text-xs text-slate-400">Concepto / Servicio de Taller</label>
+                        <input type="text" id="regConceptoTaller" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-white" placeholder="Ej. Cambio de aceite por garantía">
                     </div>
                     <div>
-                        <label class="font-bold text-xs text-slate-600">Monto Total ($)</label>
-                        <input type="number" id="regMontoTaller" class="w-full border rounded-xl p-2 font-bold" value="0">
+                        <label class="font-bold text-xs text-slate-400">Monto Total ($)</label>
+                        <input type="number" id="regMontoTaller" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0">
                     </div>
                 </div>
 
-                <!-- DISTRIBUCIÓN DE PAGOS DEL DÍA -->
-                <div class="border-t pt-3 space-y-3">
-                    <h4 class="font-bold text-xs uppercase text-slate-500"><i class="fa-solid fa-coins mr-1"></i> Desglose de Medios de Pago (Abono u Operación del Día)</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        <div>
-                            <label class="text-xs font-semibold">Divisas Efectivo ($)</label>
-                            <input type="number" id="pagoEfectivo" class="w-full border rounded-xl p-2 font-bold text-emerald-600" value="0">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold">Zelle ($)</label>
-                            <input type="number" id="pagoZelle" class="w-full border rounded-xl p-2 font-bold text-blue-600" value="0">
-                            <input type="text" id="refZelle" class="w-full border rounded-xl p-1 mt-1 text-xs" placeholder="Ref / Titular Zelle">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold">Binance / Towerbank ($)</label>
-                            <input type="number" id="pagoBinance" class="w-full border rounded-xl p-2 font-bold text-amber-600" value="0">
-                            <input type="text" id="refBinance" class="w-full border rounded-xl p-1 mt-1 text-xs" placeholder="Ref TX / Recibido en Cuenta">
-                        </div>
+                <!-- MEDIOS DE PAGO -->
+                <div class="border-t border-slate-800 pt-3 space-y-2">
+                    <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Pago (Abono u Operación del Día)</h4>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div><label class="text-xs text-slate-400">Efectivo ($)</label><input type="number" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400" value="0"></div>
+                        <div><label class="text-xs text-slate-400">Zelle ($)</label><input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0"></div>
+                        <div><label class="text-xs text-slate-400">Binance/Tower ($)</label><input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0"></div>
                     </div>
                 </div>
 
                 <!-- CLAVE GERENCIAL -->
-                <div class="border-t pt-3">
-                    <label class="font-bold text-xs text-red-600">Clave de Autorización Gerencial para Registrar</label>
-                    <input type="password" id="regClaveAdmin" class="w-full border rounded-xl p-2 font-bold" placeholder="MotosHiram">
+                <div class="border-t border-slate-800 pt-3">
+                    <label class="font-bold text-xs text-red-400">Clave de Autorización Gerencial</label>
+                    <input type="password" id="regClave" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" placeholder="MotosHiram">
                 </div>
             </div>
-            <div class="border-t pt-3 flex justify-end gap-2">
-                <button onclick="cerrarModal()" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm">Cancelar</button>
-                <button onclick="procesarNuevoRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl font-bold text-sm shadow">Guardar Operación</button>
+            <div class="border-t border-slate-800 pt-3 flex justify-end gap-2">
+                <button onclick="cerrarModal()" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="procesarRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl font-bold text-sm shadow">Guardar en Cierre</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT DE CONTROL Y FUNCIONALIDAD -->
+    <!-- SCRIPT DE LÓGICA -->
     <script>
-        let movimientos = [];
+        let tipoActual = 'MOTO';
+        let movimientosMotos = [];
+        let movimientosTaller = [];
         let tasaBCV = 997.92;
+        let inventario = {
+            "BOXER CT100": 3,
+            "BOXER BM150": 3,
+            "PULSAR NEON 150": 2,
+            "PULSAR N160": 3,
+            "PULSAR NS200": 11,
+            "PULSAR N250": 0,
+            "KTM DUKE 200": 1,
+            "KTM DUKE 390": 1
+        };
+
         let personalSedes = {
             "MARACAIBO": { admin: "Jennmary Parra", gerente: "Lic. David A. García V." },
             "CABIMAS": { admin: "Alejandra Florida", gerente: "Néstor Córdoba" }
@@ -363,12 +374,13 @@
         function cambiarPestana(p) {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('text-red-600', 'border-red-600');
-                b.classList.add('text-slate-500', 'border-transparent');
+                b.classList.remove('text-red-500', 'border-red-500', 'font-bold');
+                b.classList.add('text-slate-400', 'border-transparent', 'font-semibold');
             });
             document.getElementById(`seccion-${p}`).classList.remove('hidden');
-            event.currentTarget.classList.add('text-red-600', 'border-red-600');
-            event.currentTarget.classList.remove('text-slate-500', 'border-transparent');
+            event.currentTarget.classList.add('text-red-500', 'border-red-500', 'font-bold');
+            event.currentTarget.classList.remove('text-slate-400', 'border-transparent', 'font-semibold');
+            if(p === 'inventario') renderInventario();
             if(p === 'historico') cargarHistoricoNube();
         }
 
@@ -376,94 +388,121 @@
             let sede = document.getElementById('sucursalActiva').value;
             document.getElementById('lblAdminNombre').innerText = personalSedes[sede].admin;
             document.getElementById('lblGerenteNombre').innerText = personalSedes[sede].gerente;
+            document.getElementById('txtSedeInfo').innerText = `Sede: ${sede} • Adm: ${personalSedes[sede].admin} • Gerente: ${personalSedes[sede].gerente}`;
         }
 
-        function iniciarNuevoRegistro() { document.getElementById('modalRegistro').classList.remove('hidden'); }
+        function iniciarModalRegistro(tipo) {
+            tipoActual = tipo;
+            document.getElementById('modalTitulo').innerText = tipo === 'MOTO' ? 'Registrar Venta de Motocicleta o Abono' : 'Registrar Servicio de Taller';
+            document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
+            document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
+            document.getElementById('modalRegistro').classList.remove('hidden');
+        }
+
         function cerrarModal() { document.getElementById('modalRegistro').classList.add('hidden'); }
-
-        function toggleTipoIngreso() {
-            let t = document.getElementById('regTipo').value;
-            document.getElementById('grupoMoto').classList.toggle('hidden', t !== 'MOTO');
-            document.getElementById('grupoTaller').classList.toggle('hidden', t !== 'TALLER');
-        }
 
         function actualizarPrecioMoto() {
             let v = document.getElementById('regModeloMoto').value.split('|');
             document.getElementById('regPrecioMoto').value = v[1];
         }
 
-        function procesarNuevoRegistro() {
-            let clave = document.getElementById('regClaveAdmin').value;
+        function procesarRegistro() {
+            let clave = document.getElementById('regClave').value;
             let claveConfig = document.getElementById('txtClaveAdmin').value || 'MotosHiram';
             if(clave !== claveConfig) {
                 alert('Error: Clave de autorización gerencial incorrecta.');
                 return;
             }
 
-            let tipo = document.getElementById('regTipo').value;
             let cliente = document.getElementById('regCliente').value || 'Cliente General';
             let factura = document.getElementById('regFactura').value || 'S/N';
-            let desc = '', montoTotal = 0, abonoAnt = 0;
+            let efec = parseFloat(document.getElementById('pagoEfec').value || 0);
+            let zelle = parseFloat(document.getElementById('pagoZelle').value || 0);
+            let binance = parseFloat(document.getElementById('pagoBinance').value || 0);
+            let pagoDia = efec + zelle + binance;
 
-            if(tipo === 'MOTO') {
+            if(tipoActual === 'MOTO') {
                 let mData = document.getElementById('regModeloMoto').value.split('|');
-                desc = mData[0];
-                montoTotal = parseFloat(document.getElementById('regPrecioMoto').value) || 0;
-                abonoAnt = parseFloat(document.getElementById('regAbonoAnt').value) || 0;
+                let modelo = mData[0];
+                let facturado = parseFloat(document.getElementById('regPrecioMoto').value) || 0;
+                let abonoAnt = parseFloat(document.getElementById('regAbonoAnt').value) || 0;
+                let cxc = facturado - abonoAnt - pagoDia;
+                if(cxc < 0) cxc = 0;
+
+                movimientosMotos.push({ cliente, modelo, factura, facturado, abonoAnt, pagoDia, cxc });
+                if(inventario[modelo] > 0) inventario[modelo]--;
+                renderMotos();
             } else {
-                desc = document.getElementById('regDescTaller').value || 'Servicio Taller';
-                montoTotal = parseFloat(document.getElementById('regMontoTaller').value) || 0;
+                let concepto = document.getElementById('regConceptoTaller').value || 'Servicio General';
+                let total = parseFloat(document.getElementById('regMontoTaller').value) || 0;
+                let medio = `Efectiv:$${efec} / Zelle:$${zelle} / Bin:$${binance}`;
+
+                movimientosTaller.push({ cliente, factura, concepto, medio, total });
+                renderTaller();
             }
 
-            let pEfectivo = parseFloat(document.getElementById('pagoEfectivo').value) || 0;
-            let pZelle = parseFloat(document.getElementById('pagoZelle').value) || 0;
-            let pBinance = parseFloat(document.getElementById('pagoBinance').value) || 0;
-            let pagoHoy = pEfectivo + pZelle + pBinance;
-
-            // Cálculo exacto de CXC
-            let cxc = montoTotal - abonoAnt - pagoHoy;
-            if(cxc < 0) cxc = 0;
-
-            movimientos.push({ cliente, desc, factura, montoTotal, abonoAnt, pagoHoy, cxc, pEfectivo, pZelle, pBinance });
             cerrarModal();
-            renderMovimientos();
-            document.getElementById('regClaveAdmin').value = '';
-            document.getElementById('pagoEfectivo').value = 0;
+            document.getElementById('regClave').value = '';
+            document.getElementById('pagoEfec').value = 0;
             document.getElementById('pagoZelle').value = 0;
             document.getElementById('pagoBinance').value = 0;
         }
 
-        function renderMovimientos() {
-            let tbody = document.getElementById('tablaMovimientosBody');
-            if(movimientos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400 italic">No hay transacciones cargadas para hoy.</td></tr>`;
-                document.getElementById('lblTotalFacturado').innerText = '$0.00';
-                document.getElementById('lblTotalAbonos').innerText = '$0.00';
-                document.getElementById('lblTotalCXC').innerText = '$0.00';
+        function renderMotos() {
+            let tbody = document.getElementById('tablaMotosBody');
+            if(movimientosMotos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
                 return;
             }
             tbody.innerHTML = '';
-            let totF = 0, totA = 0, totC = 0;
-            movimientos.forEach((m, idx) => {
-                totF += m.montoTotal;
-                totA += m.pagoHoy;
-                totC += m.cxc;
+            movimientosMotos.forEach((m, idx) => {
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-3 font-semibold">${m.cliente}</td>
-                        <td class="p-3 text-slate-600">${m.desc}</td>
-                        <td class="p-3 font-bold">${m.factura}</td>
-                        <td class="p-3 font-bold">$${m.montoTotal.toFixed(2)}</td>
-                        <td class="p-3 text-slate-500">$${m.abonoAnt.toFixed(2)}</td>
-                        <td class="p-3 text-emerald-600 font-bold">$${m.pagoHoy.toFixed(2)}</td>
-                        <td class="p-3 text-amber-600 font-bold">$${m.cxc.toFixed(2)}</td>
-                        <td class="p-3 text-center print:hidden"><button onclick="movimientos.splice(${idx},1);renderMovimientos();" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td>
+                    <tr class="hover:bg-slate-800/40 border-b border-slate-800">
+                        <td class="p-3 font-semibold text-white">${m.cliente}</td>
+                        <td class="p-3 text-slate-300">${m.modelo}</td>
+                        <td class="p-3">${m.factura}</td>
+                        <td class="p-3 font-bold text-white">$${m.facturado.toFixed(2)}</td>
+                        <td class="p-3 text-slate-400">$${m.abonoAnt.toFixed(2)}</td>
+                        <td class="p-3 text-emerald-400 font-bold">$${m.pagoDia.toFixed(2)}</td>
+                        <td class="p-3 text-amber-400 font-bold">$${m.cxc.toFixed(2)}</td>
+                        <td class="p-3 text-center print:hidden"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
             });
-            document.getElementById('lblTotalFacturado').innerText = `$${totF.toFixed(2)}`;
-            document.getElementById('lblTotalAbonos').innerText = `$${totA.toFixed(2)}`;
-            document.getElementById('lblTotalCXC').innerText = `$${totC.toFixed(2)}`;
+        }
+
+        function renderTaller() {
+            let tbody = document.getElementById('tablaTallerBody');
+            if(movimientosTaller.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 italic">No hay servicios de taller cargados.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = '';
+            movimientosTaller.forEach((t, idx) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/40 border-b border-slate-800">
+                        <td class="p-3 font-semibold text-white">${t.cliente}</td>
+                        <td class="p-3">${t.factura}</td>
+                        <td class="p-3 text-slate-300">${t.concepto}</td>
+                        <td class="p-3 text-xs text-slate-400">${t.medio}</td>
+                        <td class="p-3 font-bold text-emerald-400">$${t.total.toFixed(2)}</td>
+                        <td class="p-3 text-center print:hidden"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderInventario() {
+            let container = document.getElementById('inventarioContainer');
+            container.innerHTML = '';
+            for (let [mod, cant] of Object.entries(inventario)) {
+                container.innerHTML += `
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-200">${mod}</span>
+                        <input type="number" value="${cant}" onchange="inventario['${mod}'] = parseInt(this.value)" class="w-20 bg-slate-900 border border-slate-600 rounded-lg p-1 text-center font-bold text-sm text-white">
+                    </div>
+                `;
+            }
         }
 
         function calcularArqueo() {
@@ -472,19 +511,17 @@
                        (parseFloat(document.getElementById('b20').value || 0) * 20) +
                        (parseFloat(document.getElementById('b10').value || 0) * 10);
             document.getElementById('lblArqueoTotal').innerText = `$${efec.toFixed(2)}`;
-
             let bs = parseFloat(document.getElementById('montoBs').value || 0);
-            let bsUSD = bs / tasaBCV;
-            document.getElementById('lblArqueoBsUSD').innerText = `$${bsUSD.toFixed(2)}`;
+            document.getElementById('lblArqueoBsUSD').innerText = `$${(bs / tasaBCV).toFixed(2)}`;
         }
 
         function agregarLineaSeguro() {
             let html = `
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-50 p-3 rounded-xl border linea-seguro">
-                    <div><label class="text-xs font-bold">Cantidad</label><input type="number" class="w-full border rounded-lg p-1.5 seg-cant" value="1" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold">Precio Unitario ($)</label><input type="number" class="w-full border rounded-lg p-1.5 seg-precio" value="18.00" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold">Subtotal</label><p class="font-black text-slate-700 py-1.5 seg-sub">$18.00</p></div>
-                    <div class="text-right"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-500 text-xs font-bold">Eliminar</button></div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
+                    <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
+                    <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="18.00" oninput="calcularSeguros()"></div>
+                    <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$18.00</p></div>
+                    <div class="text-right"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
                 </div>
             `;
             document.getElementById('contenedorSeguros').insertAdjacentHTML('beforeend', html);
@@ -501,41 +538,42 @@
                 total += sub;
             });
             document.getElementById('lblTotalSeguroCaracas').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('lblTotalSeguros').innerText = `$${total.toFixed(2)}`;
         }
 
         function guardarConfiguracion() {
             tasaBCV = parseFloat(document.getElementById('txtTasaBCV').value) || 997.92;
-            document.getElementById('lblTasaDisplay').innerText = tasaBCV;
-            alert('Configuración y tasa BCV guardadas exitosamente.');
+            document.getElementById('lblTasaHeader').innerText = tasaBCV;
+            document.getElementById('lblTasaArqueo').innerText = tasaBCV;
+            alert('Configuración guardada exitosamente.');
         }
 
         function reiniciarCierreDia() {
-            if(confirm('¿Está seguro de reiniciar todas las notas emitidas del día?')) {
-                movimientos = [];
-                renderMovimientos();
+            if(confirm('¿Reiniciar notas del día?')) {
+                movimientosMotos = [];
+                movimientosTaller = [];
+                renderMotos();
+                renderTaller();
                 alert('Cierre reiniciado.');
             }
         }
 
         async function guardarCierreGlobal() {
-            if(movimientos.length === 0) {
-                alert('No hay transacciones cargadas para consolidar.');
+            if(movimientosMotos.length === 0 && movimientosTaller.length === 0) {
+                alert('No hay transacciones para sincronizar.');
                 return;
             }
             try {
                 let sucursal = document.getElementById('sucursalActiva').value;
-                let totalF = movimientos.reduce((a, b) => a + b.montoTotal, 0);
-                let totalA = movimientos.reduce((a, b) => a + b.pagoHoy, 0);
+                let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
                 await window.firebaseOperations.addDoc(window.firebaseOperations.collection(window.db, "cierres"), {
                     sucursal: sucursal,
                     fecha: new Date().toLocaleString(),
-                    totalFacturado: totalF,
-                    totalAbonos: totalA,
-                    transacciones: movimientos,
+                    totalFacturado: totF,
+                    motos: movimientosMotos,
+                    taller: movimientosTaller,
                     timestamp: window.firebaseOperations.serverTimestamp()
                 });
-                alert('¡Cierre consolidado y sincronizado en Firebase para la sede ' + sucursal + '!');
+                alert('¡Cierre sincronizado con éxito en Firebase para la sede ' + sucursal + '!');
             } catch(e) {
                 console.error(e);
                 alert('Error al sincronizar con la nube.');
@@ -548,31 +586,29 @@
                 let q = window.firebaseOperations.query(window.firebaseOperations.collection(window.db, "cierres"), window.firebaseOperations.orderBy("timestamp", "desc"));
                 let snap = await window.firebaseOperations.getDocs(q);
                 if(snap.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay registros previos en la nube.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No hay registros previos en la nube.</td></tr>`;
                     return;
                 }
                 tbody.innerHTML = '';
                 snap.forEach(doc => {
                     let d = doc.data();
                     tbody.innerHTML += `
-                        <tr class="border-b hover:bg-slate-50">
+                        <tr class="border-b border-slate-800 hover:bg-slate-800/40">
                             <td class="p-3">${d.fecha}</td>
-                            <td class="p-3 font-bold text-red-600">${d.sucursal}</td>
-                            <td class="p-3 font-bold">$${d.totalFacturado.toFixed(2)}</td>
-                            <td class="p-3 text-emerald-600 font-bold">$${(d.totalAbonos || 0).toFixed(2)}</td>
-                            <td class="p-3">${d.transacciones.length} operaciones</td>
+                            <td class="p-3 font-bold text-red-400">${d.sucursal}</td>
+                            <td class="p-3 font-bold text-emerald-400">$${(d.totalFacturado || 0).toFixed(2)}</td>
+                            <td class="p-3">${(d.motos?.length || 0) + (d.taller?.length || 0)} operaciones</td>
                         </tr>
                     `;
                 });
             } catch(e) {
                 console.error(e);
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error al cargar el histórico.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-400">Error cargando histórico.</td></tr>`;
             }
         }
 
-        function generarReportePDF() {
-            window.print();
-        }
+        function generarReportePDF() { window.print(); }
+        window.onload = () => { renderInventario(); };
     </script>
 </body>
 </html>
