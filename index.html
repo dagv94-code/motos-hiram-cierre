@@ -24,14 +24,16 @@
         window.db = db;
     </script>
     <style>
+        /* ESTILO EJECUTIVO DE ALTA GERENCIA PARA PDF E IMPRESIÓN */
         @media print {
-            body { background: #ffffff !important; color: #000000 !important; font-family: Arial, sans-serif; font-size: 11px; }
+            body { background: #f8fafc !important; color: #0f172a !important; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; }
             .print\:hidden { display: none !important; }
             .page-break { page-break-before: always; }
-            main { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-            th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; color: #000000 !important; }
-            th { background-color: #f1f5f9 !important; font-weight: bold; }
+            main { background: #ffffff !important; color: #0f172a !important; padding: 15px !important; box-shadow: none !important; border: none !important; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            th, td { border: 1px solid #e2e8f0; padding: 5px 6px; text-align: left; color: #1e293b !important; }
+            th { background-color: #1e293b !important; color: #ffffff !important; font-weight: bold; }
+            .card-exec { background: #ffffff !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; }
         }
     </style>
 </head>
@@ -44,7 +46,7 @@
                 <div class="bg-red-600 text-white p-2.5 rounded-xl font-black text-xl shadow-lg">MH</div>
                 <div>
                     <h1 class="text-lg font-extrabold tracking-tight text-white">MOTOS HIRAM, C.A.</h1>
-                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Gerencial de Cierres</p>
+                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Ejecutivo de Cierres</p>
                 </div>
             </div>
             
@@ -58,7 +60,7 @@
                 </div>
                 <!-- CALENDARIO INTERACTIVO NATIVO -->
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-slate-300">
-                    <i class="fa-solid fa-calendar text-red-500"></i> Fecha Cierre:
+                    <i class="fa-solid fa-calendar text-red-500"></i> Fecha:
                     <input type="date" id="inputFechaCierre" onchange="actualizarValoresGlobales()" class="bg-slate-900 border border-slate-600 rounded p-1 text-white font-bold text-xs cursor-pointer focus:outline-none focus:border-red-500">
                 </div>
                 <!-- TASA BCV GLOBAL -->
@@ -83,47 +85,47 @@
         </div>
     </nav>
 
-    <!-- CONTENIDO GENERAL (ÁREA DE REPORTE PROFESIONAL PARA PDF) -->
-    <main id="areaPDF" class="max-w-4xl mx-auto px-6 py-8 space-y-6 bg-slate-950 text-slate-100">
+    <!-- CONTENIDO GENERAL (ÁREA DE REPORTE GERENCIAL PROFESIONAL PARA PDF) -->
+    <main id="areaPDF" class="max-w-4xl mx-auto px-6 py-8 space-y-6 bg-slate-900 text-slate-100 rounded-2xl shadow-2xl my-6 border border-slate-800">
 
-        <!-- ENCABEZADO GERENCIAL OFICIAL -->
-        <div class="border-b-2 border-red-600 pb-3 flex justify-between items-start">
+        <!-- ENCABEZADO EJECUTIVO -->
+        <div class="border-b-2 border-red-600 pb-4 flex justify-between items-center bg-slate-950 p-4 rounded-xl">
             <div>
-                <h1 class="text-lg font-black tracking-wider text-white">MOTOS HIRAM, C.A.</h1>
+                <h1 class="text-xl font-black tracking-wider text-white">MOTOS HIRAM, C.A.</h1>
                 <p class="text-xs text-slate-400">ZULIA • RIF: J-050770055-0</p>
-                <h2 class="text-sm font-extrabold text-red-500 mt-1 uppercase" id="lblReporteTitulo">REPORTE DE CIERRE DIARIO - MARACAIBO</h2>
+                <h2 class="text-xs font-extrabold text-red-500 mt-1 uppercase" id="lblReporteTitulo">INFORME DE ESTADO DE CIERRE - MARACAIBO</h2>
             </div>
-            <div class="text-right text-xs text-slate-300 space-y-0.5">
-                <p><span class="font-bold">Fecha del Cierre:</span> <span id="lblFechaPDF" class="font-bold text-white">--/--/----</span></p>
-                <p><span class="font-bold">Tasa Oficial BCV:</span> <span id="lblTasaPDF" class="text-amber-400 font-bold">0.00</span> Bs/$</p>
+            <div class="text-right text-xs text-slate-300 space-y-1 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                <p><span class="font-bold text-slate-400">Fecha Cierre:</span> <span id="lblFechaPDF" class="font-bold text-white">--/--/----</span></p>
+                <p><span class="font-bold text-slate-400">Tasa BCV:</span> <span id="lblTasaPDF" class="text-amber-400 font-bold">0.00</span> Bs/$</p>
             </div>
         </div>
 
-        <!-- TARJETAS DE RESUMEN EJECUTIVO -->
+        <!-- TARJETAS DE RESUMEN EJECUTIVO (KPIs) -->
         <div class="grid grid-cols-4 gap-3">
-            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center card-exec">
                 <p class="text-[10px] font-bold text-slate-400 uppercase">Total Facturado</p>
-                <p class="text-lg font-black text-white" id="lblTotalFacturado">$0.00</p>
+                <p class="text-lg font-black text-white mt-1" id="lblTotalFacturado">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center card-exec">
                 <p class="text-[10px] font-bold text-slate-400 uppercase">Pagos del Día</p>
-                <p class="text-lg font-black text-emerald-400" id="lblTotalAbonos">$0.00</p>
+                <p class="text-lg font-black text-emerald-400 mt-1" id="lblTotalAbonos">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center card-exec">
                 <p class="text-[10px] font-bold text-slate-400 uppercase">Cuentas por Cobrar</p>
-                <p class="text-lg font-black text-amber-400" id="lblTotalCXC">$0.00</p>
+                <p class="text-lg font-black text-amber-400 mt-1" id="lblTotalCXC">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center card-exec">
                 <p class="text-[10px] font-bold text-slate-400 uppercase">Seguro Caracas</p>
-                <p class="text-lg font-black text-blue-400" id="lblTotalSegurosCard">$0.00</p>
+                <p class="text-lg font-black text-blue-400 mt-1" id="lblTotalSegurosCard">$0.00</p>
             </div>
         </div>
 
         <!-- 1. TABLA DE MOTOS CON CHECK "SIN MOVIMIENTOS" -->
-        <div class="space-y-3">
+        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800 card-exec">
             <div class="flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-motorcycle text-red-500 mr-1.5"></i> 1. Ventas y Abonos de Motocicletas</h3>
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-200"><i class="fa-solid fa-motorcycle text-red-500 mr-1.5"></i> 1. Ventas y Abonos de Motocicletas</h3>
                     <label class="text-xs text-amber-400 flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" id="checkSinMotos" onchange="toggleSinMovimiento('motos')" class="rounded bg-slate-800 border-slate-700"> Sin Movimientos</label>
                 </div>
                 <button onclick="iniciarModalRegistro('MOTO')" class="bg-red-600 hover:bg-red-700 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1 print:hidden cursor-pointer">
@@ -133,7 +135,7 @@
             <div class="overflow-x-auto" id="contenedorTablaMotos">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800 text-[10px]">
+                        <tr class="bg-slate-900 text-slate-300 uppercase border-b border-slate-800 text-[10px]">
                             <th class="p-2">Cliente</th>
                             <th class="p-2">Modelo</th>
                             <th class="p-2">Factura</th>
@@ -152,10 +154,10 @@
         </div>
 
         <!-- 2. TABLA DE TALLER CON CHECK "SIN MOVIMIENTOS" -->
-        <div class="space-y-3">
+        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800 card-exec">
             <div class="flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-1.5"></i> 2. Movimientos y Servicios de Taller</h3>
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-200"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-1.5"></i> 2. Movimientos y Servicios de Taller</h3>
                     <label class="text-xs text-amber-400 flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" id="checkSinTaller" onchange="toggleSinMovimiento('taller')" class="rounded bg-slate-800 border-slate-700"> Sin Movimientos</label>
                 </div>
                 <button onclick="iniciarModalRegistro('TALLER')" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1 print:hidden cursor-pointer">
@@ -165,7 +167,7 @@
             <div class="overflow-x-auto" id="contenedorTablaTaller">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800 text-[10px]">
+                        <tr class="bg-slate-900 text-slate-300 uppercase border-b border-slate-800 text-[10px]">
                             <th class="p-2">Cliente</th>
                             <th class="p-2">N° Factura</th>
                             <th class="p-2">Concepto / Descripción</th>
@@ -182,10 +184,10 @@
         </div>
 
         <!-- 3. PÓLIZAS SEGURO CARACAS CON CHECK "0 PÓLIZAS" -->
-        <div class="space-y-3">
+        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800 card-exec">
             <div class="flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-shield-cat text-red-500 mr-1.5"></i> 3. Pólizas Pendientes Seguros Caracas</h3>
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-200"><i class="fa-solid fa-shield-cat text-red-500 mr-1.5"></i> 3. Pólizas Pendientes Seguros Caracas</h3>
                     <label class="text-xs text-amber-400 flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" id="checkSinSeguros" onchange="toggleSinMovimiento('seguros')" class="rounded bg-slate-800 border-slate-700"> 0 Pólizas</label>
                 </div>
                 <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-[11px] px-3 py-1 rounded font-bold border border-slate-700 print:hidden cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Agregar Línea (+)</button>
@@ -210,8 +212,8 @@
         <div class="page-break"></div>
 
         <!-- 4. RESUMEN Y DETALLE DE FORMAS DE PAGO -->
-        <div class="space-y-4 pt-4">
-            <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-vault text-emerald-500 mr-1.5"></i> 4. Resumen Detallado de Formas de Pago y Referencias</h3>
+        <div class="space-y-4 pt-2 bg-slate-950 p-4 rounded-xl border border-slate-800 card-exec">
+            <h3 class="text-xs font-bold uppercase tracking-wide text-slate-200 border-b border-slate-800 pb-2"><i class="fa-solid fa-vault text-emerald-500 mr-1.5"></i> 4. Resumen Detallado de Formas de Pago y Referencias</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <!-- EFECTIVO -->
@@ -259,16 +261,16 @@
             <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
                 <h4 class="font-bold text-slate-200 uppercase text-xs border-b border-slate-800 pb-1">Cuadre Gerencial de Cierre (Debe ser $0.00)</h4>
                 <div class="grid grid-cols-3 gap-3 text-center font-bold">
-                    <div class="bg-slate-800 p-2 rounded-lg"><p class="text-[10px] text-slate-400">Total Ingresos Recibidos</p><p id="cuadreIngresos" class="text-emerald-400 text-sm">$0.00</p></div>
-                    <div class="bg-slate-800 p-2 rounded-lg"><p class="text-[10px] text-slate-400">Total Venta Facturada</p><p id="cuadreVentas" class="text-white text-sm">$0.00</p></div>
-                    <div class="bg-slate-800 p-2 rounded-lg"><p class="text-[10px] text-slate-400">Diferencia (Cuadre)</p><p id="cuadreDiferencia" class="text-cyan-400 text-sm">$0.00</p></div>
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"><p class="text-[10px] text-slate-400">Total Ingresos Recibidos</p><p id="cuadreIngresos" class="text-emerald-400 text-sm mt-0.5">$0.00</p></div>
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"><p class="text-[10px] text-slate-400">Total Venta Facturada</p><p id="cuadreVentas" class="text-white text-sm mt-0.5">$0.00</p></div>
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"><p class="text-[10px] text-slate-400">Diferencia (Cuadre)</p><p id="cuadreDiferencia" class="text-cyan-400 text-sm mt-0.5">$0.00</p></div>
                 </div>
             </div>
         </div>
 
         <!-- 5. INVENTARIO AL CIERRE -->
-        <div class="space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-boxes-stacked text-red-500 mr-1.5"></i> 5. Inventario de Motos al Cierre</h3>
+        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800 card-exec">
+            <h3 class="text-xs font-bold uppercase tracking-wide text-slate-200 border-b border-slate-800 pb-2"><i class="fa-solid fa-boxes-stacked text-red-500 mr-1.5"></i> 5. Inventario de Motos al Cierre</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs" id="inventarioContainer"></div>
             <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-2.5 rounded-lg border border-slate-800">
                 <span>Total Unidades en Existencia:</span>
@@ -277,7 +279,7 @@
         </div>
 
         <!-- FIRMAS GERENCIALES -->
-        <div class="grid grid-cols-2 gap-8 pt-6 border-t border-slate-800">
+        <div class="grid grid-cols-2 gap-8 pt-6 border-t border-slate-800 bg-slate-950 p-4 rounded-xl card-exec">
             <div class="text-center space-y-1">
                 <div class="pt-8 border-b border-slate-600 w-3/4 mx-auto"></div>
                 <p class="font-bold text-white text-xs" id="lblAdminNombre">Jennmary Parra</p>
@@ -496,7 +498,6 @@
             let lblFechaPDF = document.getElementById('lblFechaPDF');
             let lblTasaPDF = document.getElementById('lblTasaPDF');
 
-            if(lblFechaHoy) lblFechaHoy.innerText = fechaTexto;
             if(lblFechaPDF) lblFechaPDF.innerText = fechaTexto;
             if(lblTasaPDF) lblTasaPDF.innerText = tasaBCV.toFixed(2);
         }
@@ -515,13 +516,11 @@
             let sede = document.getElementById('sucursalActiva').value;
             let adminEl = document.getElementById('lblAdminNombre');
             let gerenteEl = document.getElementById('lblGerenteNombre');
-            let sedeInfoEl = document.getElementById('txtSedeInfo');
             let reporteTitEl = document.getElementById('lblReporteTitulo');
 
             if(adminEl) adminEl.innerText = personalSedes[sede].admin;
             if(gerenteEl) gerenteEl.innerText = personalSedes[sede].gerente;
-            if(sedeInfoEl) sedeInfoEl.innerText = `Sede: ${sede} • Adm: ${personalSedes[sede].admin} • Gerente: ${personalSedes[sede].gerente}`;
-            if(reporteTitEl) reporteTitEl.innerText = `REPORTE DE CIERRE DIARIO - ${sede}`;
+            if(reporteTitEl) reporteTitEl.innerText = `INFORME DE ESTADO DE CIERRE - ${sede}`;
         }
 
         function iniciarModalRegistro(tipo) {
