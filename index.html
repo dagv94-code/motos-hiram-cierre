@@ -284,7 +284,7 @@
 
     <!-- MODAL DE REGISTRO UNIFICADO -->
     <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-40 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-8 text-white relative">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 my-8 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-lg font-bold" id="modalTitulo">Registrar Operación</h3>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
@@ -342,24 +342,51 @@
                     </div>
                 </div>
 
-                <!-- MEDIOS DE PAGO -->
-                <div class="border-t border-slate-800 pt-3 space-y-2">
-                    <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Pago</h4>
+                <!-- MEDIOS DE PAGO COMPLETOS (DIVISAS, ZELLE, BINANCE, PAGO MÓVIL, TRANSF. NACIONAL, PUNTO DE VENTA) -->
+                <div class="border-t border-slate-800 pt-3 space-y-3">
+                    <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Medios de Pago (Abono u Operación)</h4>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <!-- EFECTIVO CON ARQUEO -->
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Efectivo ($)</label>
+                            <label class="text-xs text-slate-400 block mb-1">Divisas Efectivo ($)</label>
                             <div class="flex gap-1">
-                                <input type="text" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400 text-center text-sm" value="$0.00" readonly>
-                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap cursor-pointer"><i class="fa-solid fa-vault mr-1"></i> Arqueo</button>
+                                <input type="text" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-emerald-400 text-center text-xs" value="$0.00" readonly>
+                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow whitespace-nowrap"><i class="fa-solid fa-vault"></i> Arqueo</button>
                             </div>
                         </div>
+                        <!-- ZELLE -->
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Zelle ($)</label>
-                            <input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0">
+                            <input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-blue-400 text-xs" value="0" placeholder="Monto $">
+                            <input type="text" id="refZelle" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1 mt-1 text-[10px]" placeholder="Titular / Ref Zelle">
                         </div>
+                        <!-- BINANCE / TOWERBANK -->
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">Binance/Tower ($)</label>
-                            <input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0">
+                            <label class="text-xs text-slate-400 block mb-1">Binance / Tower ($)</label>
+                            <input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-amber-400 text-xs" value="0" placeholder="Monto $">
+                            <input type="text" id="refBinance" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1 mt-1 text-[10px]" placeholder="Ref / Recibido en Cuenta">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2 border-t border-slate-800/60">
+                        <!-- PAGO MÓVIL (BS) -->
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Pago Móvil (Bs.)</label>
+                            <input type="number" id="pagoMovilBs" oninput="calcularEquivalenteBs()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-purple-400 text-xs" value="0" placeholder="Monto Bs.">
+                            <p class="text-[10px] text-slate-400 mt-0.5">Equiv: $<span id="eqMovil">0.00</span></p>
+                        </div>
+                        <!-- TRANSFERENCIA NACIONAL (BS) -->
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Transf. Nacional (Bs.)</label>
+                            <input type="number" id="pagoTransfBs" oninput="calcularEquivalenteBs()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-purple-400 text-xs" value="0" placeholder="Monto Bs.">
+                            <p class="text-[10px] text-slate-400 mt-0.5">Equiv: $<span id="eqTransf">0.00</span></p>
+                        </div>
+                        <!-- PUNTO DE VENTA (BS) -->
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Punto de Venta (Bs.)</label>
+                            <input type="number" id="pagoPuntoBs" oninput="calcularEquivalenteBs()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-1.5 font-bold text-purple-400 text-xs" value="0" placeholder="Monto Bs.">
+                            <p class="text-[10px] text-slate-400 mt-0.5">Equiv: $<span id="eqPunto">0.00</span></p>
                         </div>
                     </div>
                 </div>
@@ -371,7 +398,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE ARQUEO DE EFECTIVO (LÍNEAS SEPARADAS 1, 5, 10, 20, 50, 100) -->
+    <!-- MODAL DE ARQUEO DE EFECTIVO ($1, $5, $10, $20, $50, $100 SEPARADOS) -->
     <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -448,6 +475,12 @@
             document.getElementById('pagoEfec').value = "$0.00";
             document.getElementById('pagoZelle').value = 0;
             document.getElementById('pagoBinance').value = 0;
+            document.getElementById('pagoMovilBs').value = 0;
+            document.getElementById('pagoTransfBs').value = 0;
+            document.getElementById('pagoPuntoBs').value = 0;
+            document.getElementById('eqMovil').innerText = "0.00";
+            document.getElementById('eqTransf').innerText = "0.00";
+            document.getElementById('eqPunto').innerText = "0.00";
             document.getElementById('arq100').value = 0;
             document.getElementById('arq50').value = 0;
             document.getElementById('arq20').value = 0;
@@ -488,6 +521,16 @@
             document.getElementById('lblArqTotal').innerText = `$${t.toFixed(2)}`;
         }
 
+        function calcularEquivalenteBs() {
+            let movBs = parseFloat(document.getElementById('pagoMovilBs').value || 0);
+            let trsBs = parseFloat(document.getElementById('pagoTransfBs').value || 0);
+            let ptoBs = parseFloat(document.getElementById('pagoPuntoBs').value || 0);
+
+            document.getElementById('eqMovil').innerText = (movBs / tasaBCV).toFixed(2);
+            document.getElementById('eqTransf').innerText = (trsBs / tasaBCV).toFixed(2);
+            document.getElementById('eqPunto').innerText = (ptoBs / tasaBCV).toFixed(2);
+        }
+
         function actualizarPrecioMoto() {
             let v = document.getElementById('regModeloMoto').value.split('|');
             document.getElementById('regPrecioMoto').value = v[1];
@@ -496,10 +539,17 @@
         function procesarRegistro() {
             let cliente = document.getElementById('regCliente').value || 'Cliente General';
             let factura = document.getElementById('regFactura').value || 'S/N';
+            
             let efec = efectivoCalculado;
             let zelle = parseFloat(document.getElementById('pagoZelle').value || 0);
             let binance = parseFloat(document.getElementById('pagoBinance').value || 0);
-            let pagoDia = efec + zelle + binance;
+            
+            let movBs = parseFloat(document.getElementById('pagoMovilBs').value || 0);
+            let trsBs = parseFloat(document.getElementById('pagoTransfBs').value || 0);
+            let ptoBs = parseFloat(document.getElementById('pagoPuntoBs').value || 0);
+            
+            let totalBsUSD = (movBs + trsBs + ptoBs) / tasaBCV;
+            let pagoDia = efec + zelle + binance + totalBsUSD;
 
             if(tipoActual === 'MOTO') {
                 let mData = document.getElementById('regModeloMoto').value.split('|');
@@ -510,7 +560,7 @@
 
                 let pendienteRequerido = facturado - abonoAnt;
 
-                if(modalidad === 'CONTADO' && Math.abs(pagoDia - pendienteRequerido) > 0.01) {
+                if(modalidad === 'CONTADO' && Math.abs(pagoDia - pendienteRequerido) > 0.05) {
                     alert(`Error: La modalidad es de CONTADO. El pago del día ($${pagoDia.toFixed(2)}) debe cubrir exactamente el monto pendiente de la factura ($${pendienteRequerido.toFixed(2)}). Si es pago parcial, seleccione Apartado o Motos Yes.`);
                     return;
                 }
@@ -524,7 +574,7 @@
             } else {
                 let concepto = document.getElementById('regConceptoTaller').value || 'Servicio General';
                 let total = parseFloat(document.getElementById('regMontoTaller').value) || 0;
-                let medio = `Efectiv:$${efec} / Zelle:$${zelle} / Bin:$${binance}`;
+                let medio = `Efect:$${efec} / Zel:$${zelle} / Bin:$${binance} / BsUSD:$${totalBsUSD.toFixed(2)}`;
 
                 movimientosTaller.push({ cliente, factura, concepto, medio, total });
                 renderTaller();
