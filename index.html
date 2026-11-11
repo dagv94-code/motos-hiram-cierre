@@ -371,7 +371,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE ARQUEO DE EFECTIVO (LÍNEAS SEPARADAS) -->
+    <!-- MODAL DE ARQUEO DE EFECTIVO (LÍNEAS SEPARADAS 1, 5, 10, 20, 50, 100) -->
     <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -630,8 +630,8 @@
             let html = `
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
                     <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="18.00" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$18.00</p></div>
+                    <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="17.40" oninput="calcularSeguros()"></div>
+                    <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$17.40</p></div>
                     <div class="text-right"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
                 </div>
             `;
