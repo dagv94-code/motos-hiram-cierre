@@ -24,74 +24,74 @@
         window.db = db;
     </script>
     <style>
-        /* ESTILOS EXCLUSIVOS PARA EL PDF GERENCIAL DE UNA SOLA PÁGINA */
+        /* ESTILOS EXCLUSIVOS PARA EL PDF GERENCIAL COMPACTO DE UNA SOLA PÁGINA */
         .pdf-page {
             background: #ffffff !important;
             color: #0f172a !important;
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 9.5px;
-            padding: 12px 15px;
+            font-size: 8.5px;
+            padding: 10px 12px;
             width: 210mm;
             box-sizing: border-box;
         }
         .pdf-header {
             border-bottom: 2px solid #dc2626;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .pdf-title h1 { font-size: 15px; font-weight: 900; color: #0f172a; margin: 0; }
-        .pdf-title p { font-size: 9px; color: #64748b; margin: 1px 0; }
-        .pdf-title h2 { font-size: 10px; font-weight: 800; color: #dc2626; margin-top: 2px; text-transform: uppercase; }
+        .pdf-title h1 { font-size: 14px; font-weight: 900; color: #0f172a; margin: 0; }
+        .pdf-title p { font-size: 8.5px; color: #64748b; margin: 1px 0; }
+        .pdf-title h2 { font-size: 9.5px; font-weight: 800; color: #dc2626; margin-top: 2px; text-transform: uppercase; }
         
         .pdf-meta {
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
-            padding: 4px 8px;
+            padding: 4px 6px;
             border-radius: 4px;
             text-align: right;
-            font-size: 9px;
+            font-size: 8.5px;
             color: #334155;
         }
         
         .pdf-kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 5px;
+            margin-bottom: 6px;
         }
         .pdf-kpi-card {
             background: #f8fafc;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
-            padding: 6px;
+            padding: 5px;
             text-align: center;
         }
-        .pdf-kpi-card span { font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; }
-        .pdf-kpi-card strong { font-size: 12px; font-weight: 900; color: #0f172a; margin-top: 1px; display: block; }
+        .pdf-kpi-card span { font-size: 7.5px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; }
+        .pdf-kpi-card strong { font-size: 11px; font-weight: 900; color: #0f172a; margin-top: 1px; display: block; }
 
         .pdf-section-title {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: bold;
             color: #0f172a;
             border-bottom: 1.5px solid #0f172a;
             padding-bottom: 2px;
-            margin-top: 8px;
-            margin-bottom: 4px;
+            margin-top: 6px;
+            margin-bottom: 3px;
             text-transform: uppercase;
         }
 
         .pdf-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 6px;
-            font-size: 9px;
+            margin-bottom: 5px;
+            font-size: 8.5px;
         }
         .pdf-table th, .pdf-table td {
             border: 1px solid #cbd5e1;
-            padding: 4px 5px;
+            padding: 3px 4px;
             text-align: left;
             color: #1e293b;
         }
@@ -104,39 +104,39 @@
         .pdf-grid-2 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 6px;
+            margin-bottom: 5px;
         }
         .pdf-box {
             background: #f8fafc;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
-            padding: 6px;
-            font-size: 9px;
+            padding: 5px;
+            font-size: 8.5px;
         }
         .pdf-box h4 {
-            font-size: 9px;
+            font-size: 8.5px;
             font-weight: bold;
             text-transform: uppercase;
             border-bottom: 1px solid #cbd5e1;
             padding-bottom: 2px;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .pdf-signatures {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 30px;
-            margin-top: 15px;
+            margin-top: 10px;
             text-align: center;
         }
         .pdf-sig-line {
             border-top: 1px solid #475569;
-            padding-top: 4px;
-            margin-top: 25px;
+            padding-top: 3px;
+            margin-top: 20px;
         }
-        .pdf-sig-line p { font-size: 9px; font-weight: bold; color: #0f172a; margin: 0; }
-        .pdf-sig-line span { font-size: 8px; color: #64748b; }
+        .pdf-sig-line p { font-size: 8.5px; font-weight: bold; color: #0f172a; margin: 0; }
+        .pdf-sig-line span { font-size: 7.5px; color: #64748b; }
 
         @media print {
             body { background: #ffffff !important; }
@@ -193,7 +193,7 @@
     </nav>
 
     <!-- PANEL INTERACTIVO DE TRABAJO (WEB) -->
-    <main class="max-w-5xl mx-auto px-6 py-8 space-y-6 bg-slate-950 text-slate-100 print:hidden">
+    <main class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 print:hidden">
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
             <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias</h2>
             
@@ -230,6 +230,16 @@
                 <div class="space-y-2">
                     <div class="flex justify-between items-center"><span class="font-bold text-sm">3. Pólizas Seguros</span><label class="text-xs text-amber-400 flex items-center gap-1 cursor-pointer"><input type="checkbox" id="checkSinSeguros" onchange="toggleSinMovimiento('seguros')" class="rounded"> 0 Pólizas</label></div>
                     <button onclick="agregarLineaSeguro()" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold border border-slate-700 shadow cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Agregar Póliza</button>
+                </div>
+            </div>
+
+            <!-- INVENTARIO INTERACTIVO EN WEB -->
+            <div class="pt-4 border-t border-slate-800 space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-boxes-stacked text-red-500 mr-1.5"></i> 5. Inventario de Motos al Cierre (Confirmación)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs" id="webInventarioContainer"></div>
+                <div class="flex justify-between items-center font-bold text-xs bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <span>Total Unidades en Existencia:</span>
+                    <span id="webTotalInventario" class="text-emerald-400 text-sm">0</span>
                 </div>
             </div>
         </div>
@@ -335,36 +345,36 @@
             <div class="pdf-section-title">4. Resumen Detallado de Formas de Pago y Referencias</div>
             <div class="pdf-grid-2">
                 <div class="pdf-box">
-                    <h4 style="color: #059669; margin: 0 0 4px 0;">Efectivo Divisas ($)</h4>
+                    <h4 style="color: #059669; margin: 0 0 3px 0;">Efectivo Divisas ($)</h4>
                     <div id="pdfResumenEfectivo"><p style="color: #64748b; font-style: italic; margin: 0;">Sin arqueo registrado.</p></div>
                 </div>
                 <div class="pdf-box">
-                    <h4 style="color: #2563eb; margin: 0 0 4px 0;">Zelle ($) - Referencias y Titulares</h4>
+                    <h4 style="color: #2563eb; margin: 0 0 3px 0;">Zelle ($) - Referencias y Titulares</h4>
                     <div id="pdfResumenZelle"><p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Zelle registrados.</p></div>
                 </div>
                 <div class="pdf-box">
-                    <h4 style="color: #d97706; margin: 0 0 4px 0;">Binance / Towerbank ($)</h4>
+                    <h4 style="color: #d97706; margin: 0 0 3px 0;">Binance / Towerbank ($)</h4>
                     <div id="pdfResumenBinance"><p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Binance registrados.</p></div>
                 </div>
                 <div class="pdf-box">
-                    <h4 style="color: #7c3aed; margin: 0 0 4px 0;">Bolívares (Pago Móvil / Transf / Punto)</h4>
+                    <h4 style="color: #7c3aed; margin: 0 0 3px 0;">Bolívares (Pago Móvil / Transf / Punto)</h4>
                     <div id="pdfResumenBs"><p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos en Bolívares registrados.</p></div>
                 </div>
             </div>
 
             <!-- CUADRE GERENCIAL -->
-            <div class="pdf-box" style="background: #f1f5f9; border: 1px solid #94a3b8; margin-bottom: 8px; padding: 6px;">
-                <h4 style="color: #0f172a; text-align: center; font-weight: bold; font-size: 10px; margin: 0 0 4px 0;">Cuadre Gerencial de Cierre (Diferencia Objetivo: $0.00)</h4>
+            <div class="pdf-box" style="background: #f1f5f9; border: 1px solid #94a3b8; margin-bottom: 6px; padding: 5px;">
+                <h4 style="color: #0f172a; text-align: center; font-weight: bold; font-size: 9px; margin: 0 0 3px 0;">Cuadre Gerencial de Cierre (Diferencia Objetivo: $0.00)</h4>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
-                    <div><span style="font-size: 8px; color: #64748b;">Total Ingresos Recibidos</span><strong id="pdfCuadreIngresos" style="font-size: 11px; color: #059669;">$0.00</strong></div>
-                    <div><span style="font-size: 8px; color: #64748b;">Total Venta Facturada</span><strong id="pdfCuadreVentas" style="font-size: 11px; color: #0f172a;">$0.00</strong></div>
-                    <div><span style="font-size: 8px; color: #64748b;">Diferencia (Cuadre)</span><strong id="pdfCuadreDiferencia" style="font-size: 11px; color: #dc2626;">$0.00</strong></div>
+                    <div><span style="font-size: 7.5px; color: #64748b;">Total Ingresos Recibidos</span><strong id="pdfCuadreIngresos" style="font-size: 10.5px; color: #059669;">$0.00</strong></div>
+                    <div><span style="font-size: 7.5px; color: #64748b;">Total Venta Facturada</span><strong id="pdfCuadreVentas" style="font-size: 10.5px; color: #0f172a;">$0.00</strong></div>
+                    <div><span style="font-size: 7.5px; color: #64748b;">Diferencia (Cuadre)</span><strong id="pdfCuadreDiferencia" style="font-size: 10.5px; color: #dc2626;">$0.00</strong></div>
                 </div>
             </div>
 
             <!-- 5. INVENTARIO -->
             <div class="pdf-section-title">5. Inventario de Motocicletas al Cierre</div>
-            <table class="pdf-table" style="margin-bottom: 4px;">
+            <table class="pdf-table" style="margin-bottom: 3px;">
                 <thead>
                     <tr>
                         <th>Modelo de Motocicleta</th>
@@ -375,7 +385,7 @@
                     <!-- Dinámico -->
                 </tbody>
             </table>
-            <div style="text-align: right; font-weight: bold; font-size: 10px; margin-bottom: 15px;">
+            <div style="text-align: right; font-weight: bold; font-size: 9.5px; margin-bottom: 10px;">
                 Total Unidades en Existencia: <span id="pdfTotalInventario" style="color: #059669;">0</span>
             </div>
 
@@ -911,24 +921,24 @@
                 if(op.efec > 0) totalEfec += op.efec;
                 if(op.zelle > 0) {
                     totalZelle += op.zelle;
-                    zelleLines.push(`<p style="margin: 2px 0;">${op.cliente} | Ref: ${op.zelleRef} | Titular: ${op.zelleTitular} | <strong>$${op.zelle.toFixed(2)}</strong></p>`);
+                    zelleLines.push(`<p style="margin: 1px 0;">${op.cliente} | Ref: ${op.zelleRef} | Titular: ${op.zelleTitular} | <strong>$${op.zelle.toFixed(2)}</strong></p>`);
                 }
                 if(op.binance > 0) {
                     totalBinance += op.binance;
-                    binanceLines.push(`<p style="margin: 2px 0;">${op.cliente} | Ref: ${op.binRef} | Recibido: <strong>$${(op.binRecibido || op.binance).toFixed(2)}</strong></p>`);
+                    binanceLines.push(`<p style="margin: 1px 0;">${op.cliente} | Ref: ${op.binRef} | Recibido: <strong>$${(op.binRecibido || op.binance).toFixed(2)}</strong></p>`);
                 }
                 if(op.bsList) {
                     op.bsList.forEach(bs => {
                         totalBs += bs.usd;
-                        bsLines.push(`<p style="margin: 2px 0;">${bs.tipo}: ${bs.montoBs} Bs. (Ref: ${bs.ref}) -> <strong>$${bs.usd.toFixed(2)}</strong></p>`);
+                        bsLines.push(`<p style="margin: 1px 0;">${bs.tipo}: ${bs.montoBs} Bs. (Ref: ${bs.ref}) -> <strong>$${bs.usd.toFixed(2)}</strong></p>`);
                     });
                 }
             });
 
             document.getElementById('pdfResumenEfectivo').innerHTML = totalEfec > 0 ? `<p style="margin: 0;">Total Efectivo Recaudado: <strong>$${totalEfec.toFixed(2)}</strong></p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin arqueo de efectivo registrado.</p>`;
-            document.getElementById('pdfResumenZelle').innerHTML = zelleLines.length > 0 ? zelleLines.join('') + `<p style="margin-top: 3px; font-weight: bold;">Total Zelle: $${totalZelle.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Zelle registrados.</p>`;
-            document.getElementById('pdfResumenBinance').innerHTML = binanceLines.length > 0 ? binanceLines.join('') + `<p style="margin-top: 3px; font-weight: bold;">Total Binance: $${totalBinance.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Binance registrados.</p>`;
-            document.getElementById('pdfResumenBs').innerHTML = bsLines.length > 0 ? bsLines.join('') + `<p style="margin-top: 3px; font-weight: bold;">Total Bs. Eq: $${totalBs.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos en Bolívares registrados.</p>`;
+            document.getElementById('pdfResumenZelle').innerHTML = zelleLines.length > 0 ? zelleLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Zelle: $${totalZelle.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Zelle registrados.</p>`;
+            document.getElementById('pdfResumenBinance').innerHTML = binanceLines.length > 0 ? binanceLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Binance: $${totalBinance.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Binance registrados.</p>`;
+            document.getElementById('pdfResumenBs').innerHTML = bsLines.length > 0 ? bsLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Bs. Eq: $${totalBs.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos en Bolívares registrados.</p>`;
 
             let totalIngresos = totalEfec + totalZelle + totalBinance + totalBs;
             let totalVentas = movimientosMotos.reduce((a,b) => a + b.pagoDia, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
@@ -942,22 +952,41 @@
         }
 
         function renderInventario() {
-            let tbody = document.getElementById('pdfTablaInventarioBody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
+            let container = document.getElementById('webInventarioContainer');
+            let pdfContainer = document.getElementById('pdfTablaInventarioBody');
+            
+            if(container) container.innerHTML = '';
+            if(pdfContainer) pdfContainer.innerHTML = '';
+            
             let totalUnidades = 0;
             for (let [mod, cant] of Object.entries(inventario)) {
                 totalUnidades += cant;
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${mod}</strong></td>
-                        <td style="text-align: center; font-weight: bold;">
-                            <input type="number" value="${cant}" onchange="actualizarInventario('${mod}', this.value)" style="width: 50px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px;">
-                        </td>
-                    </tr>
-                `;
+                
+                // Renderizado interactivo en panel web
+                if(container) {
+                    container.innerHTML += `
+                        <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-[11px] font-bold text-slate-300">${mod}</span>
+                            <input type="number" value="${cant}" onchange="actualizarInventario('${mod}', this.value)" class="w-14 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-xs text-white">
+                        </div>
+                    `;
+                }
+
+                // Renderizado compacto para el PDF
+                if(pdfContainer) {
+                    pdfContainer.innerHTML += `
+                        <tr>
+                            <td><strong>${mod}</strong></td>
+                            <td style="text-align: center; font-weight: bold;">${cant}</td>
+                        </tr>
+                    `;
+                }
             }
-            document.getElementById('pdfTotalInventario').innerText = totalUnidades;
+            
+            let lblInv = document.getElementById('webTotalInventario');
+            let pdfInv = document.getElementById('pdfTotalInventario');
+            if(lblInv) lblInv.innerText = totalUnidades;
+            if(pdfInv) pdfInv.innerText = totalUnidades;
         }
 
         function actualizarInventario(mod, val) {
@@ -968,15 +997,17 @@
         function agregarLineaSeguro() {
             let segBody = document.getElementById('pdfTablaSegurosBody');
             if(segBody) {
-                segBody.innerHTML = `<tr><td>Pólizas Seguros Caracas (Ajustadas)</td><td id="pdfSegCantidad">1</td><td id="pdfSegPrecio">$15.00</td><td id="pdfSegSubtotal">$15.00</td></tr>`;
+                segBody.innerHTML = `<tr><td>Pólizas Seguros Caracas</td><td id="pdfSegCantidad">1</td><td id="pdfSegPrecio">$15.00</td><td id="pdfSegSubtotal">$15.00</td></tr>`;
             }
             document.getElementById('webTotalSegurosCard').innerText = '$15.00';
+            document.getElementById('pdfTotalSegurosCard').innerText = '$15.00';
         }
 
         function calcularSeguros() {
             let chk = document.getElementById('checkSinSeguros');
             if(chk && chk.checked) {
                 document.getElementById('webTotalSegurosCard').innerText = '$0.00';
+                document.getElementById('pdfTotalSegurosCard').innerText = '$0.00';
                 let segBody = document.getElementById('pdfTablaSegurosBody');
                 if(segBody) segBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #059669; font-weight: bold;">[ 0 PÓLIZAS REGISTRADAS ]</td></tr>`;
             }
@@ -1006,12 +1037,12 @@
                 console.error("Error al guardar en Firebase:", e);
             }
 
-            // 2. Generar PDF exclusivamente con la plantilla gerencial formal de una página
+            // 2. Generar PDF exclusivamente con la plantilla gerencial compactada en una página
             let element = document.getElementById('areaPDF');
-            element.style.display = 'block'; // Mostrar la plantilla limpia para la captura
+            element.style.display = 'block';
 
             let opt = {
-                margin:       [8, 8, 8, 8],
+                margin:       [5, 5, 5, 5],
                 filename:     `Cierre_Gerencial_MotosHiram_${document.getElementById('sucursalActiva').value}_${document.getElementById('inputFechaCierre').value}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
@@ -1019,14 +1050,21 @@
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                element.style.display = 'none'; // Ocultar nuevamente
+                element.style.display = 'none';
                 alert('¡Informe ejecutivo consolidado, guardado en la nube y PDF descargado con éxito!');
 
                 // 3. Limpiar pantalla de forma automática para el día siguiente
                 movimientosMotos = [];
                 movimientosTaller = [];
+                document.getElementById('checkSinMotos').checked = false;
+                document.getElementById('checkSinTaller').checked = false;
+                document.getElementById('checkSinSeguros').checked = false;
+                document.getElementById('contenedorTablaMotos').style.display = 'block';
+                document.getElementById('contenedorTablaTaller').style.display = 'block';
+                document.getElementById('contenedorSegurosArea').style.display = 'block';
                 renderMotos();
                 renderTaller();
+                renderInventario();
             });
         }
 
