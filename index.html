@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motos Hiram C.A. - Sistema Integral de Cierres</title>
+    <title>Motos Hiram C.A. - Reporte Gerencial de Cierre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -23,6 +23,13 @@
         const db = firebase.firestore();
         window.db = db;
     </script>
+    <style>
+        @media print {
+            body { background: white !important; color: black !important; }
+            .print\:hidden { display: none !important; }
+            .page-break { page-break-before: always; }
+        }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased">
 
@@ -33,7 +40,7 @@
                 <div class="bg-red-600 text-white p-2.5 rounded-xl font-black text-xl shadow-lg">MH</div>
                 <div>
                     <h1 class="text-lg font-extrabold tracking-tight text-white">MOTOS HIRAM, C.A.</h1>
-                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Integral de Cierres Multisede</p>
+                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Gerencial de Cierres</p>
                 </div>
             </div>
             
@@ -46,11 +53,11 @@
                     </select>
                 </div>
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-slate-300">
-                    <i class="fa-solid fa-calendar text-red-500 mr-1"></i> Miércoles, 11 de nov. de 2026
+                    <i class="fa-solid fa-calendar text-red-500 mr-1"></i> <span id="lblFechaHoy"></span>
                 </div>
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-amber-400">
                     <i class="fa-solid fa-coins"></i> Tasa: 
-                    <input type="number" id="txtTasaBCV" value="1000" placeholder="Ej. 1000" oninput="actualizarTasaGlobal()" class="w-20 bg-slate-900 border border-amber-500 rounded p-1 text-center font-bold text-white text-xs"> Bs/$
+                    <input type="number" id="txtTasaBCV" value="" placeholder="Ej. 997.92" oninput="actualizarTasaGlobal()" class="w-20 bg-slate-900 border border-amber-500 rounded p-1 text-center font-bold text-white text-xs"> Bs/$
                 </div>
                 <button onclick="totalizarYDescargarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
                     <i class="fa-solid fa-file-pdf"></i> Totalizar y Descargar PDF
@@ -69,214 +76,195 @@
         </div>
     </nav>
 
-    <!-- CONTENIDO IMPRIMIBLE / PDF -->
-    <main id="areaPDF" class="max-w-7xl mx-auto px-4 py-6 space-y-6 bg-slate-950">
+    <!-- CONTENIDO GENERAL (ÁREA DE PDF GERENCIAL) -->
+    <main id="areaPDF" class="max-w-5xl mx-auto px-6 py-8 space-y-8 bg-slate-950 text-slate-100">
 
-        <!-- 1. CIERRE DIARIO -->
-        <section id="seccion-cierre" class="space-y-6">
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex justify-between items-center flex-wrap gap-4 print:hidden">
-                <div>
-                    <h2 class="text-lg font-bold text-white">Cierre Diario Activo</h2>
-                    <p class="text-xs text-slate-400" id="txtSedeInfo">Sede: Maracaibo (Principal) • Adm: Jennmary Parra • Gerente: Lic. David García</p>
-                </div>
+        <!-- ENCABEZADO INSTITUCIONAL PARA PDF -->
+        <div class="border-b-2 border-red-600 pb-4 flex justify-between items-start">
+            <div>
+                <h1 class="text-xl font-black tracking-wider text-white">MOTOS HIRAM, C.A.</h1>
+                <p class="text-xs text-slate-400">ZULIA • RIF: J-050770055-0</p>
+                <h2 class="text-base font-extrabold text-red-500 mt-1 uppercase" id="lblReporteTitulo">REPORTE DE CIERRE DIARIO - MARACAIBO</h2>
             </div>
-
-            <!-- TARJETAS -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 print:grid-cols-2">
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Total Facturado</p>
-                    <p class="text-2xl font-black text-white" id="lblTotalFacturado">$0.00</p>
-                </div>
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Total Abonos / Pagos Hoy</p>
-                    <p class="text-2xl font-black text-emerald-400" id="lblTotalAbonos">$0.00</p>
-                </div>
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Cuentas por Cobrar (CXC)</p>
-                    <p class="text-2xl font-black text-amber-400" id="lblTotalCXC">$0.00</p>
-                </div>
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Seguro Caracas</p>
-                    <p class="text-2xl font-black text-blue-400" id="lblTotalSegurosCard">$0.00</p>
-                </div>
+            <div class="text-right text-xs text-slate-300 space-y-1">
+                <p><span class="font-bold">Fecha:</span> <span id="lblFechaPDF">--/--/----</span></p>
+                <p><span class="font-bold">Tasa Oficial BCV:</span> <span id="lblTasaPDF" class="text-amber-400 font-bold">0.00</span> Bs/$</p>
+                <p><span class="font-bold">Versión:</span> 1.4</p>
             </div>
+        </div>
 
-            <!-- TABLA MOTOS -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-                <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
-                    <span class="font-bold text-sm text-white"><i class="fa-solid fa-motorcycle text-red-500 mr-2"></i> Registro de Ventas de Motos y Abonos (CXC)</span>
-                    <button onclick="iniciarModalRegistro('MOTO')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5 print:hidden">
-                        <i class="fa-solid fa-plus"></i> Cargar Venta / Abono Moto
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-800/60 text-slate-400 text-xs uppercase border-b border-slate-800">
-                                <th class="p-3">Cliente</th>
-                                <th class="p-3">Modelo</th>
-                                <th class="p-3">Factura</th>
-                                <th class="p-3">Facturado ($)</th>
-                                <th class="p-3">Abonos Ant. ($)</th>
-                                <th class="p-3">Pago Día ($)</th>
-                                <th class="p-3">CXC ($)</th>
-                                <th class="p-3 text-center print:hidden">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaMotosBody" class="divide-y divide-slate-800">
-                            <tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- PÁGINA 1: TRANSACCIONES (MOTOS Y TALLER) -->
+        <div class="space-y-6">
+            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-motorcycle text-red-500 mr-2"></i> 1. Relación de Ventas y Abonos de Motos</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800">
+                            <th class="p-2.5">Cliente</th>
+                            <th class="p-2.5">Descripción / Modelo</th>
+                            <th class="p-2.5">Factura</th>
+                            <th class="p-2.5">Facturación ($)</th>
+                            <th class="p-2.5">Abonos Ant. ($)</th>
+                            <th class="p-2.5">Pago Día ($)</th>
+                            <th class="p-2.5">CXC ($)</th>
+                            <th class="p-2.5 text-center print:hidden">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaMotosBody" class="divide-y divide-slate-800/60">
+                        <tr><td colspan="8" class="p-4 text-center text-slate-500 italic">No hay registros de motos cargados para hoy.</td></tr>
+                    </tbody>
+                </table>
             </div>
-
-            <!-- TABLA TALLER -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-                <div class="p-4 bg-slate-850 border-b border-slate-800 flex justify-between items-center">
-                    <span class="font-bold text-sm text-white"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-2"></i> Movimientos y Servicios de Taller</span>
-                    <button onclick="iniciarModalRegistro('TALLER')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5 print:hidden">
-                        <i class="fa-solid fa-plus"></i> Cargar Servicio Taller
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-800/60 text-slate-400 text-xs uppercase border-b border-slate-800">
-                                <th class="p-3">Cliente</th>
-                                <th class="p-3">N° Factura</th>
-                                <th class="p-3">Concepto / Descripción</th>
-                                <th class="p-3">Medio de Pago</th>
-                                <th class="p-3">Total ($)</th>
-                                <th class="p-3 text-center print:hidden">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaTallerBody" class="divide-y divide-slate-800">
-                            <tr><td colspan="6" class="p-6 text-center text-slate-500 italic">No hay servicios de taller cargados.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="flex justify-end print:hidden">
+                <button onclick="iniciarModalRegistro('MOTO')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Cargar Venta / Abono Moto
+                </button>
             </div>
+        </div>
 
-            <!-- PÓLIZAS SEGURO CARACAS -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="text-base font-bold text-white"><i class="fa-solid fa-shield-cat text-red-500 mr-2"></i> Pólizas Pendientes Seguros Caracas</h3>
-                    <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold border border-slate-700 print:hidden"><i class="fa-solid fa-plus mr-1"></i> Agregar Línea (+)</button>
-                </div>
-                <div id="contenedorSeguros" class="space-y-3">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
-                        <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
-                        <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
-                        <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$0.00</p></div>
-                        <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+        <div class="space-y-6">
+            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-screwdriver-wrench text-amber-500 mr-2"></i> 2. Movimientos y Servicios de Taller</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800">
+                            <th class="p-2.5">Cliente</th>
+                            <th class="p-2.5">N° Factura</th>
+                            <th class="p-2.5">Concepto / Descripción</th>
+                            <th class="p-2.5">Medio de Pago</th>
+                            <th class="p-2.5">Total ($)</th>
+                            <th class="p-2.5 text-center print:hidden">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaTallerBody" class="divide-y divide-slate-800/60">
+                        <tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Espacio en blanco)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-end print:hidden">
+                <button onclick="iniciarModalRegistro('TALLER')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Cargar Servicio Taller
+                </button>
+            </div>
+        </div>
+
+        <!-- SALTO DE PÁGINA PROFESIONAL PARA PDF -->
+        <div class="page-break"></div>
+
+        <!-- PÁGINA 2: RESUMEN FINANCIERO, MEDIOS DE PAGO, SEGUROS E INVENTARIO -->
+        <div class="space-y-6 pt-4">
+            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> 3. Resumen y Detalle de Formas de Pago</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                <!-- DETALLE EFECTIVO -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h4 class="font-bold text-emerald-400 uppercase text-xs border-b border-slate-800 pb-1">Efectivo Divisas ($)</h4>
+                    <div id="resumenEfectivoList" class="space-y-1 text-slate-300">
+                        <p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p>
                     </div>
-                </div>
-                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center font-black text-base">
-                    <span class="text-slate-200">Total Pólizas Seguro Caracas:</span>
-                    <span id="lblTotalSeguroCaracas" class="text-white">$0.00</span>
-                </div>
-            </div>
-
-            <!-- INVENTARIO -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-                <h3 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-boxes-stacked text-red-500 mr-2"></i> Inventario de Motos al Cierre</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3" id="inventarioContainer"></div>
-                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center font-black text-base">
-                    <span class="text-slate-200">Total Unidades en Existencia:</span>
-                    <span id="lblTotalInventario" class="text-emerald-400">0</span>
-                </div>
-            </div>
-
-            <!-- FIRMAS -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-                <div class="text-center space-y-3">
-                    <p class="text-xs uppercase font-bold text-slate-400">Preparado por (Administración)</p>
-                    <div class="pt-8 border-b border-slate-700 w-3/4 mx-auto"></div>
-                    <p class="font-bold text-white text-sm" id="lblAdminNombre">Jennmary Parra</p>
-                    <p class="text-xs text-slate-500">Analista Administrativo</p>
-                </div>
-                <div class="text-center space-y-3">
-                    <p class="text-xs uppercase font-bold text-slate-400">Revisado por (Gerencia)</p>
-                    <div class="pt-8 border-b border-slate-700 w-3/4 mx-auto"></div>
-                    <p class="font-bold text-white text-sm" id="lblGerenteNombre">Lic. David A. García V. (CI: 22.362.833)</p>
-                    <p class="text-xs text-slate-500">Gerente de Concesionario</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. ARQUEO -->
-        <section id="seccion-arqueo" class="hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-                    <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-money-bill-wave text-emerald-500 mr-2"></i> Arqueo de Divisas en Efectivo ($)</h2>
-                    <div class="grid grid-cols-2 gap-3 text-sm">
-                        <div><label class="font-bold text-xs text-slate-400">Billetes de $100</label><input type="number" id="b100" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
-                        <div><label class="font-bold text-xs text-slate-400">Billetes de $50</label><input type="number" id="b50" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
-                        <div><label class="font-bold text-xs text-slate-400">Billetes de $20</label><input type="number" id="b20" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
-                        <div><label class="font-bold text-xs text-slate-400">Billetes de $10</label><input type="number" id="b10" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
-                        <div><label class="font-bold text-xs text-slate-400">Billetes de $5</label><input type="number" id="b5" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
-                        <div><label class="font-bold text-xs text-slate-400">Billetes de $1</label><input type="number" id="b1" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0"></div>
-                    </div>
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center text-lg font-black">
-                        <span class="text-slate-300">Total Efectivo Divisas:</span>
-                        <span id="lblArqueoTotal" class="text-emerald-400">$0.00</span>
+                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                        <span>Total Efectivo:</span>
+                        <span id="resumenEfectivoTotal" class="text-emerald-400">$0.00</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-                    <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-credit-card text-blue-500 mr-2"></i> Ingresos en Bolívares</h2>
-                    <div class="space-y-3 text-sm">
-                        <div>
-                            <label class="font-bold text-xs text-slate-400">Monto Total en Bolívares (Bs.)</label>
-                            <input type="number" id="montoBs" oninput="calcularArqueo()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white" value="0" placeholder="Ej. 26025.81">
-                        </div>
+                <!-- DETALLE ZELLE -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h4 class="font-bold text-blue-400 uppercase text-xs border-b border-slate-800 pb-1">Zelle ($)</h4>
+                    <div id="resumenZelleList" class="space-y-1 text-slate-300">
+                        <p class="italic text-slate-500">Sin pagos por Zelle registrados.</p>
                     </div>
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center text-lg font-black">
-                        <span class="text-slate-300">Equivalente en USD ($):</span>
-                        <span id="lblArqueoBsUSD" class="text-blue-400">$0.00</span>
+                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                        <span>Total Zelle:</span>
+                        <span id="resumenZelleTotal" class="text-blue-400">$0.00</span>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- 3. HISTÓRICO -->
-        <section id="seccion-historico" class="hidden space-y-6">
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <h2 class="text-xl font-bold text-white mb-4">Cierres Históricos Sincronizados (Maracaibo y Cabimas)</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-800 text-slate-400 text-xs uppercase border-b border-slate-800">
-                                <th class="p-3">Fecha y Hora</th>
-                                <th class="p-3">Sucursal</th>
-                                <th class="p-3">Facturado ($)</th>
-                                <th class="p-3">Operaciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaHistoricoBody">
-                            <tr><td colspan="4" class="p-4 text-center text-slate-500">Consultando base de datos en la nube...</td></tr>
-                        </tbody>
-                    </table>
+                <!-- DETALLE BINANCE -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h4 class="font-bold text-amber-400 uppercase text-xs border-b border-slate-800 pb-1">Binance / Towerbank ($)</h4>
+                    <div id="resumenBinanceList" class="space-y-1 text-slate-300">
+                        <p class="italic text-slate-500">Sin pagos por Binance registrados.</p>
+                    </div>
+                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                        <span>Total Binance:</span>
+                        <span id="resumenBinanceTotal" class="text-amber-400">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- DETALLE BOLÍVARES -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h4 class="font-bold text-purple-400 uppercase text-xs border-b border-slate-800 pb-1">Bolívares (Pago Móvil / Transf / Punto)</h4>
+                    <div id="resumenBsList" class="space-y-1 text-slate-300">
+                        <p class="italic text-slate-500">Sin pagos en Bolívares registrados.</p>
+                    </div>
+                    <div class="flex justify-between font-black pt-2 border-t border-slate-800 text-sm">
+                        <span>Total Bs. Equivalente:</span>
+                        <span id="resumenBsTotal" class="text-purple-400">$0.00</span>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- 4. CONFIGURACIÓN -->
-        <section id="seccion-config" class="hidden space-y-6">
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl max-w-xl space-y-4">
-                <h2 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Configuración y Seguridad</h2>
-                <div class="space-y-3 text-sm">
-                    <div><label class="font-bold text-xs text-slate-400">Clave Gerencial Interna</label><input type="password" id="txtClaveAdmin" value="MotosHiram" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white"></div>
-                    <button onclick="reiniciarCierreDia()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl font-bold text-sm shadow">Reiniciar Cierre del Día (Borrar notas emitidas)</button>
+            <!-- CUADRE GERENCIAL DE CIERRE (DIFERENCIA = 0) -->
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                <h4 class="font-bold text-slate-200 uppercase text-xs border-b border-slate-800 pb-1">Cuadre General de Cierre</h4>
+                <div class="grid grid-cols-3 gap-4 text-center font-bold">
+                    <div class="bg-slate-800 p-2.5 rounded-lg"><p class="text-[10px] text-slate-400">Total Ingresos Recibidos</p><p id="cuadreIngresos" class="text-emerald-400 text-base">$0.00</p></div>
+                    <div class="bg-slate-800 p-2.5 rounded-lg"><p class="text-[10px] text-slate-400">Total Venta Facturada</p><p id="cuadreVentas" class="text-white text-base">$0.00</p></div>
+                    <div class="bg-slate-800 p-2.5 rounded-lg"><p class="text-[10px] text-slate-400">Diferencia (Debe ser $0.00)</p><p id="cuadreDiferencia" class="text-cyan-400 text-base">$0.00</p></div>
                 </div>
             </div>
-        </section>
+        </div>
+
+        <!-- PÓLIZAS SEGURO CARACAS -->
+        <div class="space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-shield-cat text-red-500 mr-2"></i> 4. Pólizas Pendientes Seguros Caracas</h3>
+                <button onclick="agregarLineaSeguro()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1 rounded font-bold border border-slate-700 print:hidden"><i class="fa-solid fa-plus mr-1"></i> Agregar Línea (+)</button>
+            </div>
+            <div id="contenedorSeguros" class="space-y-2 text-xs">
+                <div class="grid grid-cols-4 gap-2 items-center bg-slate-900 p-2.5 rounded-lg border border-slate-800 linea-seguro">
+                    <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-cant font-bold" value="1" oninput="calcularSeguros()"></div>
+                    <div><label class="text-[10px] text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-precio font-bold" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
+                    <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 seg-sub">$0.00</p></div>
+                    <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-3 rounded-lg border border-slate-800">
+                <span>Total Pólizas Seguro Caracas:</span>
+                <span id="lblTotalSeguroCaracas" class="text-white text-sm">$0.00</span>
+            </div>
+        </div>
+
+        <!-- INVENTARIO AL CIERRE -->
+        <div class="space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 border-b border-slate-800 pb-2"><i class="fa-solid fa-boxes-stacked text-red-500 mr-2"></i> 5. Inventario de Motos al Cierre</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs" id="inventarioContainer"></div>
+            <div class="flex justify-between items-center font-bold text-xs bg-slate-900 p-3 rounded-lg border border-slate-800">
+                <span>Total Unidades en Existencia:</span>
+                <span id="lblTotalInventario" class="text-emerald-400 text-sm">0</span>
+            </div>
+        </div>
+
+        <!-- FIRMAS GERENCIALES -->
+        <div class="grid grid-cols-2 gap-8 pt-8 border-t border-slate-800">
+            <div class="text-center space-y-2">
+                <div class="pt-10 border-b border-slate-600 w-3/4 mx-auto"></div>
+                <p class="font-bold text-white text-xs" id="lblAdminNombre">Jennmary Parra</p>
+                <p class="text-[10px] text-slate-400">Preparado por (Analista Administrativo)</p>
+            </div>
+            <div class="text-center space-y-2">
+                <div class="pt-10 border-b border-slate-600 w-3/4 mx-auto"></div>
+                <p class="font-bold text-white text-xs" id="lblGerenteNombre">Lic. David A. García V. (CI: 22.362.833)</p>
+                <p class="text-[10px] text-slate-400">Revisado por (Gerente de Concesionario)</p>
+            </div>
+        </div>
 
     </main>
 
     <!-- MODAL DE REGISTRO UNIFICADO -->
-    <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-40 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 my-8 text-white relative">
+    <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-lg font-bold" id="modalTitulo">Registrar Operación</h3>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
@@ -337,7 +325,6 @@
                 <!-- MEDIOS DE PAGO -->
                 <div class="border-t border-slate-800 pt-3 space-y-3">
                     <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Medios de Pago</h4>
-                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Divisas Efectivo ($)</label>
@@ -361,7 +348,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2 border-t border-slate-800/60">
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Pago Móvil (Bs.)</label>
@@ -389,12 +375,12 @@
             </div>
             <div class="border-t border-slate-800 pt-3 flex justify-end gap-2">
                 <button onclick="cerrarModal()" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl font-bold text-sm">Cancelar</button>
-                <button onclick="procesarRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl font-bold text-sm shadow">Guardar en Cierre</button>
+                <button onclick="procesarRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl font-bold text-sm shadow">Guardar Operación</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE ARQUEO DE EFECTIVO -->
+    <!-- MODALES DE ARQUEO Y PAGOS -->
     <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -419,7 +405,6 @@
         </div>
     </div>
 
-    <!-- MODAL FLOTANTE ZELLE -->
     <div id="modalZelle" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -437,7 +422,6 @@
         </div>
     </div>
 
-    <!-- MODAL FLOTANTE BINANCE -->
     <div id="modalBinance" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -455,7 +439,6 @@
         </div>
     </div>
 
-    <!-- MODAL FLOTANTE BS -->
     <div id="modalBs" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-white relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -505,6 +488,10 @@
 
         function actualizarTasaGlobal() {
             tasaBCV = parseFloat(document.getElementById('txtTasaBCV').value) || 0;
+            let f = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('lblFechaHoy').innerText = f.charAt(0).toUpperCase() + f.slice(1);
+            document.getElementById('lblFechaPDF').innerText = new Date().toLocaleDateString();
+            document.getElementById('lblTasaPDF').innerText = tasaBCV.toFixed(2);
         }
 
         function cambiarPestana(p) {
@@ -524,6 +511,7 @@
             document.getElementById('lblAdminNombre').innerText = personalSedes[sede].admin;
             document.getElementById('lblGerenteNombre').innerText = personalSedes[sede].gerente;
             document.getElementById('txtSedeInfo').innerText = `Sede: ${sede} • Adm: ${personalSedes[sede].admin} • Gerente: ${personalSedes[sede].gerente}`;
+            document.getElementById('lblReporteTitulo').innerText = `REPORTE DE CIERRE DIARIO - ${sede}`;
         }
 
         function iniciarModalRegistro(tipo) {
@@ -662,24 +650,25 @@
                 let pendienteRequerido = facturado - abonoAnt;
 
                 if(modalidad === 'CONTADO' && Math.abs(pagoDia - pendienteRequerido) > 0.05) {
-                    alert(`Error: La modalidad es de CONTADO. El pago del día ($${pagoDia.toFixed(2)}) debe cubrir exactamente el monto pendiente de la factura ($${pendienteRequerido.toFixed(2)}). Si es pago parcial, seleccione Apartado o Motos Yes.`);
+                    alert(`Error: La modalidad es de CONTADO. El pago del día ($${pagoDia.toFixed(2)}) debe cubrir exactamente el monto pendiente de la factura ($${pendienteRequerido.toFixed(2)}).`);
                     return;
                 }
 
                 let cxc = facturado - abonoAnt - pagoDia;
                 if(cxc < 0) cxc = 0;
 
-                movimientosMotos.push({ cliente, modelo, factura, facturado, abonoAnt, pagoDia, cxc });
+                movimientosMotos.push({ cliente, modelo, factura, facturado, abonoAnt, pagoDia, cxc, efec, zelle, binance, bsList: [...bsDataList] });
                 renderMotos();
             } else {
                 let concepto = document.getElementById('regConceptoTaller').value || 'Servicio General';
                 let total = parseFloat(document.getElementById('regMontoTaller').value) || 0;
                 let medio = `Efec:$${efec} / Zel:$${zelle} / Bin:$${binance} / BsUSD:$${totalBsUSD.toFixed(2)}`;
 
-                movimientosTaller.push({ cliente, factura, concepto, medio, total });
+                movimientosTaller.push({ cliente, factura, concepto, medio, total, efec, zelle, binance, bsList: [...bsDataList] });
                 renderTaller();
             }
 
+            actualizarResumenFinanciero();
             cerrarModal();
             document.getElementById('regCliente').value = '';
             document.getElementById('regFactura').value = '';
@@ -688,7 +677,7 @@
         function renderMotos() {
             let tbody = document.getElementById('tablaMotosBody');
             if(movimientosMotos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
                 document.getElementById('lblTotalFacturado').innerText = '$0.00';
                 document.getElementById('lblTotalAbonos').innerText = '$0.00';
                 document.getElementById('lblTotalCXC').innerText = '$0.00';
@@ -701,15 +690,15 @@
                 totA += m.pagoDia;
                 totC += m.cxc;
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800">
-                        <td class="p-3 font-semibold text-white">${m.cliente}</td>
-                        <td class="p-3 text-slate-300">${m.modelo}</td>
-                        <td class="p-3">${m.factura}</td>
-                        <td class="p-3 font-bold text-white">$${m.facturado.toFixed(2)}</td>
-                        <td class="p-3 text-slate-400">$${m.abonoAnt.toFixed(2)}</td>
-                        <td class="p-3 text-emerald-400 font-bold">$${m.pagoDia.toFixed(2)}</td>
-                        <td class="p-3 text-amber-400 font-bold">$${m.cxc.toFixed(2)}</td>
-                        <td class="p-3 text-center print:hidden"><button onclick="verificarClaveEliminar(${idx})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
+                    <tr class="hover:bg-slate-900 border-b border-slate-800">
+                        <td class="p-2.5 font-semibold text-white">${m.cliente}</td>
+                        <td class="p-2.5 text-slate-300">${m.modelo}</td>
+                        <td class="p-2.5">${m.factura}</td>
+                        <td class="p-2.5 font-bold text-white">$${m.facturado.toFixed(2)}</td>
+                        <td class="p-2.5 text-slate-400">$${m.abonoAnt.toFixed(2)}</td>
+                        <td class="p-2.5 text-emerald-400 font-bold">$${m.pagoDia.toFixed(2)}</td>
+                        <td class="p-2.5 text-amber-400 font-bold">$${m.cxc.toFixed(2)}</td>
+                        <td class="p-2.5 text-center print:hidden"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
             });
@@ -718,37 +707,69 @@
             document.getElementById('lblTotalCXC').innerText = `$${totC.toFixed(2)}`;
         }
 
-        function verificarClaveEliminar(idx) {
-            let claveIngresada = prompt("Ingrese la clave gerencial (MotosHiram) para eliminar este registro:");
-            let claveConfig = document.getElementById('txtClaveAdmin').value || 'MotosHiram';
-            if(claveIngresada === claveConfig) {
-                movimientosMotos.splice(idx, 1);
-                renderMotos();
-                alert('Registro eliminado con éxito.');
-            } else if(claveIngresada !== null) {
-                alert('Clave incorrecta.');
-            }
-        }
-
         function renderTaller() {
             let tbody = document.getElementById('tablaTallerBody');
             if(movimientosTaller.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 italic">No hay servicios de taller cargados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Sin movimientos de taller registrados. (Espacio en blanco)</td></tr>`;
                 return;
             }
             tbody.innerHTML = '';
             movimientosTaller.forEach((t, idx) => {
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800">
-                        <td class="p-3 font-semibold text-white">${t.cliente}</td>
-                        <td class="p-3">${t.factura}</td>
-                        <td class="p-3 text-slate-300">${t.concepto}</td>
-                        <td class="p-3 text-xs text-slate-400">${t.medio}</td>
-                        <td class="p-3 font-bold text-emerald-400">$${t.total.toFixed(2)}</td>
-                        <td class="p-3 text-center print:hidden"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
+                    <tr class="hover:bg-slate-900 border-b border-slate-800">
+                        <td class="p-2.5 font-semibold text-white">${t.cliente}</td>
+                        <td class="p-2.5">${t.factura}</td>
+                        <td class="p-2.5 text-slate-300">${t.concepto}</td>
+                        <td class="p-2.5 text-xs text-slate-400">${t.medio}</td>
+                        <td class="p-2.5 font-bold text-emerald-400">$${t.total.toFixed(2)}</td>
+                        <td class="p-2.5 text-center print:hidden"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
             });
+        }
+
+        function actualizarResumenFinanciero() {
+            let totalEfec = 0, totalZelle = 0, totalBinance = 0, totalBs = 0;
+            let zelleLines = [], binanceLines = [], bsLines = [];
+
+            let todasOps = [...movimientosMotos, ...movimientosTaller];
+            todasOps.forEach(op => {
+                if(op.efec > 0) totalEfec += op.efec;
+                if(op.zelle > 0) {
+                    totalZelle += op.zelle;
+                    zelleLines.push(`<p>${op.cliente} | Monto: $${op.zelle.toFixed(2)}</p>`);
+                }
+                if(op.binance > 0) {
+                    totalBinance += op.binance;
+                    binanceLines.push(`<p>${op.cliente} | Monto: $${op.binance.toFixed(2)}</p>`);
+                }
+                if(op.bsList) {
+                    op.bsList.forEach(bs => {
+                        totalBs += bs.usd;
+                        bsLines.push(`<p>${bs.tipo}: ${bs.montoBs} Bs. (Ref: ${bs.ref}) -> $${bs.usd.toFixed(2)}</p>`);
+                    });
+                }
+            });
+
+            document.getElementById('resumenEfectivoList').innerHTML = totalEfec > 0 ? `<p>Efectivo Recaudado en Arqueo</p>` : `<p class="italic text-slate-500">Sin arqueo de efectivo registrado.</p>`;
+            document.getElementById('resumenEfectivoTotal').innerText = `$${totalEfec.toFixed(2)}`;
+
+            document.getElementById('resumenZelleList').innerHTML = zelleLines.length > 0 ? zelleLines.join('') : `<p class="italic text-slate-500">Sin pagos por Zelle registrados.</p>`;
+            document.getElementById('resumenZelleTotal').innerText = `$${totalZelle.toFixed(2)}`;
+
+            document.getElementById('resumenBinanceList').innerHTML = binanceLines.length > 0 ? binanceLines.join('') : `<p class="italic text-slate-500">Sin pagos por Binance registrados.</p>`;
+            document.getElementById('resumenBinanceTotal').innerText = `$${totalBinance.toFixed(2)}`;
+
+            document.getElementById('resumenBsList').innerHTML = bsLines.length > 0 ? bsLines.join('') : `<p class="italic text-slate-500">Sin pagos en Bolívares registrados.</p>`;
+            document.getElementById('resumenBsTotal').innerText = `$${totalBs.toFixed(2)}`;
+
+            let totalIngresos = totalEfec + totalZelle + totalBinance + totalBs;
+            let totalVentas = movimientosMotos.reduce((a,b) => a + b.pagoDia, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
+            let diferencia = totalIngresos - totalVentas;
+
+            document.getElementById('cuadreIngresos').innerText = `$${totalIngresos.toFixed(2)}`;
+            document.getElementById('cuadreVentas').innerText = `$${totalVentas.toFixed(2)}`;
+            document.getElementById('cuadreDiferencia').innerText = `$${diferencia.toFixed(2)}`;
         }
 
         function renderInventario() {
@@ -758,9 +779,9 @@
             for (let [mod, cant] of Object.entries(inventario)) {
                 totalUnidades += cant;
                 container.innerHTML += `
-                    <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-200">${mod}</span>
-                        <input type="number" value="${cant}" onchange="actualizarInventario('${mod}', this.value)" class="w-16 bg-slate-900 border border-slate-600 rounded-lg p-1 text-center font-bold text-sm text-white">
+                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <span class="text-[11px] font-bold text-slate-300">${mod}</span>
+                        <input type="number" value="${cant}" onchange="actualizarInventario('${mod}', this.value)" class="w-14 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-xs text-white">
                     </div>
                 `;
             }
@@ -774,10 +795,10 @@
 
         function agregarLineaSeguro() {
             let html = `
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700 linea-seguro">
-                    <div><label class="text-xs font-bold text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-cant" value="1" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-white seg-precio" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
-                    <div><label class="text-xs font-bold text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1.5 seg-sub">$0.00</p></div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2 items-center bg-slate-900 p-2.5 rounded-xl border border-slate-800 linea-seguro">
+                    <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-cant font-bold text-xs" value="1" oninput="calcularSeguros()"></div>
+                    <div><label class="text-[10px] text-slate-400">Precio Unitario ($)</label><input type="number" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white seg-precio font-bold text-xs" value="" placeholder="Ej. 10" oninput="calcularSeguros()"></div>
+                    <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 seg-sub text-xs">$0.00</p></div>
                     <div class="text-right print:hidden"><button onclick="this.parentElement.parentElement.remove(); calcularSeguros();" class="text-red-400 text-xs font-bold">Eliminar</button></div>
                 </div>
             `;
@@ -818,6 +839,7 @@
                 movimientosTaller = [];
                 renderMotos();
                 renderTaller();
+                actualizarResumenFinanciero();
                 alert('Cierre reiniciado.');
             } else if(claveIngresada !== null) {
                 alert('Clave incorrecta.');
@@ -867,7 +889,7 @@
             });
         }
 
-        window.onload = () => { renderInventario(); calcularSeguros(); };
+        window.onload = () => { actualizarTasaGlobal(); renderInventario(); calcularSeguros(); };
     </script>
 </body>
 </html>
