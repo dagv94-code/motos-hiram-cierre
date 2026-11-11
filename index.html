@@ -69,8 +69,8 @@
         </div>
     </nav>
 
-    <!-- CONTENIDO -->
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <!-- CONTENIDO IMPRIMIBLE / PDF -->
+    <main id="areaPDF" class="max-w-7xl mx-auto px-4 py-6 space-y-6 bg-slate-950">
 
         <!-- 1. CIERRE DIARIO -->
         <section id="seccion-cierre" class="space-y-6">
@@ -79,13 +79,10 @@
                     <h2 class="text-lg font-bold text-white">Cierre Diario Activo</h2>
                     <p class="text-xs text-slate-400" id="txtSedeInfo">Sede: Maracaibo (Principal) • Adm: Jennmary Parra • Gerente: Lic. David García</p>
                 </div>
-                <button onclick="guardarCierreGlobal()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-2 text-sm border border-slate-700">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar con Firebase
-                </button>
             </div>
 
             <!-- TARJETAS -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 print:grid-cols-2">
                 <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
                     <p class="text-xs font-bold text-slate-400 uppercase">Total Facturado</p>
                     <p class="text-2xl font-black text-white" id="lblTotalFacturado">$0.00</p>
@@ -882,13 +879,45 @@
             }
         }
 
-        function totalizarYDescargarPDF() {
+        async function totalizarYDescargarPDF() {
             actualizarTasaGlobal();
             if(tasaBCV <= 0) {
                 alert('Atención: Debe ingresar la Tasa del Día en la parte superior antes de totalizar y generar el reporte PDF.');
                 return;
             }
-            window.print();
+            
+            // 1. Sincronizar automáticamente a Firebase antes de descargar
+            if(movimientosMotos.length > 0 || movimientosTaller.length > 0) {
+                try {
+                    let sucursal = document.getElementById('sucursalActiva').value;
+                    let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
+                    await db.collection("cierres").add({
+                        sucursal: sucursal,
+                        fecha: new Date().toLocaleString(),
+                        tasa: tasaBCV,
+                        totalFacturado: totF,
+                        motos: movimientosMotos,
+                        taller: movimientosTaller,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch(e) {
+                    console.error("Error guardando en Firebase al totalizar:", e);
+                }
+            }
+
+            // 2. Generar y descargar el PDF automáticamente con html2pdf
+            let element = document.getElementById('areaPDF');
+            let opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Cierre_Diario_MotosHiram_${document.getElementById('sucursalActiva').value}_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(opt).save().then(() => {
+                alert('¡Cierre totalizado, guardado en la nube y PDF descargado con éxito!');
+            });
         }
 
         window.onload = () => { renderInventario(); calcularSeguros(); };
