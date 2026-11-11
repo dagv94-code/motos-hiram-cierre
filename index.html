@@ -340,16 +340,25 @@
                     </div>
                 </div>
 
-                <!-- MEDIOS DE PAGO -->
+                <!-- MEDIOS DE PAGO CON BOTÓN DE ARQUEO DEDICADO -->
                 <div class="border-t border-slate-800 pt-3 space-y-2">
                     <h4 class="font-bold text-xs uppercase text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Desglose de Pago</h4>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                         <div>
                             <label class="text-xs text-slate-400 block mb-1">Efectivo ($)</label>
-                            <input type="text" id="pagoEfec" onclick="abrirArqueoModal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400 cursor-pointer text-center" value="$0.00" readonly title="Haga clic para abrir el arqueo por denominaciones">
+                            <div class="flex gap-1.5">
+                                <input type="text" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-emerald-400 text-center text-sm" value="$0.00" readonly>
+                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap shadow transition"><i class="fa-solid fa-vault mr-1"></i> Arqueo</button>
+                            </div>
                         </div>
-                        <div><label class="text-xs text-slate-400 block mb-1">Zelle ($)</label><input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0"></div>
-                        <div><label class="text-xs text-slate-400 block mb-1">Binance/Tower ($)</label><input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0"></div>
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Zelle ($)</label>
+                            <input type="number" id="pagoZelle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-blue-400" value="0">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Binance/Tower ($)</label>
+                            <input type="number" id="pagoBinance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-amber-400" value="0">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -361,9 +370,12 @@
     </div>
 
     <!-- MODAL DE ARQUEO DE EFECTIVO -->
-    <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-60 flex items-center justify-center p-4">
+    <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-[70] flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-white">
-            <h3 class="text-base font-bold border-b border-slate-800 pb-2"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> Arqueo por Denominaciones ($)</h3>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="text-base font-bold"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> Arqueo por Denominaciones ($)</h3>
+                <button onclick="document.getElementById('modalArqueo').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
             <div class="space-y-2 text-xs">
                 <div class="flex justify-between items-center"><span>Billetes $100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
                 <div class="flex justify-between items-center"><span>Billetes $50</span><input type="number" id="arq50" value="0" oninput="calcularArqueoModal()" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-white"></div>
@@ -432,6 +444,11 @@
             document.getElementById('pagoEfec').value = "$0.00";
             document.getElementById('pagoZelle').value = 0;
             document.getElementById('pagoBinance').value = 0;
+            document.getElementById('arq100').value = 0;
+            document.getElementById('arq50').value = 0;
+            document.getElementById('arq20').value = 0;
+            document.getElementById('arq10').value = 0;
+            document.getElementById('lblArqTotal').innerText = "$0.00";
             document.getElementById('modalRegistro').classList.remove('hidden');
         }
 
@@ -501,10 +518,6 @@
             cerrarModal();
             document.getElementById('regCliente').value = '';
             document.getElementById('regFactura').value = '';
-            document.getElementById('arq100').value = 0;
-            document.getElementById('arq50').value = 0;
-            document.getElementById('arq20').value = 0;
-            document.getElementById('arq10').value = 0;
         }
 
         function renderMotos() {
