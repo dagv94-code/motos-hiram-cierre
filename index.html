@@ -259,9 +259,9 @@
                 </div>
 
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas Agregadas</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas Agregadas (Cantidad y Precio Variable)</p>
                     <div id="webContenedorSeguros" class="space-y-2">
-                        <p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún.</p>
+                        <p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún. Use el botón "Agregar Póliza" arriba.</p>
                     </div>
                 </div>
             </div>
@@ -400,7 +400,7 @@
                         </tr>
                     </thead>
                     <tbody id="pdfTablaSegurosBody">
-                        <tr><td>Pólizas Seguros Caracas</td><td id="pdfSegCantidad">0</td><td id="pdfSegPrecio">$0.00</td><td id="pdfSegSubtotal">$0.00</td></tr>
+                        <tr><td colspan="4" style="text-align: center; color: #64748b;">0 Pólizas registradas.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1047,7 +1047,8 @@
         }
 
         function agregarLineaSeguro() {
-            document.getElementById('checkSinSeguros').checked = false;
+            let chk = document.getElementById('checkSinSeguros');
+            if(chk) chk.checked = false;
             polizasData.push({ cantidad: 1, precio: 15.00 });
             renderSeguros();
         }
