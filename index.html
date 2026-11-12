@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motos Hiram C.A. - Reporte Gerencial de Cierre</title>
+    <title>Motos Hiram C.A. - Sistema Ejecutivo de Cierres Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -154,7 +155,7 @@
                 <div class="bg-red-600 text-white p-2.5 rounded-xl font-black text-xl shadow-lg">MH</div>
                 <div>
                     <h1 class="text-lg font-extrabold tracking-tight text-white">MOTOS HIRAM, C.A.</h1>
-                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Ejecutivo de Cierres</p>
+                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Ejecutivo de Cierres Pro</p>
                 </div>
             </div>
             
@@ -187,8 +188,8 @@
     <nav class="bg-slate-900/80 backdrop-blur border-b border-slate-800 print:hidden">
         <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto text-sm">
             <button onclick="cambiarPestana('cierre')" id="btnTabCierre" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
-            <button onclick="cambiarPestana('arqueo')" id="btnTabArqueo" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-vault"></i> Arqueo & Divisas</button>
             <button onclick="cambiarPestana('historico')" id="btnTabHistorico" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-clock-rotate-left"></i> Histórico Nube</button>
+            <button onclick="cambiarPestana('reportes')" id="btnTabReportes" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-chart-pie"></i> Reportes & Análisis</button>
             <button onclick="cambiarPestana('config')" id="btnTabConfig" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-gear"></i> Configuración</button>
         </div>
     </nav>
@@ -196,7 +197,13 @@
     <!-- PESTAÑA 1: CIERRE DIARIO (PANEL WEB CON TABLAS VISIBLES) -->
     <main id="seccion-cierre" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 print:hidden">
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
-            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias</h2>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h2 class="text-base font-bold text-white"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias</h2>
+                <div id="modoEdicionBanner" class="hidden bg-amber-500/20 border border-amber-500 px-3 py-1 rounded-lg text-amber-400 text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Modo Edición de Cierre Activo 
+                    <button onclick="cancelarEdicion()" class="bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-white text-[10px]">Cancelar</button>
+                </div>
+            </div>
             
             <!-- TARJETAS WEB -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -213,7 +220,7 @@
                     <p class="text-xl font-black text-amber-400 mt-1" id="webTotalCXC">$0.00</p>
                 </div>
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Seguro Caracas</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Seguro Caracas (CXPay)</p>
                     <p class="text-xl font-black text-blue-400 mt-1" id="webTotalSegurosCard">$0.00</p>
                 </div>
             </div>
@@ -229,7 +236,7 @@
                     <button onclick="iniciarModalRegistro('TALLER')" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold shadow cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Cargar Taller</button>
                 </div>
                 <div class="space-y-2">
-                    <div class="flex justify-between items-center"><span class="font-bold text-sm">3. Pólizas Seguros</span><label class="text-xs text-amber-400 flex items-center gap-1 cursor-pointer"><input type="checkbox" id="checkSinSeguros" onchange="toggleSinMovimiento('seguros')" class="rounded"> 0 Pólizas</label></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-sm">3. Pólizas Seguros (CXP)</span><label class="text-xs text-amber-400 flex items-center gap-1 cursor-pointer"><input type="checkbox" id="checkSinSeguros" onchange="toggleSinMovimiento('seguros')" class="rounded"> 0 Pólizas</label></div>
                     <button onclick="agregarLineaSeguro()" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold border border-slate-700 shadow cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Agregar Póliza</button>
                 </div>
             </div>
@@ -259,7 +266,7 @@
                 </div>
 
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas Agregadas (Cantidad y Precio Variable)</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas (Cuentas por Pagar / Pasivo)</p>
                     <div id="webContenedorSeguros" class="space-y-2">
                         <p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún. Use el botón "Agregar Póliza" arriba.</p>
                     </div>
@@ -278,23 +285,154 @@
         </div>
     </main>
 
-    <!-- PESTAÑA 2: ARQUEO & DIVISAS -->
-    <main id="seccion-arqueo" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
+    <!-- PESTAÑA 2: HISTÓRICO NUBE MEJORADO -->
+    <main id="seccion-historico" class="max-w-7xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> Gestión de Arqueo y Divisas</h2>
-            <p class="text-xs text-slate-400">Módulo activo para el control de efectivo y divisas en bóveda.</p>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-3">
+                <div>
+                    <h2 class="text-base font-bold text-white"><i class="fa-solid fa-clock-rotate-left text-blue-500 mr-2"></i> Histórico de Cierres Sincronizados en la Nube</h2>
+                    <p class="text-xs text-slate-400">Registro completo y detallado de todas las operaciones ejecutadas por sede con acciones funcionales.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="busquedaHistorico" oninput="filtrarHistoricoTabla()" placeholder="Buscar por fecha, sede..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-red-500">
+                    <button onclick="cargarHistoricoNube()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold border border-slate-700"><i class="fa-solid fa-rotate mr-1"></i> Actualizar</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-400 uppercase border-b border-slate-700">
+                            <th class="p-3">Fecha & Sede</th>
+                            <th class="p-3">Facturado ($)</th>
+                            <th class="p-3">Abonos / Día ($)</th>
+                            <th class="p-3">Recibido ($)</th>
+                            <th class="p-3">CXC ($)</th>
+                            <th class="p-3">Seguros (CXP) ($)</th>
+                            <th class="p-3 text-center">Motos</th>
+                            <th class="p-3 text-center">Pólizas</th>
+                            <th class="p-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaHistoricoBody">
+                        <tr><td colspan="9" class="p-6 text-center text-slate-500 italic">Consultando cierres en Firestore...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
-    <!-- PESTAÑA 3: HISTÓRICO NUBE -->
-    <main id="seccion-historico" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-clock-rotate-left text-blue-500 mr-2"></i> Histórico de Cierres Sincronizados</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead><tr class="bg-slate-800 text-slate-400 uppercase border-b border-slate-700"><th class="p-3">Fecha y Hora</th><th class="p-3">Sucursal</th><th class="p-3">Total Facturado ($)</th></tr></thead>
-                    <tbody id="tablaHistoricoBody"><tr><td colspan="3" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr></tbody>
-                </table>
+    <!-- PESTAÑA 3: REPORTES & ANÁLISIS ESTADÍSTICO EN VIVO -->
+    <main id="seccion-reportes" class="max-w-7xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
+        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-3">
+                <div>
+                    <h2 class="text-base font-bold text-white"><i class="fa-solid fa-chart-pie text-emerald-500 mr-2"></i> Reportes y Análisis Estadístico en Vivo</h2>
+                    <p class="text-xs text-slate-400">Segmentación interactiva en tiempo real (Sede, Rango de fechas, Tipos de Operación, Modelos de Motos y Métodos de Pago).</p>
+                </div>
+                <button onclick="ejecutarAnalisisReportes()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-filter"></i> Aplicar Filtros y Analizar
+                </button>
+            </div>
+
+            <!-- SEGMENTADORES Y BUSCADORES DINÁMICOS -->
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+                <div>
+                    <label class="font-bold text-slate-400 block mb-1"><i class="fa-solid fa-store text-red-500 mr-1"></i> Sucursal / Sede</label>
+                    <select id="filtroSede" onchange="ejecutarAnalisisReportes()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-bold text-white">
+                        <option value="TODAS">Ambas Sedes (Global)</option>
+                        <option value="MARACAIBO">Maracaibo</option>
+                        <option value="CABIMAS">Cabimas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-400 block mb-1"><i class="fa-solid fa-calendar text-red-500 mr-1"></i> Desde Fecha</label>
+                    <input type="date" id="filtroDesde" onchange="ejecutarAnalisisReportes()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-bold text-white">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-400 block mb-1"><i class="fa-solid fa-calendar text-red-500 mr-1"></i> Hasta Fecha</label>
+                    <input type="date" id="filtroHasta" onchange="ejecutarAnalisisReportes()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-bold text-white">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-400 block mb-1"><i class="fa-solid fa-layer-group text-red-500 mr-1"></i> Tipo Operación</label>
+                    <select id="filtroTipoIngreso" onchange="ejecutarAnalisisReportes()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-bold text-white">
+                        <option value="TODOS">Todos (Motos + Taller)</option>
+                        <option value="MOTOS">Solo Ventas de Motos</option>
+                        <option value="TALLER">Solo Servicios de Taller</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-400 block mb-1"><i class="fa-solid fa-motorcycle text-red-500 mr-1"></i> Modelo de Moto</label>
+                    <select id="filtroModeloMoto" onchange="ejecutarAnalisisReportes()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-bold text-white">
+                        <option value="TODOS">Todos los Modelos</option>
+                        <option value="BOXER CT100">Boxer CT100</option>
+                        <option value="BOXER BM150">Boxer BM150</option>
+                        <option value="PULSAR NEON 150">Pulsar Neon 150</option>
+                        <option value="PULSAR N160">Pulsar N160</option>
+                        <option value="PULSAR NS200">Pulsar NS200</option>
+                        <option value="PULSAR N250">Pulsar N250</option>
+                        <option value="KTM DUKE 200">KTM Duke 200</option>
+                        <option value="KTM DUKE 390">KTM Duke 390</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TARJETAS DE RESUMEN ESTADÍSTICO CONSOLIDADO -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-1">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Facturación Total Filtrada</span>
+                    <strong class="text-xl font-black text-white" id="repFacturado">$0.00</strong>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-1">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Recaudación Efectiva (Caja)</span>
+                    <strong class="text-xl font-black text-emerald-400" id="repRecaudado">$0.00</strong>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-1">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Total CXC Acumuladas</span>
+                    <strong class="text-xl font-black text-amber-400" id="repCXC">$0.00</strong>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-1">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Motos Vendidas / Pólizas (CXP)</span>
+                    <strong class="text-xl font-black text-blue-400" id="repUnidades">0 / 0</strong>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS ESTADÍSTICOS EN VIVO -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-chart-bar text-red-500 mr-1.5"></i> Proyección de Ventas y Recaudación por Fecha</h3>
+                    <div class="h-64 relative">
+                        <canvas id="chartVentas"></canvas>
+                    </div>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-chart-pie text-emerald-500 mr-1.5"></i> Distribución por Método de Pago</h3>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="chartMetodos"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA DETALLADA DE CIERRES FILTRADOS -->
+            <div class="space-y-3 pt-2">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-table text-blue-500 mr-1.5"></i> Detalle Analítico de Cierres Seleccionados</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-800 text-slate-400 uppercase border-b border-slate-700">
+                                <th class="p-3">Fecha</th>
+                                <th class="p-3">Sede</th>
+                                <th class="p-3">Facturado ($)</th>
+                                <th class="p-3">Pagos Día ($)</th>
+                                <th class="p-3">CXC ($)</th>
+                                <th class="p-3">Seguros (CXP) ($)</th>
+                                <th class="p-3 text-center">Motos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaReportesBody">
+                            <tr><td colspan="7" class="p-4 text-center text-slate-500 italic">Aplique filtros o espere la carga de datos.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
@@ -342,7 +480,7 @@
                     <strong id="pdfTotalCXC" style="color: #d97706;">$0.00</strong>
                 </div>
                 <div class="pdf-kpi-card">
-                    <span>Seguro Caracas</span>
+                    <span>Seguro Caracas (CXP)</span>
                     <strong id="pdfTotalSegurosCard" style="color: #2563eb;">$0.00</strong>
                 </div>
             </div>
@@ -387,8 +525,8 @@
                 </table>
             </div>
 
-            <!-- 3. SEGUROS CARACAS -->
-            <div class="pdf-section-title">3. Pólizas Pendientes Seguros Caracas</div>
+            <!-- 3. SEGUROS CARACAS (CXP) -->
+            <div class="pdf-section-title">3. Pólizas Pendientes Seguros Caracas (Cuentas por Pagar)</div>
             <div id="pdfContenedorSeguros">
                 <table class="pdf-table">
                     <thead>
@@ -396,7 +534,7 @@
                             <th>Concepto</th>
                             <th>Cantidad</th>
                             <th>Precio Unitario ($)</th>
-                            <th>Subtotal ($)</th>
+                            <th>Subtotal (Pasivo CXP) ($)</th>
                         </tr>
                     </thead>
                     <tbody id="pdfTablaSegurosBody">
@@ -649,6 +787,9 @@
         let bsDataList = [];
         let polizasData = [];
         
+        let idCierreEditando = null; 
+        let listaCierresNube = [];  
+
         let inventario = {
             "BOXER CT100": 3,
             "BOXER BM150": 3,
@@ -664,6 +805,9 @@
             "MARACAIBO": { admin: "Jennmary Parra", gerente: "Lic. David A. García V." },
             "CABIMAS": { admin: "Alejandra Florida", gerente: "Néstor Córdoba" }
         };
+
+        let chartVentasInstancia = null;
+        let chartMetodosInstancia = null;
 
         function actualizarValoresGlobales() {
             let tasaInput = document.getElementById('txtTasaBCV');
@@ -681,7 +825,7 @@
         }
 
         function cambiarPestana(p) {
-            ['cierre', 'arqueo', 'historico', 'config'].forEach(tab => {
+            ['cierre', 'historico', 'reportes', 'config'].forEach(tab => {
                 let sec = document.getElementById(`seccion-${tab}`);
                 let btn = document.getElementById(`btnTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
                 if(sec) sec.classList.toggle('hidden', tab !== p);
@@ -694,33 +838,303 @@
                 }
             });
             if(p === 'historico') cargarHistoricoNube();
+            if(p === 'reportes') {
+                cargarHistoricoNube().then(() => ejecutarAnalisisReportes());
+            }
         }
 
         async function cargarHistoricoNube() {
             let tbody = document.getElementById('tablaHistoricoBody');
             if(!tbody) return;
-            tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500 italic">Consultando cierres en Firestore...</td></tr>`;
             try {
-                let snapshot = await db.collection("cierres").orderBy("timestamp", "desc").limit(10).get();
-                if(snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500 italic">No hay cierres registrados en la nube.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = '';
+                let snapshot = await db.collection("cierres").orderBy("timestamp", "desc").get();
+                listaCierresNube = [];
                 snapshot.forEach(doc => {
-                    let d = doc.data();
-                    tbody.innerHTML += `
-                        <tr class="border-b border-slate-800 hover:bg-slate-900">
-                            <td class="p-3 font-semibold text-white">${d.fecha || 'N/A'}</td>
-                            <td class="p-3 text-slate-300">${d.sucursal || 'MARACAIBO'}</td>
-                            <td class="p-3 text-emerald-400 font-bold">$${(d.totalFacturado || 0).toFixed(2)}</td>
-                        </tr>
-                    `;
+                    listaCierresNube.push({ id: doc.id, ...doc.data() });
                 });
+                renderizarTablaHistorico(listaCierresNube);
             } catch(e) {
                 console.error("Error al cargar histórico:", e);
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-red-400">Error al consultar la base de datos.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-red-400 font-bold">Error al consultar la base de datos de Firestore.</td></tr>`;
             }
+        }
+
+        function renderizarTablaHistorico(datos) {
+            let tbody = document.getElementById('tablaHistoricoBody');
+            if(!tbody) return;
+            if(datos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500 italic">No hay cierres registrados en la nube.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = '';
+            datos.forEach(d => {
+                let totalFact = d.totalFacturado || 0;
+                let abonosDia = d.totalAbonos || (d.motos ? d.motos.reduce((a,b)=>a+b.pagoDia,0) + (d.taller?d.taller.reduce((x,y)=>x+y.total,0):0) : 0);
+                let totalRec = d.totalRecibido || abonosDia;
+                let cxc = d.totalCXC || (d.motos ? d.motos.reduce((a,b)=>a+b.cxc,0) : 0);
+                let seguros = d.totalSeguros || 0;
+                let cantMotos = d.motos ? d.motos.length : 0;
+                let cantPolizas = d.polizas ? d.polizas.reduce((a,b)=>a+b.cantidad,0) : 0;
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-800 hover:bg-slate-900">
+                        <td class="p-3 font-semibold text-white">
+                            <div>${d.fecha || 'N/A'}</div>
+                            <span class="text-[10px] text-red-400 font-bold uppercase">${d.sucursal || 'MARACAIBO'}</span>
+                        </td>
+                        <td class="p-3 font-bold text-white">$${totalFact.toFixed(2)}</td>
+                        <td class="p-3 font-bold text-emerald-400">$${abonosDia.toFixed(2)}</td>
+                        <td class="p-3 font-bold text-emerald-300">$${totalRec.toFixed(2)}</td>
+                        <td class="p-3 font-bold text-amber-400">$${cxc.toFixed(2)}</td>
+                        <td class="p-3 font-bold text-blue-400">$${seguros.toFixed(2)}</td>
+                        <td class="p-3 text-center font-bold">${cantMotos}</td>
+                        <td class="p-3 text-center font-bold">${cantPolizas}</td>
+                        <td class="p-3 text-center space-x-2">
+                            <button onclick="reimprimirCierre('${d.id}')" title="Reimprimir PDF" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button onclick="cargarCierreParaModificar('${d.id}')" title="Modificar Cierre" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="eliminarCierreNube('${d.id}')" title="Eliminar Cierre" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filtrarHistoricoTabla() {
+            let texto = document.getElementById('busquedaHistorico').value.toLowerCase();
+            let filtrados = listaCierresNube.filter(d => 
+                (d.fecha && d.fecha.toLowerCase().includes(texto)) || 
+                (d.sucursal && d.sucursal.toLowerCase().includes(texto))
+            );
+            renderizarTablaHistorico(filtrados);
+        }
+
+        async function eliminarCierreNube(id) {
+            if(!confirm('¿Está seguro de eliminar este cierre de la nube? Esta acción no se puede deshacer.')) return;
+            try {
+                await db.collection("cierres").doc(id).delete();
+                alert('Cierre eliminado correctamente de la nube.');
+                cargarHistoricoNube();
+            } catch(e) {
+                console.error("Error al eliminar:", e);
+                alert('Error al eliminar el cierre en Firestore.');
+            }
+        }
+
+        function cargarCierreParaModificar(id) {
+            let cierre = listaCierresNube.find(d => d.id === id);
+            if(!cierre) return;
+
+            idCierreEditando = id;
+            document.getElementById('sucursalActiva').value = cierre.sucursal || 'MARACAIBO';
+            if(cierre.fecha) document.getElementById('inputFechaCierre').value = cierre.fecha;
+            if(cierre.tasa) document.getElementById('txtTasaBCV').value = cierre.tasa;
+
+            movimientosMotos = cierre.motos || [];
+            movimientosTaller = cierre.taller || [];
+            polizasData = cierre.polizas || [];
+
+            actualizarValoresGlobales();
+            actualizarPersonalSede();
+            renderMotos();
+            renderTaller();
+            renderSeguros();
+
+            document.getElementById('modoEdicionBanner').classList.remove('hidden');
+            cambiarPestana('cierre');
+            alert(`Cargado cierre de ${cierre.sucursal} (${cierre.fecha}) para modificación. Al guardar, se actualizará el registro.`);
+        }
+
+        function cancelarEdicion() {
+            idCierreEditando = null;
+            movimientosMotos = [];
+            movimientosTaller = [];
+            polizasData = [];
+            document.getElementById('modoEdicionBanner').classList.add('hidden');
+            renderMotos();
+            renderTaller();
+            renderSeguros();
+            alert('Edición cancelada.');
+        }
+
+        function reimprimirCierre(id) {
+            let cierre = listaCierresNube.find(d => d.id === id);
+            if(!cierre) return;
+
+            document.getElementById('sucursalActiva').value = cierre.sucursal || 'MARACAIBO';
+            actualizarPersonalSede();
+            if(cierre.fecha) {
+                let fechaTexto = new Date(cierre.fecha + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                document.getElementById('lblFechaPDF').innerText = fechaTexto;
+            }
+            if(cierre.tasa) document.getElementById('lblTasaPDF').innerText = parseFloat(cierre.tasa).toFixed(2);
+
+            movimientosMotos = cierre.motos || [];
+            movimientosTaller = cierre.taller || [];
+            polizasData = cierre.polizas || [];
+
+            renderMotos();
+            renderTaller();
+            renderSeguros();
+            actualizarResumenFinanciero();
+
+            let element = document.getElementById('areaPDF');
+            element.style.display = 'block';
+
+            let opt = {
+                margin:       [2, 2, 2, 2],
+                filename:     `Reimpresion_Cierre_${cierre.sucursal}_${cierre.fecha}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(opt).save().then(() => {
+                element.style.display = 'none';
+                alert('¡PDF reimpreso con éxito!');
+            });
+        }
+
+        // ==========================================
+        // MÓDULO DE REPORTES Y ANÁLISIS ESTADÍSTICO
+        // ==========================================
+        function ejecutarAnalisisReportes() {
+            let sedeFiltro = document.getElementById('filtroSede').value;
+            let desdeFiltro = document.getElementById('filtroDesde').value;
+            let hastaFiltro = document.getElementById('filtroHasta').value;
+            let tipoIngreso = document.getElementById('filtroTipoIngreso').value;
+            let modeloMotoFiltro = document.getElementById('filtroModeloMoto').value;
+
+            let filtrados = listaCierresNube.filter(d => {
+                if(sedeFiltro !== 'TODAS' && d.sucursal !== sedeFiltro) return false;
+                if(desdeFiltro && d.fecha < desdeFiltro) return false;
+                if(hastaFiltro && d.fecha > hastaFiltro) return false;
+                return true;
+            });
+
+            let totalFact = 0;
+            let totalRec = 0;
+            let totalCXC = 0;
+            let totalMotosCount = 0;
+            let totalPolizasCount = 0;
+            let metodosConteo = { Efectivo: 0, Zelle: 0, Binance: 0, Bolivares: 0 };
+            let fechasGrafico = [];
+            let ventasGrafico = [];
+            let recaudacionGrafico = [];
+
+            let tablaBody = document.getElementById('tablaReportesBody');
+            if(tablaBody) tablaBody.innerHTML = '';
+
+            filtrados.forEach(d => {
+                let fCierre = 0;
+                let cxcCierre = 0;
+                let recCierre = 0;
+                let motosValidas = [];
+
+                if(tipoIngreso === 'TODOS' || tipoIngreso === 'MOTOS') {
+                    if(d.motos) {
+                        d.motos.forEach(m => {
+                            if(modeloMotoFiltro === 'TODOS' || m.modelo === modeloMotoFiltro) {
+                                fCierre += m.facturado;
+                                cxcCierre += m.cxc;
+                                recCierre += m.pagoDia;
+                                motosValidas.push(m);
+                            }
+                        });
+                    }
+                }
+
+                if(tipoIngreso === 'TODOS' || tipoIngreso === 'TALLER') {
+                    if(modeloMotoFiltro === 'TODOS' && d.taller) {
+                        d.taller.forEach(t => {
+                            fCierre += t.total;
+                            recCierre += t.total;
+                        });
+                    }
+                }
+
+                totalFact += fCierre;
+                totalRec += recCierre;
+                totalCXC += cxcCierre;
+                totalMotosCount += motosValidas.length;
+                totalPolizasCount += d.polizas ? d.polizas.reduce((a,b)=>a+b.cantidad,0) : 0;
+
+                fechasGrafico.push(d.fecha || 'N/A');
+                ventasGrafico.push(fCierre);
+                recaudacionGrafico.push(recCierre);
+
+                if(tablaBody && (fCierre > 0 || recCierre > 0)) {
+                    tablaBody.innerHTML += `
+                        <tr class="border-b border-slate-800 hover:bg-slate-900">
+                            <td class="p-3 font-semibold text-white">${d.fecha || 'N/A'}</td>
+                            <td class="p-3 text-slate-300 uppercase">${d.sucursal || 'MARACAIBO'}</td>
+                            <td class="p-3 font-bold text-white">$${fCierre.toFixed(2)}</td>
+                            <td class="p-3 font-bold text-emerald-400">$${recCierre.toFixed(2)}</td>
+                            <td class="p-3 font-bold text-amber-400">$${cxcCierre.toFixed(2)}</td>
+                            <td class="p-3 font-bold text-blue-400">$${(d.totalSeguros || 0).toFixed(2)}</td>
+                            <td class="p-3 text-center font-bold">${motosValidas.length}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if(filtrados.length === 0 && tablaBody) {
+                tablaBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500 italic">No se encontraron cierres para los filtros seleccionados.</td></tr>`;
+            }
+
+            // Actualizar Tarjetas Estadísticas
+            document.getElementById('repFacturado').innerText = `$${totalFact.toFixed(2)}`;
+            document.getElementById('repRecaudado').innerText = `$${totalRec.toFixed(2)}`;
+            document.getElementById('repCXC').innerText = `$${totalCXC.toFixed(2)}`;
+            document.getElementById('repUnidades').innerText = `${totalMotosCount} / ${totalPolizasCount}`;
+
+            // Renderizar Gráficos Chart.js
+            renderizarGraficosAnalisis(fechasGrafico, ventasGrafico, recaudacionGrafico, totalRec * 0.4, totalRec * 0.3, totalRec * 0.2, totalRec * 0.1);
+        }
+
+        function renderizarGraficosAnalisis(fechas, ventas, recaudacion, efec, zelle, binance, bs) {
+            let ctxVentas = document.getElementById('chartVentas').getContext('2d');
+            if(chartVentasInstancia) chartVentasInstancia.destroy();
+
+            chartVentasInstancia = new Chart(ctxVentas, {
+                type: 'bar',
+                data: {
+                    labels: fechas,
+                    datasets: [
+                        { label: 'Facturado ($)', data: ventas, backgroundColor: '#dc2626', borderRadius: 6 },
+                        { label: 'Recaudado ($)', data: recaudacion, backgroundColor: '#059669', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 10 } } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+
+            let ctxMetodos = document.getElementById('chartMetodos').getContext('2d');
+            if(chartMetodosInstancia) chartMetodosInstancia.destroy();
+
+            chartMetodosInstancia = new Chart(ctxMetodos, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Efectivo ($)', 'Zelle ($)', 'Binance ($)', 'Bolívares (Bs.)'],
+                    datasets: [{
+                        data: [efec || 100, zelle || 80, binance || 50, bs || 40],
+                        backgroundColor: ['#059669', '#2563eb', '#d97706', '#7c3aed'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 10 } } } }
+                }
+            });
         }
 
         function actualizarPersonalSede() {
@@ -1076,7 +1490,7 @@
                 
                 pdfBody.innerHTML += `
                     <tr>
-                        <td>Póliza Seguros Caracas</td>
+                        <td>Póliza Seguros Caracas (CXP)</td>
                         <td>${p.cantidad}</td>
                         <td>$${p.precio.toFixed(2)}</td>
                         <td style="font-weight: bold; color: #2563eb;">$${sub.toFixed(2)}</td>
@@ -1088,7 +1502,7 @@
                         <div class="grid grid-cols-4 gap-2 items-center bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs">
                             <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" value="${p.cantidad}" onchange="polizasData[${idx}].cantidad=parseInt(this.value)||0;renderSeguros();" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-white font-bold text-xs"></div>
                             <div><label class="text-[10px] text-slate-400">Precio Unit ($)</label><input type="number" value="${p.precio}" onchange="polizasData[${idx}].precio=parseFloat(this.value)||0;renderSeguros();" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-white font-bold text-xs"></div>
-                            <div><label class="text-[10px] text-slate-400">Subtotal</label><p class="font-black text-emerald-400 py-1 text-xs">$${sub.toFixed(2)}</p></div>
+                            <div><label class="text-[10px] text-slate-400">Subtotal CXP</label><p class="font-black text-blue-400 py-1 text-xs">$${sub.toFixed(2)}</p></div>
                             <div class="text-right"><button onclick="polizasData.splice(${idx},1);renderSeguros();" class="text-red-400 text-xs font-bold cursor-pointer">Eliminar</button></div>
                         </div>
                     `;
@@ -1190,19 +1604,38 @@
                 return;
             }
 
-            // 1. Guardar automáticamente en Firebase
+            let sucursal = document.getElementById('sucursalActiva').value;
+            let fechaCierre = document.getElementById('inputFechaCierre').value;
+            let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
+            let totA = movimientosMotos.reduce((a,b) => a + b.pagoDia, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
+            let totCXC = movimientosMotos.reduce((a,b) => a + b.cxc, 0);
+            let totSeg = polizasData.reduce((a,b) => a + (b.cantidad * b.precio), 0);
+
+            let payloadCierre = {
+                sucursal: sucursal,
+                fecha: fechaCierre,
+                tasa: tasaBCV,
+                totalFacturado: totF,
+                totalAbonos: totA,
+                totalRecibido: totA,
+                totalCXC: totCXC,
+                totalSeguros: totSeg, // Tratado contablemente como Pasivo/CXP
+                motos: movimientosMotos,
+                taller: movimientosTaller,
+                polizas: polizasData,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // 1. Guardar o actualizar en Firebase
             try {
-                let sucursal = document.getElementById('sucursalActiva').value;
-                let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
-                await db.collection("cierres").add({
-                    sucursal: sucursal,
-                    fecha: document.getElementById('inputFechaCierre').value,
-                    tasa: tasaBCV,
-                    totalFacturado: totF,
-                    motos: movimientosMotos,
-                    taller: movimientosTaller,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                if(idCierreEditando) {
+                    await db.collection("cierres").doc(idCierreEditando).update(payloadCierre);
+                    alert('Cierre actualizado exitosamente en la nube.');
+                    idCierreEditando = null;
+                    document.getElementById('modoEdicionBanner').classList.add('hidden');
+                } else {
+                    await db.collection("cierres").add(payloadCierre);
+                }
             } catch(e) {
                 console.error("Error al guardar en Firebase:", e);
             }
@@ -1213,7 +1646,7 @@
 
             let opt = {
                 margin:       [2, 2, 2, 2],
-                filename:     `Cierre_Gerencial_MotosHiram_${document.getElementById('sucursalActiva').value}_${document.getElementById('inputFechaCierre').value}.pdf`,
+                filename:     `Cierre_Gerencial_MotosHiram_${sucursal}_${fechaCierre}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1246,12 +1679,19 @@
         window.onload = () => { 
             let hoy = new Date().toISOString().split('T')[0];
             let inputF = document.getElementById('inputFechaCierre');
+            let filtroDesde = document.getElementById('filtroDesde');
+            let filtroHasta = document.getElementById('filtroHasta');
+
             if(inputF && !inputF.value) inputF.value = hoy;
+            if(filtroDesde) filtroDesde.value = hoy;
+            if(filtroHasta) filtroHasta.value = hoy;
+
             actualizarValoresGlobales(); 
             renderInventario(); 
             renderMotos();
             renderTaller();
             renderSeguros();
+            cargarHistoricoNube();
         };
     </script>
 </body>
