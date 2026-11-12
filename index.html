@@ -24,14 +24,14 @@
         window.db = db;
     </script>
     <style>
-        /* ESTILOS EXCLUSIVOS PARA EL PDF GERENCIAL DE UNA SOLA PÁGINA (CARTA EXACTO SIN CORTES) */
+        /* ESTILOS EXCLUSIVOS PARA EL PDF GERENCIAL DE UNA SOLA PÁGINA (CARTA) */
         .pdf-page {
             background: #ffffff !important;
             color: #0f172a !important;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 8px;
             padding: 5px 8px;
-            width: 184mm; /* Ancho milimétricamente ajustado para carta */
+            width: 184mm;
             box-sizing: border-box;
             margin: 0 auto;
         }
@@ -183,18 +183,18 @@
         </div>
     </header>
 
-    <!-- NAVEGACIÓN -->
+    <!-- NAVEGACIÓN (PESTAÑAS ACTIVAS) -->
     <nav class="bg-slate-900/80 backdrop-blur border-b border-slate-800 print:hidden">
         <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto text-sm">
-            <button onclick="cambiarPestana('cierre')" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
-            <button onclick="cambiarPestana('arqueo')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-vault"></i> Arqueo & Divisas</button>
-            <button onclick="cambiarPestana('historico')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Histórico Nube</button>
-            <button onclick="cambiarPestana('config')" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2"><i class="fa-solid fa-gear"></i> Configuración</button>
+            <button onclick="cambiarPestana('cierre')" id="btnTabCierre" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
+            <button onclick="cambiarPestana('arqueo')" id="btnTabArqueo" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-vault"></i> Arqueo & Divisas</button>
+            <button onclick="cambiarPestana('historico')" id="btnTabHistorico" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-clock-rotate-left"></i> Histórico Nube</button>
+            <button onclick="cambiarPestana('config')" id="btnTabConfig" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-gear"></i> Configuración</button>
         </div>
     </nav>
 
-    <!-- PANEL INTERACTIVO DE TRABAJO (WEB) -->
-    <main class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 print:hidden">
+    <!-- PESTAÑA 1: CIERRE DIARIO (PANEL WEB CON TABLAS VISIBLES) -->
+    <main id="seccion-cierre" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 print:hidden">
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
             <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias</h2>
             
@@ -234,10 +234,29 @@
                 </div>
             </div>
 
-            <!-- ÁREA DINÁMICA DE PÓLIZAS EN WEB -->
-            <div id="webContenedorSegurosArea" class="space-y-2 pt-3 border-t border-slate-800">
-                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300">Pólizas Agregadas al Cierre</h3>
-                <div id="webContenedorSeguros" class="space-y-2"></div>
+            <!-- TABLAS VISIBLES EN PANTALLA WEB PARA VERIFICACIÓN ANTES DE TOTALIZAR -->
+            <div class="space-y-4 pt-4 border-t border-slate-800">
+                <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-emerald-500 mr-2"></i> Verificación de Registros del Día (Pantalla Activa)</h3>
+                
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Motos Cargadas</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead><tr class="bg-slate-900 text-slate-400 border-b border-slate-800"><th class="p-2">Cliente</th><th class="p-2">Modelo</th><th class="p-2">Factura</th><th class="p-2">Pago Día ($)</th><th class="p-2 text-center">Acción</th></tr></thead>
+                            <tbody id="webTablaMotosBody"><tr><td colspan="5" class="p-3 text-center text-slate-500 italic">No hay motos cargadas aún.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Servicios de Taller Cargados</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead><tr class="bg-slate-900 text-slate-400 border-b border-slate-800"><th class="p-2">Cliente</th><th class="p-2">N° Factura</th><th class="p-2">Concepto</th><th class="p-2">Total ($)</th><th class="p-2 text-center">Acción</th></tr></thead>
+                            <tbody id="webTablaTallerBody"><tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Sin servicios de taller cargados aún.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- INVENTARIO INTERACTIVO EN WEB -->
@@ -248,6 +267,37 @@
                     <span>Total Unidades en Existencia:</span>
                     <span id="webTotalInventario" class="text-emerald-400 text-sm">0</span>
                 </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PESTAÑA 2: ARQUEO & DIVISAS -->
+    <main id="seccion-arqueo" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
+        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-vault text-emerald-500 mr-2"></i> Gestión de Arqueo y Divisas</h2>
+            <p class="text-xs text-slate-400">Módulo activo para el control de efectivo y divisas en bóveda.</p>
+        </div>
+    </main>
+
+    <!-- PESTAÑA 3: HISTÓRICO NUBE -->
+    <main id="seccion-historico" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
+        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-clock-rotate-left text-blue-500 mr-2"></i> Histórico de Cierres Sincronizados</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead><tr class="bg-slate-800 text-slate-400 uppercase border-b border-slate-700"><th class="p-3">Fecha y Hora</th><th class="p-3">Sucursal</th><th class="p-3">Total Facturado ($)</th></tr></thead>
+                    <tbody id="tablaHistoricoBody"><tr><td colspan="3" class="p-4 text-center text-slate-500">Consultando base de datos en la nube...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- PESTAÑA 4: CONFIGURACIÓN -->
+    <main id="seccion-config" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
+        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl max-w-xl space-y-4">
+            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-gear text-amber-500 mr-2"></i> Configuración de Seguridad</h2>
+            <div class="space-y-3 text-xs">
+                <div><label class="font-bold text-slate-400 block mb-1">Clave Gerencial Interna</label><input type="password" id="txtClaveAdmin" value="MotosHiram" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 font-bold text-white"></div>
             </div>
         </div>
     </main>
@@ -624,13 +674,46 @@
         }
 
         function cambiarPestana(p) {
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('text-red-500', 'border-red-500', 'font-bold');
-                b.classList.add('text-slate-400', 'border-transparent', 'font-semibold');
+            ['cierre', 'arqueo', 'historico', 'config'].forEach(tab => {
+                let sec = document.getElementById(`seccion-${tab}`);
+                let btn = document.getElementById(`btnTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+                if(sec) sec.classList.toggle('hidden', tab !== p);
+                if(btn) {
+                    if(tab === p) {
+                        btn.className = "tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2 cursor-pointer";
+                    } else {
+                        btn.className = "tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer";
+                    }
+                }
             });
-            let sec = document.getElementById(`seccion-${p}`);
-            if(sec) sec.classList.remove('hidden');
+            if(p === 'historico') cargarHistoricoNube();
+        }
+
+        async function cargarHistoricoNube() {
+            let tbody = document.getElementById('tablaHistoricoBody');
+            if(!tbody) return;
+            tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr>`;
+            try {
+                let snapshot = await db.collection("cierres").orderBy("timestamp", "desc").limit(10).get();
+                if(snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500 italic">No hay cierres registrados en la nube.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = '';
+                snapshot.forEach(doc => {
+                    let d = doc.data();
+                    tbody.innerHTML += `
+                        <tr class="border-b border-slate-800 hover:bg-slate-900">
+                            <td class="p-3 font-semibold text-white">${d.fecha || 'N/A'}</td>
+                            <td class="p-3 text-slate-300">${d.sucursal || 'MARACAIBO'}</td>
+                            <td class="p-3 text-emerald-400 font-bold">$${(d.totalFacturado || 0).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+            } catch(e) {
+                console.error("Error al cargar histórico:", e);
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-red-400">Error al consultar la base de datos.</td></tr>`;
+            }
         }
 
         function actualizarPersonalSede() {
@@ -638,12 +721,10 @@
             let adminEl = document.getElementById('pdfAdminNombre');
             let gerenteEl = document.getElementById('pdfGerenteNombre');
             let reporteTitEl = document.getElementById('pdfReporteTitulo');
-            let sedeMetaEl = document.getElementById('pdfSedeMeta');
 
             if(adminEl) adminEl.innerText = personalSedes[sede].admin;
             if(gerenteEl) gerenteEl.innerText = personalSedes[sede].gerente;
             if(reporteTitEl) reporteTitEl.innerText = `INFORME EJECUTIVO DE CIERRE - ${sede}`;
-            if(sedeMetaEl) sedeMetaEl.innerText = sede;
         }
 
         function iniciarModalRegistro(tipo) {
@@ -835,11 +916,15 @@
         }
 
         function renderMotos() {
-            let tbody = document.getElementById('pdfTablaMotosBody');
-            if(!tbody) return;
+            let webTbody = document.getElementById('webTablaMotosBody');
+            let pdfTbody = document.getElementById('pdfTablaMotosBody');
+            if(!webTbody || !pdfTbody) return;
+
             let chk = document.getElementById('checkSinMotos').checked;
             if(chk) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                let msg = `<tr><td colspan="7" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                webTbody.innerHTML = msg;
+                pdfTbody.innerHTML = msg;
                 document.getElementById('webTotalFacturado').innerText = '$0.00';
                 document.getElementById('pdfTotalFacturado').innerText = '$0.00';
                 document.getElementById('webTotalAbonos').innerText = '$0.00';
@@ -851,7 +936,9 @@
             }
 
             if(movimientosMotos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; font-style: italic;">No hay ventas o abonos de motos cargados.</td></tr>`;
+                let msg = `<tr><td colspan="7" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
+                webTbody.innerHTML = msg;
+                pdfTbody.innerHTML = msg;
                 document.getElementById('webTotalFacturado').innerText = '$0.00';
                 document.getElementById('pdfTotalFacturado').innerText = '$0.00';
                 document.getElementById('webTotalAbonos').innerText = '$0.00';
@@ -861,24 +948,30 @@
                 actualizarResumenFinanciero();
                 return;
             }
-            tbody.innerHTML = '';
+
+            webTbody.innerHTML = '';
+            pdfTbody.innerHTML = '';
             let totF = 0, totA = 0, totC = 0;
-            movimientosMotos.forEach((m) => {
+            movimientosMotos.forEach((m, idx) => {
                 totF += m.facturado;
                 totA += m.pagoDia;
                 totC += m.cxc;
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${m.cliente}</td>
-                        <td>${m.modelo}</td>
-                        <td>${m.factura}</td>
-                        <td>$${m.facturado.toFixed(2)}</td>
-                        <td>$${m.abonoAnt.toFixed(2)}</td>
-                        <td style="font-weight: bold; color: #059669;">$${m.pagoDia.toFixed(2)}</td>
-                        <td style="font-weight: bold; color: #d97706;">$${m.cxc.toFixed(2)}</td>
-                    </tr>
+                
+                let fila = `
+                    <tr class="border-b border-slate-800 hover:bg-slate-900">
+                        <td class="p-2">${m.cliente}</td>
+                        <td class="p-2">${m.modelo}</td>
+                        <td class="p-2">${m.factura}</td>
+                        <td class="p-2">$${m.facturado.toFixed(2)}</td>
+                        <td class="p-2">$${m.abonoAnt.toFixed(2)}</td>
+                        <td class="p-2 text-emerald-400 font-bold">$${m.pagoDia.toFixed(2)}</td>
+                        <td class="p-2 text-amber-400 font-bold">$${m.cxc.toFixed(2)}</td>
                 `;
+                
+                webTbody.innerHTML += fila + `<td class="p-2 text-center print:hidden"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                pdfTbody.innerHTML += fila + `</tr>`;
             });
+
             document.getElementById('webTotalFacturado').innerText = `$${totF.toFixed(2)}`;
             document.getElementById('pdfTotalFacturado').innerText = `$${totF.toFixed(2)}`;
             document.getElementById('webTotalAbonos').innerText = `$${totA.toFixed(2)}`;
@@ -889,31 +982,40 @@
         }
 
         function renderTaller() {
-            let tbody = document.getElementById('pdfTablaTallerBody');
-            if(!tbody) return;
+            let webTbody = document.getElementById('webTablaTallerBody');
+            let pdfTbody = document.getElementById('pdfTablaTallerBody');
+            if(!webTbody || !pdfTbody) return;
+
             let chk = document.getElementById('checkSinTaller').checked;
             if(chk) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                let msg = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                webTbody.innerHTML = msg;
+                pdfTbody.innerHTML = msg;
                 actualizarResumenFinanciero();
                 return;
             }
 
             if(movimientosTaller.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748b; font-style: italic;">Sin movimientos de taller registrados.</td></tr>`;
+                let msg = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
+                webTbody.innerHTML = msg;
+                pdfTbody.innerHTML = msg;
                 actualizarResumenFinanciero();
                 return;
             }
-            tbody.innerHTML = '';
-            movimientosTaller.forEach((t) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${t.cliente}</td>
-                        <td>${t.factura}</td>
-                        <td>${t.concepto}</td>
-                        <td>${t.medio}</td>
-                        <td style="font-weight: bold; color: #059669;">$${t.total.toFixed(2)}</td>
-                    </tr>
+
+            webTbody.innerHTML = '';
+            pdfTbody.innerHTML = '';
+            movimientosTaller.forEach((t, idx) => {
+                let fila = `
+                    <tr class="border-b border-slate-800 hover:bg-slate-900">
+                        <td class="p-2">${t.cliente}</td>
+                        <td class="p-2">${t.factura}</td>
+                        <td class="p-2">${t.concepto}</td>
+                        <td class="p-2">${t.medio}</td>
+                        <td class="p-2 text-emerald-400 font-bold">$${t.total.toFixed(2)}</td>
                 `;
+                webTbody.innerHTML += fila + `<td class="p-2 text-center print:hidden"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                pdfTbody.innerHTML += fila + `</tr>`;
             });
             actualizarResumenFinanciero();
         }
@@ -927,8 +1029,9 @@
         function renderSeguros() {
             let webCont = document.getElementById('webContenedorSeguros');
             let pdfBody = document.getElementById('pdfTablaSegurosBody');
-            if(webCont) webCont.innerHTML = '';
             if(!pdfBody) return;
+
+            if(webCont) webCont.innerHTML = '';
 
             if(polizasData.length === 0) {
                 pdfBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748b; font-style: italic;">0 Pólizas registradas.</td></tr>`;
@@ -1076,12 +1179,12 @@
                 console.error("Error al guardar en Firebase:", e);
             }
 
-            // 2. Generar PDF exclusivamente con plantilla compacta de una sola página
+            // 2. Generar PDF exclusivamente con plantilla compactada en una página sin cortes
             let element = document.getElementById('areaPDF');
             element.style.display = 'block';
 
             let opt = {
-                margin:       [3, 3, 3, 3],
+                margin:       [2, 2, 2, 2],
                 filename:     `Cierre_Gerencial_MotosHiram_${document.getElementById('sucursalActiva').value}_${document.getElementById('inputFechaCierre').value}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
@@ -1092,13 +1195,19 @@
                 element.style.display = 'none';
                 alert('¡Informe ejecutivo consolidado, guardado en la nube y PDF descargado con éxito!');
 
-                // 3. Limpiar pantalla para el día siguiente
+                // 3. Limpieza absoluta de toda la información para el día siguiente
                 movimientosMotos = [];
                 movimientosTaller = [];
                 polizasData = [];
+                zelleData = { monto: 0, ref: '', titular: '' };
+                binanceData = { monto: 0, recibido: 0, ref: '' };
+                bsDataList = [];
+                efectivoCalculado = 0;
+
                 document.getElementById('checkSinMotos').checked = false;
                 document.getElementById('checkSinTaller').checked = false;
                 document.getElementById('checkSinSeguros').checked = false;
+                
                 renderMotos();
                 renderTaller();
                 renderSeguros();
