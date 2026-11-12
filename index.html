@@ -257,6 +257,13 @@
                         </table>
                     </div>
                 </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas Agregadas</p>
+                    <div id="webContenedorSeguros" class="space-y-2">
+                        <p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún.</p>
+                    </div>
+                </div>
             </div>
 
             <!-- INVENTARIO INTERACTIVO EN WEB -->
@@ -286,7 +293,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead><tr class="bg-slate-800 text-slate-400 uppercase border-b border-slate-700"><th class="p-3">Fecha y Hora</th><th class="p-3">Sucursal</th><th class="p-3">Total Facturado ($)</th></tr></thead>
-                    <tbody id="tablaHistoricoBody"><tr><td colspan="3" class="p-4 text-center text-slate-500">Consultando base de datos en la nube...</td></tr></tbody>
+                    <tbody id="tablaHistoricoBody"><tr><td colspan="3" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -922,9 +929,10 @@
 
             let chk = document.getElementById('checkSinMotos').checked;
             if(chk) {
-                let msg = `<tr><td colspan="7" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                let msg = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                let msgPdf = `<tr><td colspan="7" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
                 webTbody.innerHTML = msg;
-                pdfTbody.innerHTML = msg;
+                pdfTbody.innerHTML = msgPdf;
                 document.getElementById('webTotalFacturado').innerText = '$0.00';
                 document.getElementById('pdfTotalFacturado').innerText = '$0.00';
                 document.getElementById('webTotalAbonos').innerText = '$0.00';
@@ -936,9 +944,8 @@
             }
 
             if(movimientosMotos.length === 0) {
-                let msg = `<tr><td colspan="7" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
-                webTbody.innerHTML = msg;
-                pdfTbody.innerHTML = msg;
+                webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
+                pdfTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; font-style: italic;">No hay ventas o abonos de motos cargados.</td></tr>`;
                 document.getElementById('webTotalFacturado').innerText = '$0.00';
                 document.getElementById('pdfTotalFacturado').innerText = '$0.00';
                 document.getElementById('webTotalAbonos').innerText = '$0.00';
@@ -957,19 +964,30 @@
                 totA += m.pagoDia;
                 totC += m.cxc;
                 
-                let fila = `
+                let filaWeb = `
                     <tr class="border-b border-slate-800 hover:bg-slate-900">
-                        <td class="p-2">${m.cliente}</td>
-                        <td class="p-2">${m.modelo}</td>
+                        <td class="p-2 font-semibold text-white">${m.cliente}</td>
+                        <td class="p-2 text-slate-300">${m.modelo}</td>
                         <td class="p-2">${m.factura}</td>
-                        <td class="p-2">$${m.facturado.toFixed(2)}</td>
-                        <td class="p-2">$${m.abonoAnt.toFixed(2)}</td>
                         <td class="p-2 text-emerald-400 font-bold">$${m.pagoDia.toFixed(2)}</td>
-                        <td class="p-2 text-amber-400 font-bold">$${m.cxc.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+
+                let filaPdf = `
+                    <tr>
+                        <td>${m.cliente}</td>
+                        <td>${m.modelo}</td>
+                        <td>${m.factura}</td>
+                        <td>$${m.facturado.toFixed(2)}</td>
+                        <td>$${m.abonoAnt.toFixed(2)}</td>
+                        <td style="font-weight: bold; color: #059669;">$${m.pagoDia.toFixed(2)}</td>
+                        <td style="font-weight: bold; color: #d97706;">$${m.cxc.toFixed(2)}</td>
+                    </tr>
                 `;
                 
-                webTbody.innerHTML += fila + `<td class="p-2 text-center print:hidden"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                pdfTbody.innerHTML += fila + `</tr>`;
+                webTbody.innerHTML += filaWeb;
+                pdfTbody.innerHTML += filaPdf;
             });
 
             document.getElementById('webTotalFacturado').innerText = `$${totF.toFixed(2)}`;
@@ -988,17 +1006,15 @@
 
             let chk = document.getElementById('checkSinTaller').checked;
             if(chk) {
-                let msg = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
-                webTbody.innerHTML = msg;
-                pdfTbody.innerHTML = msg;
+                webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                pdfTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
                 actualizarResumenFinanciero();
                 return;
             }
 
             if(movimientosTaller.length === 0) {
-                let msg = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
-                webTbody.innerHTML = msg;
-                pdfTbody.innerHTML = msg;
+                webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
+                pdfTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748b; font-style: italic;">Sin movimientos de taller registrados.</td></tr>`;
                 actualizarResumenFinanciero();
                 return;
             }
@@ -1006,16 +1022,26 @@
             webTbody.innerHTML = '';
             pdfTbody.innerHTML = '';
             movimientosTaller.forEach((t, idx) => {
-                let fila = `
+                let filaWeb = `
                     <tr class="border-b border-slate-800 hover:bg-slate-900">
-                        <td class="p-2">${t.cliente}</td>
+                        <td class="p-2 font-semibold text-white">${t.cliente}</td>
                         <td class="p-2">${t.factura}</td>
-                        <td class="p-2">${t.concepto}</td>
-                        <td class="p-2">${t.medio}</td>
+                        <td class="p-2 text-slate-300">${t.concepto}</td>
                         <td class="p-2 text-emerald-400 font-bold">$${t.total.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
                 `;
-                webTbody.innerHTML += fila + `<td class="p-2 text-center print:hidden"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                pdfTbody.innerHTML += fila + `</tr>`;
+                let filaPdf = `
+                    <tr>
+                        <td>${t.cliente}</td>
+                        <td>${t.factura}</td>
+                        <td>${t.concepto}</td>
+                        <td>${t.medio}</td>
+                        <td style="font-weight: bold; color: #059669;">$${t.total.toFixed(2)}</td>
+                    </tr>
+                `;
+                webTbody.innerHTML += filaWeb;
+                pdfTbody.innerHTML += filaPdf;
             });
             actualizarResumenFinanciero();
         }
@@ -1035,6 +1061,7 @@
 
             if(polizasData.length === 0) {
                 pdfBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748b; font-style: italic;">0 Pólizas registradas.</td></tr>`;
+                if(webCont) webCont.innerHTML = `<p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún.</p>`;
                 document.getElementById('webTotalSegurosCard').innerText = '$0.00';
                 document.getElementById('pdfTotalSegurosCard').innerText = '$0.00';
                 return;
@@ -1179,7 +1206,7 @@
                 console.error("Error al guardar en Firebase:", e);
             }
 
-            // 2. Generar PDF exclusivamente con plantilla compactada en una sola página estricta sin cortes
+            // 2. Generar PDF exclusivamente con plantilla compactada en una sola página sin cortes laterales
             let element = document.getElementById('areaPDF');
             element.style.display = 'block';
 
