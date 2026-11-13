@@ -185,10 +185,10 @@
 
     <!-- ALERTA DE CIERRE YA DECLARADO -->
     <div id="alertaCierreDeclarado" class="max-w-5xl mx-auto px-6 pt-4 hidden print:hidden">
-        <div class="bg-red-900/80 border border-red-500 p-4 rounded-xl flex items-center justify-between text-white text-xs">
+        <div class="bg-red-900/80 border border-red-500 p-4 rounded-xl flex items-center justify-between text-white text-xs shadow-lg">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>
-                <span><strong>¡Atención!</strong> Ya existe un cierre registrado para esta Sede en la fecha seleccionada. El sistema está en modo de verificación.</span>
+                <span><strong>[BLOQUEO DE SEGURIDAD]</strong> No se puede generar doble cierre de un mismo día por favor revisar el histórico. Ya existe un cierre registrado para esta Sede en la fecha seleccionada.</span>
             </div>
         </div>
     </div>
@@ -196,12 +196,8 @@
     <!-- PESTAÑA 1: CIERRE DIARIO -->
     <main id="seccion-cierre" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 print:hidden">
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
-            <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-3 gap-3">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h2 class="text-base font-bold text-white"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias (Cierre de Sede)</h2>
-                <!-- BOTÓN TOTALIZAR Y DESCARGAR PDF UBICADO ESTRICTAMENTE AQUÍ -->
-                <button id="btnTotalizarPDF" onclick="totalizarYDescargarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-file-pdf"></i> Totalizar y Descargar PDF
-                </button>
             </div>
             
             <!-- TARJETAS WEB -->
@@ -280,6 +276,13 @@
                     <span>Total Unidades en Existencia:</span>
                     <span id="webTotalInventario" class="text-emerald-400 text-sm">0</span>
                 </div>
+            </div>
+
+            <!-- BOTÓN TOTALIZAR Y DESCARGAR PDF (UBICADO ABAJO EN EL CIERRE) -->
+            <div class="pt-4 border-t border-slate-800 flex justify-end">
+                <button id="btnTotalizarPDF" onclick="totalizarYDescargarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-6 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-file-pdf"></i> Totalizar y Descargar PDF de Cierre
+                </button>
             </div>
         </div>
     </main>
@@ -394,27 +397,27 @@
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl max-w-xl space-y-5">
             <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-gear text-amber-500 mr-2"></i> Configuración y Seguridad Avanzada</h2>
             <div class="space-y-4 text-xs">
-                <!-- CAMBIAR CLAVE -->
+                <!-- CAMBIAR CLAVE GERENCIAL -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <label class="font-bold text-slate-300 block">Cambiar Clave Gerencial Interna</label>
+                    <label class="font-bold text-slate-300 block">3. Cambiar Clave Gerencial Interna</label>
                     <div class="flex gap-2">
                         <input type="password" id="txtNuevaClave" placeholder="Nueva clave gerencial" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 font-bold text-white">
                         <button onclick="cambiarClaveGerencial()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded font-bold cursor-pointer">Actualizar Clave</button>
                     </div>
                 </div>
 
-                <!-- RESPALDO JSON -->
+                <!-- RESPALDO PARA GERENCIA -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <label class="font-bold text-slate-300 block">Generar Respaldo de Datos (JSON Backup)</label>
-                    <p class="text-slate-400 text-[11px]">Descarga un respaldo completo local con todos los cierres almacenados en Firestore.</p>
-                    <button onclick="generarRespaldoJSON()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Descargar Respaldo JSON</button>
+                    <label class="font-bold text-slate-300 block">2. Respaldo Completo para Gerencia (JSON Backup)</label>
+                    <p class="text-slate-400 text-[11px]">Descarga un respaldo completo con todos los cierres almacenados en Firestore para auditoría y gerencia.</p>
+                    <button onclick="generarRespaldoJSON()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Descargar Respaldo Gerencial</button>
                 </div>
 
-                <!-- RETIRAR / LIMPIAR PANTALLA -->
+                <!-- RESETEAR POR TIENDA CON RESPALDO AUTOMÁTICO -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <label class="font-bold text-red-400 block">Retirar / Limpiar Información de Pantalla por Sede</label>
-                    <p class="text-slate-400 text-[11px]">Limpia la pantalla activa actual para iniciar un nuevo registro en blanco.</p>
-                    <button onclick="retirarInfoSede()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-trash-can"></i> Limpiar Pantalla Activa Sede</button>
+                    <label class="font-bold text-red-400 block">1. Resetear por Tienda (Con Respaldo Automático)</label>
+                    <p class="text-slate-400 text-[11px]">Limpia y resetea la pantalla activa generando automáticamente un archivo de respaldo local.</p>
+                    <button onclick="resetearTiendaConRespaldo()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-rotate-left"></i> Resetear Tienda & Respaldar</button>
                 </div>
             </div>
         </div>
@@ -1298,7 +1301,6 @@
         }
 
         function actualizarResumenFinanciero() {
-            // Suma unificada de Motos + Taller para Facturado y Pagos del Día
             let totFactMotos = movimientosMotos.reduce((a,b) => a + b.facturado, 0);
             let totFactTaller = movimientosTaller.reduce((a,b) => a + b.total, 0);
             let totalFacturado = totFactMotos + totFactTaller;
@@ -1391,10 +1393,11 @@
                 return;
             }
 
+            // ALERTA DE BLOQUEO DE DOBLE CIERRE DIARIO
             try {
                 let snapshot = await db.collection("cierres").where("sucursal", "==", sucursal).where("fecha", "==", fecha).get();
                 if(!snapshot.empty) {
-                    alert(`[BLOQUEO DE SEGURIDAD] Ya existe un cierre declarado para la sede ${sucursal} en fecha ${fecha}.`);
+                    alert(`[BLOQUEO DE SEGURIDAD] No se puede generar doble cierre de un mismo día por favor revisar el histórico. Ya existe un cierre registrado para la sede ${sucursal} en fecha ${fecha}.`);
                     return;
                 }
             } catch(e) {}
@@ -1449,21 +1452,34 @@
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosHistoricoGlobal, null, 2));
             let downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `Respaldo_Cierres_MotosHiram_${new Date().toISOString().split('T')[0]}.json`);
+            downloadAnchor.setAttribute("download", `Respaldo_Gerencia_MotosHiram_${new Date().toISOString().split('T')[0]}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
         }
 
-        function retirarInfoSede() {
-            if(!confirm('¿Desea limpiar todos los registros activos en pantalla para esta sede?')) return;
+        function resetearTiendaConRespaldo() {
+            if(!confirm('¿Desea resetear la tienda activa? Se generará un respaldo automático local antes de limpiar.')) return;
+            
+            // 1. Generar respaldo automático local
+            let sucursal = document.getElementById('sucursalActiva').value;
+            let datosTienda = { sucursal, fechaRespaldo: new Date().toISOString(), motos: movimientosMotos, taller: movimientosTaller, polizas: polizasData };
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosTienda, null, 2));
+            let downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Respaldo_Automatico_${sucursal}_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            // 2. Limpiar pantalla
             movimientosMotos = [];
             movimientosTaller = [];
             polizasData = [];
             renderMotos();
             renderTaller();
             renderSeguros();
-            alert('Pantalla limpia con éxito.');
+            alert('¡Respaldo automático generado y tienda reseteada con éxito!');
         }
 
         function aplicarFiltrosReportes() {
