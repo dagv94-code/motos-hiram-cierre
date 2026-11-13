@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Motos Hiram C.A. - Cierres Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -33,7 +35,8 @@ const db=firebase.firestore();
  </div></header>
 <nav class="bg-slate-900/80 border-b border-slate-800 flex gap-5 px-4 text-sm overflow-x-auto" id="nav"></nav>
 <div id="alerta" class="hidden max-w-5xl mx-auto mt-4 bg-red-900/80 border border-red-500 p-3 rounded-xl text-xs">
- <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <b>[BLOQUEO]</b> No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.</div>
+ <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+<b>[BLOQUEO]</b> No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.</div>
  
 <main id="t-cierre" class="max-w-5xl mx-auto p-5 space-y-5">
  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
@@ -108,13 +111,13 @@ const db=firebase.firestore();
 <script>
 const $=i=>document.getElementById(i);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const n2=v=>(Number(v)||0).toFixed(2), M=v=>'$'+(Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const n2=v=>(Number(v)||0).toFixed(2),
+M=v=>'$'+(Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const PERSONAL={MARACAIBO:{a:'Jennmary Parra',g:'Lic. David A. García V. (CI: 22.362.833)'},CABIMAS:{a:'Alejandra Florida',g:'Néstor Córdoba'}};
 const CAT0=[["BOXER CT100",1420],["BOXER BM150",1890],["PULSAR NEON 150",2500],["PULSAR N160",3100],["PULSAR NS200",3700],["PULSAR N250",4700],["KTM DUKE 200",5200],["KTM DUKE 390",8540]].map(([nombre,precio])=>({nombre,precio}));
 let catalogo=[...CAT0], hist=[], charts={}, tipo='MOTO', editId=null, cierreExiste=false, claveCb=null, guardando=false;
 let S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:{}};
  
-/* ---------- Seguridad (clave guardada en Firestore como hash SHA-256) ---------- */
 async function hash(t){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('MH|'+t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=0;for(const c of 'MH|'+t)h=(h*31+c.charCodeAt(0))|0;return 'f'+h}}
 async function claveOk(c){const d=await db.collection('config').doc('seguridad').get();const h=await hash(c);if(!d.exists){if(c==='MotosHiram'){await db.collection('config').doc('seguridad').set({hash:h});return true}return false}return d.data().hash===h}
 function pedirClave(){return new Promise(r=>{$('cvIn').value='';$('mClave').classList.remove('hidden');$('cvIn').focus();claveCb=async ok=>{$('mClave').classList.add('hidden');if(!ok)return r(false);try{const v=await claveOk($('cvIn').value);if(!v)alert('Clave incorrecta. Operación denegada.');r(v)}catch(e){alert('Error verificando clave: '+e.message);r(false)}}})}
@@ -122,20 +125,17 @@ function claveCierra(ok){if(claveCb)claveCb(ok)}
 async function cambiarClave(){const o=$('cvOld').value,n=$('cvNew').value;if(n.length<6)return alert('La nueva clave debe tener mínimo 6 caracteres.');
  try{if(!await claveOk(o))return alert('Clave actual incorrecta.');await db.collection('config').doc('seguridad').set({hash:await hash(n)});$('cvOld').value=$('cvNew').value='';alert('Clave actualizada.')}catch(e){alert('Error: '+e.message)}}
  
-/* ---------- Navegación ---------- */
 const TABS=[['cierre','fa-file-invoice-dollar','Cierre Diario'],['historico','fa-clock-rotate-left','Histórico Nube'],['reportes','fa-chart-line','Reportes & Análisis'],['catalogo','fa-motorcycle','Catálogo'],['config','fa-gear','Configuración']];
 function tab(p){TABS.forEach(([k])=>{$('t-'+k).classList.toggle('hidden',k!==p);$('b-'+k).className='py-3 px-2 border-b-2 whitespace-nowrap cursor-pointer '+(k===p?'font-bold text-red-500 border-red-500':'text-slate-400 border-transparent hover:text-white')});
  $('alerta').classList.toggle('hidden',p!=='cierre'||!cierreExiste||!!editId);if(p==='historico'||p==='reportes')cargarHist();if(p==='catalogo')catRender()}
 $('nav').innerHTML=TABS.map(([k,i,t])=>`<button id="b-${k}" onclick="tab('${k}')"><i class="fa-solid ${i}"></i> ${t}</button>`).join('');
  
-/* ---------- Cálculos centrales (única fuente de verdad) ---------- */
 function calc(c){const m=c.motos||[],t=c.taller||[],o=[...m,...t];const s=(a,f)=>a.reduce((x,y)=>x+(Number(f(y))||0),0);
  const r={fM:s(m,x=>x.facturado),fT:s(t,x=>x.total),rM:s(m,x=>x.pagoDia),rT:s(t,x=>x.pagoDia??x.total),cxc:s(m,x=>x.cxc),abo:s(m,x=>x.abonoAnt),pol:s(c.polizas||[],p=>p.cantidad*p.precio),
-  ef:s(o,x=>x.efec),ze:s(o,x=>x.zelle),bi:s(o,x=>x.binance),bs:s(o,x=>(x.bsList||[]).reduce((a,b)=>a+(b.usd||0),0))};
+ ef:s(o,x=>x.efec),ze:s(o,x=>x.zelle),bi:s(o,x=>x.binance),bs:s(o,x=>(x.bsList||[]).reduce((a,b)=>a+(b.usd||0),0))};
  r.fact=r.fM+r.fT;r.rec=r.rM+r.rT;r.medios=r.ef+r.ze+r.bi+r.bs;r.esperado=r.fact-r.abo-r.cxc;r.dif=r.medios-r.esperado;r.cobr=r.fact?Math.min(100,(r.rec/r.fact)*100):0;return r}
 const cur=()=>({sucursal:$('sede').value,fecha:$('fecha').value,tasa:parseFloat($('tasa').value)||0,motos:S.motos,taller:S.taller,polizas:S.polizas});
  
-/* ---------- Contexto / bloqueo de doble cierre ---------- */
 const docId=(s,f)=>`${s}_${f}`;
 async function cambioContexto(sedeCambio){const f=$('fecha').value,s=$('sede').value;if(sedeCambio)await cargarInv();
  if(!f)return;try{const d=await db.collection('cierres').doc(docId(s,f)).get();cierreExiste=d.exists&&d.id!==editId}catch(e){cierreExiste=false}
@@ -143,7 +143,6 @@ async function cambioContexto(sedeCambio){const f=$('fecha').value,s=$('sede').v
 async function cargarInv(){S.inv={};catalogo.forEach(m=>S.inv[m.nombre]=0);try{const d=await db.collection('config').doc('inv_'+$('sede').value).get();if(d.exists)Object.assign(S.inv,d.data().inv)}catch(e){}renderInv()}
 async function cargarCat(){try{const d=await db.collection('config').doc('catalogo').get();if(d.exists&&d.data().modelos?.length)catalogo=d.data().modelos}catch(e){}}
  
-/* ---------- Render ---------- */
 const th=a=>`<tr class="text-slate-400 border-b border-slate-800">${a.map(x=>`<th class="p-2 text-left">${x}</th>`).join('')}</tr>`;
 function render(){const smM=S.sm.motos,smT=S.sm.taller,smS=S.sm.seguros;['motos','taller','seguros'].forEach(k=>$('sm-'+k).checked=S.sm[k]);
  const vacio=(f,msg)=>`<p class="text-center italic ${f?'text-emerald-400 font-bold':'text-slate-500'} p-2">${f?'[ SECCIÓN SIN MOVIMIENTOS ]':msg}</p>`;
@@ -158,7 +157,6 @@ function sinMov(k){const el=$('sm-'+k),lst={motos:'motos',taller:'taller',seguro
  S.sm[k]=el.checked;if(el.checked)S[lst]=[];render()}
 function addPoliza(){S.sm.seguros=false;S.polizas.push({cantidad:1,precio:15});render()}
  
-/* ---------- Registro de operaciones ---------- */
 function abrir(t){if(cierreExiste)return alert('Ya existe un cierre para esta sede y fecha. Revise el histórico.');if(!(parseFloat($('tasa').value)>0))return alert('Ingrese primero la Tasa del Día.');
  tipo=t;$('mT').textContent=t==='MOTO'?'Registrar Venta de Moto o Abono':'Registrar Servicio de Taller';$('gMoto').classList.toggle('hidden',t!=='MOTO');$('gTaller').classList.toggle('hidden',t!=='TALLER');
  ['fFac','fCli','fCon','zRef','zTit','bRef','bsRef'].forEach(i=>$(i).value='');['fAbo','fMon','pEf','pZ','pB','bsPM','bsTR','bsPU'].forEach(i=>$(i).value=0);
@@ -173,13 +171,12 @@ function guardarReg(){const tasa=parseFloat($('tasa').value)||0,v=i=>Math.max(0,
  if(tipo==='MOTO'){const m=catalogo[$('fMod').value],fa=m.precio,ab=v('fAbo'),mo=$('fModa').value;let cxc=Math.max(0,fa-ab-pagoDia);
   if(mo==='CONTADO'&&cxc>0.01)return alert(`Venta de contado con saldo pendiente de ${M(cxc)}. Complete el pago o cambie la modalidad.`);
   if(pagoDia+ab>fa+0.01)return alert('El pago más el abono anterior superan el precio de la moto.');
-  S.sm.motos=false;S.motos.push({cliente,factura,modelo:m.nombre,modalidad:mo,facturado:fa,abonoAnt:ab,pagoDia,cxc,...pago})}
+ S.sm.motos=false;S.motos.push({cliente,factura,modelo:m.nombre,modalidad:mo,facturado:fa,abonoAnt:ab,pagoDia,cxc,...pago})}
  else{const total=v('fMon'),concepto=$('fCon').value.trim()||'Servicio General';if(total<=0)return alert('Ingrese el monto del servicio.');
   if(Math.abs(pagoDia-total)>0.01)return alert(`El desglose de pagos (${M(pagoDia)}) debe ser igual al total del servicio (${M(total)}).`);
-  S.sm.taller=false;S.taller.push({cliente,factura,concepto,total,pagoDia,...pago})}
+ S.sm.taller=false;S.taller.push({cliente,factura,concepto,total,pagoDia,...pago})}
  $('modal').classList.add('hidden');render()}
  
-/* ---------- Totalizar y cerrar ---------- */
 async function totalizar(){if(guardando)return;const c=cur();
  if(!c.fecha)return alert('Seleccione la fecha del cierre.');if(c.tasa<=0)return alert('Ingrese la Tasa del Día.');
  if(!S.motos.length&&!S.sm.motos)return alert('Cargue ventas de motos o marque "Sin Mov." en Motos.');
@@ -189,14 +186,13 @@ async function totalizar(){if(guardando)return;const c=cur();
  const data={...c,sinMov:{...S.sm},inventario:{...S.inv},totales:r,totalFacturado:r.fact,editado:!!editId};
  const ref=db.collection('cierres').doc(docId(c.sucursal,c.fecha));guardando=true;$('btnTot').disabled=true;
  try{await db.runTransaction(async tx=>{const d=await tx.get(ref);if(d.exists&&d.id!==editId)throw new Error('DUP');
-   if(editId&&editId!==ref.id)tx.delete(db.collection('cierres').doc(editId));tx.set(ref,{...data,timestamp:firebase.firestore.FieldValue.serverTimestamp()})});
+  if(editId&&editId!==ref.id)tx.delete(db.collection('cierres').doc(editId));tx.set(ref,{...data,timestamp:firebase.firestore.FieldValue.serverTimestamp()})});
   await db.collection('config').doc('inv_'+c.sucursal).set({inv:S.inv});
  }catch(e){guardando=false;$('btnTot').disabled=false;if(e.message==='DUP'){cierreExiste=true;$('alerta').classList.remove('hidden');return alert('No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.')}
   return alert('No se pudo guardar el cierre (nada fue registrado): '+e.message)}
  try{await pdf(data)}catch(e){alert('Cierre guardado, pero falló el PDF. Reimprímalo desde el Histórico.')}
  editId=null;S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:S.inv};guardando=false;$('btnTot').disabled=false;render();await cambioContexto(false);alert('Cierre guardado y PDF generado con éxito.')}
  
-/* ---------- PDF gerencial ---------- */
 function bar(l,v,t,col){const p=t?Math.round(v/t*100):0;return `<tr><td style="width:22%;border:0">${l}</td><td style="border:0"><div class="bar"><i style="width:${p}%;background:${col}"></i></div></td><td style="width:26%;border:0;text-align:right"><b>${M(v)}</b> (${p}%)</td></tr>`}
 function pdfHTML(c){const r=c.totales||calc(c),sede=c.sucursal,P=PERSONAL[sede],ok=Math.abs(r.dif)<0.01,tm=r.fM+r.fT||1,inv=c.inventario||{};
  const f=c.fecha?c.fecha.split('-').reverse().join('/'):'';const totInv=Object.values(inv).reduce((a,b)=>a+b,0);
@@ -215,14 +211,13 @@ function pdfHTML(c){const r=c.totales||calc(c),sede=c.sucursal,P=PERSONAL[sede],
  ${(c.polizas||[]).map(p=>`<tr><td>Póliza Seguros Caracas</td><td>${p.cantidad}</td><td>${M(p.precio)}</td><td style="color:#2563eb"><b>${M(p.cantidad*p.precio)}</b></td></tr>`).join('')||`<tr><td colspan="4" style="text-align:center">0 Pólizas registradas.</td></tr>`}</table>
  <h3>4. Formas de Pago (Mezcla de Ingresos)</h3><table style="margin:0">${bar('Efectivo',r.ef,r.medios||1,'#059669')}${bar('Zelle',r.ze,r.medios||1,'#2563eb')}${bar('Binance',r.bi,r.medios||1,'#d97706')}${bar('Bolívares',r.bs,r.medios||1,'#7c3aed')}</table>
  ${[...(c.motos||[]),...(c.taller||[])].filter(o=>o.zelle>0||o.binance>0||(o.bsList||[]).length).map(o=>`<div style="font-size:8.5px;color:#334155">• ${esc(o.cliente)}: ${o.zelle>0?`Zelle ${M(o.zelle)} Ref ${esc(o.zelleRef)} (${esc(o.zelleTitular)}) `:''}${o.binance>0?`Binance ${M(o.binance)} Ref ${esc(o.binRef)} `:''}${(o.bsList||[]).map(b=>`${b.tipo} ${n2(b.montoBs)} Bs Ref ${esc(b.ref)}`).join(' | ')}</div>`).join('')}
- <div style="margin:8px 0;padding:6px;border:2px solid ${ok?'#059669':'#dc2626'};border-radius:4px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center"><div>Ingresos recibidos<br><b>${M(r.medios)}</b></div><div>Cobro esperado (Fact. - Abonos - CxC)<br><b>${M(r.esperado)}</b></div><div>Diferencia<br><b style="color:${ok?'#059669':'#dc2626'}">${M(r.dif)} ${ok?'✔ CUADRADO':'✖ REVISAR'}</b></div></div>
+ <div style="margin:8px 0;padding:6px;border:2px solid ${ok?'#059669':'#dc2626'};border-radius:4px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center"><div>Ingresos recibidos<br><b>${M(r.medios)}</b></div><div>Cobro esperado (Fact. - Abonos - CXC)<br><b>${M(r.esperado)}</b></div><div>Diferencia<br><b style="color:${ok?'#059669':'#dc2626'}">${M(r.dif)} ${ok?'✔ CUADRADO':'✖ REVISAR'}</b></div></div>
  <h3>5. Inventario de Motocicletas al Cierre</h3><table><tr><th>Modelo</th><th style="text-align:center">Existencia</th><th>Estado</th></tr>
  ${Object.entries(inv).map(([k,v])=>`<tr><td><b>${esc(k)}</b></td><td style="text-align:center">${v}</td><td style="color:${v===0?'#dc2626':v<=1?'#d97706':'#059669'}">${v===0?'AGOTADO':v<=1?'STOCK BAJO':'DISPONIBLE'}</td></tr>`).join('')}</table>
  <div style="text-align:right;font-weight:bold">Total unidades en existencia: ${totInv}</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px;text-align:center"><div style="border-top:1px solid #475569;padding-top:3px"><b>${P.a}</b><br>Preparado por (Analista Administrativo)</div><div style="border-top:1px solid #475569;padding-top:3px"><b>${P.g}</b><br>Revisado por (Gerente)</div></div></div>`}
 async function pdf(c){const w=$('pdfWrap');w.innerHTML=pdfHTML(c);try{await html2pdf().from(w.firstElementChild).set({margin:[4,0,4,0],filename:`Cierre_Gerencial_${c.sucursal}_${c.fecha}.pdf`,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],avoid:['tr','h3']}}).save()}finally{w.innerHTML=''}}
  
-/* ---------- Histórico ---------- */
 async function cargarHist(){try{const s=await db.collection('cierres').orderBy('fecha','desc').get();hist=s.docs.map(d=>({...d.data(),id:d.id}))}catch(e){return alert('Error consultando la nube: '+e.message)}
  $('hBody').innerHTML=hist.length?hist.map(d=>{const r=calc(d);return `<tr class="border-b border-slate-800"><td class="p-2 font-bold">${esc(d.fecha)}</td><td>${esc(d.sucursal)}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${(d.motos||[]).length}</td><td>${(d.polizas||[]).reduce((a,p)=>a+p.cantidad,0)}</td>
  <td class="text-center"><button onclick="reimprimir('${d.id}')" class="btn bg-blue-600 !p-1.5" title="PDF"><i class="fa-solid fa-file-pdf"></i></button> <button onclick="editar('${d.id}')" class="btn bg-amber-600 !p-1.5" title="Modificar"><i class="fa-solid fa-pen"></i></button> <button onclick="eliminar('${d.id}')" class="btn bg-red-600 !p-1.5" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="8" class="p-4 text-center italic text-slate-500">Sin cierres registrados.</td></tr>';
@@ -234,16 +229,15 @@ async function editar(id){if(!await pedirClave())return;const d=buscar(id);if(!d
  catalogo.forEach(m=>{if(!(m.nombre in S.inv))S.inv[m.nombre]=0});cierreExiste=false;render();renderInv();tab('cierre');alert('Cierre cargado para modificación. Al totalizar se actualizará el mismo registro.')}
 async function eliminar(id){if(!await pedirClave())return;if(!confirm('¿Eliminar este cierre de la nube? No se puede deshacer.'))return;try{await db.collection('cierres').doc(id).delete();cargarHist()}catch(e){alert('Error: '+e.message)}}
  
-/* ---------- Reportes (sin cuentas por pagar / pólizas) ---------- */
 function mkChart(id,type,labels,sets,extra={}){if(charts[id])charts[id].destroy();charts[id]=new Chart($(id),{type,data:{labels,datasets:sets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#cbd5e1'}},title:{display:true,text:extra.t||'',color:'#fff'}},scales:type==='doughnut'?{}:{x:{ticks:{color:'#94a3b8'}},y:{ticks:{color:'#94a3b8'}}}}})}
 function reportes(){const se=$('rSede').value,d1=$('rDesde').value,d2=$('rHasta').value,tp=$('rTipo').value;
  const L=hist.filter(d=>(se==='TODAS'||d.sucursal===se)&&(!d1||d.fecha>=d1)&&(!d2||d.fecha<=d2)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
  const T={fact:0,rec:0,cxc:0,motos:0,tall:0,ef:0,ze:0,bi:0,bs:0},mod={},sed={},lab=[],F=[],R=[];let rows='';
  L.forEach(d=>{const c={motos:tp==='TALLER'?[]:d.motos,taller:tp==='MOTO'?[]:d.taller},r=calc(c);
-  Object.keys(T).forEach(k=>{});T.fact+=r.fact;T.rec+=r.rec;T.cxc+=r.cxc;T.motos+=(c.motos||[]).length;T.tall+=r.fT;T.ef+=r.ef;T.ze+=r.ze;T.bi+=r.bi;T.bs+=r.bs;
-  (c.motos||[]).forEach(m=>mod[m.modelo]=(mod[m.modelo]||0)+1);sed[d.sucursal]=sed[d.sucursal]||[0,0];sed[d.sucursal][0]+=r.fact;sed[d.sucursal][1]+=r.rec;
-  lab.push(d.fecha.slice(5)+' '+d.sucursal.slice(0,3));F.push(r.fact);R.push(r.rec);
-  rows+=`<tr class="border-b border-slate-800"><td class="p-2">${d.fecha}</td><td>${d.sucursal}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${M(r.ef)}</td><td>${M(r.ze)}</td><td>${M(r.bi)}</td><td>${M(r.bs)}</td></tr>`});
+ Object.keys(T).forEach(k=>{});T.fact+=r.fact;T.rec+=r.rec;T.cxc+=r.cxc;T.motos+=(c.motos||[]).length;T.tall+=r.fT;T.ef+=r.ef;T.ze+=r.ze;T.bi+=r.bi;T.bs+=r.bs;
+ (c.motos||[]).forEach(m=>mod[m.modelo]=(mod[m.modelo]||0)+1);sed[d.sucursal]=sed[d.sucursal]||[0,0];sed[d.sucursal][0]+=r.fact;sed[d.sucursal][1]+=r.rec;
+ lab.push(d.fecha.slice(5)+' '+d.sucursal.slice(0,3));F.push(r.fact);R.push(r.rec);
+ rows+=`<tr class="border-b border-slate-800"><td class="p-2">${d.fecha}</td><td>${d.sucursal}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${M(r.ef)}</td><td>${M(r.ze)}</td><td>${M(r.bi)}</td><td>${M(r.bs)}</td></tr>`});
  $('rBody').innerHTML=rows||'<tr><td colspan="9" class="p-3 text-center italic text-slate-500">Sin datos con los filtros actuales.</td></tr>';
  const K=[['Facturado',M(T.fact),'text-white'],['Recaudado',M(T.rec),'text-emerald-400'],['Por cobrar',M(T.cxc),'text-amber-400'],['Cobranza',(T.fact?T.rec/T.fact*100:0).toFixed(1)+'%','text-blue-400'],['Motos vendidas',T.motos,'text-white'],['Ticket prom./cierre',M(L.length?T.fact/L.length:0),'text-white']];
  $('rKpi').innerHTML=K.map(([a,b,c])=>`<div class="card"><p class="text-[10px] text-slate-400 font-bold uppercase">${a}</p><p class="text-lg font-black ${c}">${b}</p></div>`).join('');
@@ -252,7 +246,6 @@ function reportes(){const se=$('rSede').value,d1=$('rDesde').value,d2=$('rHasta'
  mkChart('c3','bar',Object.keys(mod),[{label:'Unidades vendidas',data:Object.values(mod),backgroundColor:'#d97706'}],{t:'Ventas por Modelo'});
  mkChart('c4','bar',Object.keys(sed),[{label:'Facturado',data:Object.values(sed).map(x=>x[0]),backgroundColor:'#dc2626'},{label:'Recaudado',data:Object.values(sed).map(x=>x[1]),backgroundColor:'#059669'}],{t:'Comparativa por Sede'})}
  
-/* ---------- Catálogo (con clave) ---------- */
 let catTmp=[];
 function catRender(){catTmp=catalogo.map(m=>({...m}));pintarCat()}
 function pintarCat(){$('catBody').innerHTML=catTmp.map((m,i)=>`<div class="grid grid-cols-6 gap-2 items-center"><input class="inp col-span-3" value="${esc(m.nombre)}" onchange="catTmp[${i}].nombre=this.value.trim().toUpperCase()"><input type="number" min="0" class="inp col-span-2" value="${m.precio}" onchange="catTmp[${i}].precio=Math.max(0,parseFloat(this.value)||0)"><button onclick="catTmp.splice(${i},1);pintarCat()" class="text-red-400">Quitar</button></div>`).join('')}
@@ -261,14 +254,12 @@ async function catGuardar(){const nombres=catTmp.map(m=>m.nombre);if(!catTmp.len
  if(catTmp.some(m=>!(m.precio>0)))return alert('Todos los precios deben ser mayores a 0.');if(!await pedirClave())return;
  try{await db.collection('config').doc('catalogo').set({modelos:catTmp});catalogo=catTmp.map(m=>({...m}));catalogo.forEach(m=>{if(!(m.nombre in S.inv))S.inv[m.nombre]=0});renderInv();alert('Catálogo actualizado.')}catch(e){alert('Error: '+e.message)}}
  
-/* ---------- Respaldo y reseteo ---------- */
 async function respaldo(pref,sede){const q=await db.collection('cierres').get();const data=q.docs.map(d=>({...d.data(),id:d.id,timestamp:d.data().timestamp?.toDate?.().toISOString()||null})).filter(d=>!sede||sede==='GENERAL'||d.sucursal===sede);
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({generado:new Date().toISOString(),alcance:sede||'GENERAL',cierres:data},null,2)],{type:'application/json'}));a.download=`${pref}_MotosHiram_${sede||'GENERAL'}_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();return data}
 async function resetear(){const al=$('rsAlcance').value;if(!await pedirClave())return;if(prompt(`Escriba RESETEAR para borrar los cierres de: ${al}. Se descargará un respaldo antes.`)!=='RESETEAR')return;
  try{const data=await respaldo('Respaldo_Previo_Reset',al);if(!data.length)return alert('No hay cierres para resetear.');
   for(let i=0;i<data.length;i+=400){const b=db.batch();data.slice(i,i+400).forEach(d=>b.delete(db.collection('cierres').doc(d.id)));await b.commit()}
-  S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:S.inv};render();await cambioContexto(false);alert(`Reseteo completado (${data.length} cierres). Respaldo descargado.`)}catch(e){alert('Reseteo abortado: '+e.message)}}
+ S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:S.inv};render();await cambioContexto(false);alert(`Reseteo completado (${data.length} cierres). Respaldo descargado.`)}catch(e){alert('Reseteo abortado: '+e.message)}}
  
 window.onload=async()=>{$('fecha').value=new Date().toLocaleDateString('en-CA');await cargarCat();await cargarInv();render();tab('cierre');await cambioContexto(false)};
 </script></body></html>
- 
