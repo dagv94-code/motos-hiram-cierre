@@ -397,7 +397,7 @@
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl max-w-xl space-y-5">
             <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-gear text-amber-500 mr-2"></i> Configuración y Seguridad Avanzada</h2>
             <div class="space-y-4 text-xs">
-                <!-- CAMBIAR CLAVE GERENCIAL -->
+                <!-- 3. CAMBIAR CLAVE GERENCIAL -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <label class="font-bold text-slate-300 block">3. Cambiar Clave Gerencial Interna</label>
                     <div class="flex gap-2">
@@ -406,14 +406,14 @@
                     </div>
                 </div>
 
-                <!-- RESPALDO PARA GERENCIA -->
+                <!-- 2. RESPALDO PARA GERENCIA -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <label class="font-bold text-slate-300 block">2. Respaldo Completo para Gerencia (JSON Backup)</label>
                     <p class="text-slate-400 text-[11px]">Descarga un respaldo completo con todos los cierres almacenados en Firestore para auditoría y gerencia.</p>
                     <button onclick="generarRespaldoJSON()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Descargar Respaldo Gerencial</button>
                 </div>
 
-                <!-- RESETEAR POR TIENDA CON RESPALDO AUTOMÁTICO -->
+                <!-- 1. RESETEAR POR TIENDA CON RESPALDO AUTOMÁTICO -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <label class="font-bold text-red-400 block">1. Resetear por Tienda (Con Respaldo Automático)</label>
                     <p class="text-slate-400 text-[11px]">Limpia y resetea la pantalla activa generando automáticamente un archivo de respaldo local.</p>
@@ -1461,7 +1461,6 @@
         function resetearTiendaConRespaldo() {
             if(!confirm('¿Desea resetear la tienda activa? Se generará un respaldo automático local antes de limpiar.')) return;
             
-            // 1. Generar respaldo automático local
             let sucursal = document.getElementById('sucursalActiva').value;
             let datosTienda = { sucursal, fechaRespaldo: new Date().toISOString(), motos: movimientosMotos, taller: movimientosTaller, polizas: polizasData };
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosTienda, null, 2));
@@ -1472,7 +1471,6 @@
             downloadAnchor.click();
             downloadAnchor.remove();
 
-            // 2. Limpiar pantalla
             movimientosMotos = [];
             movimientosTaller = [];
             polizasData = [];
