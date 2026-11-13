@@ -1,1614 +1,274 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motos Hiram C.A. - Reporte Gerencial de Cierre Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAqyGE49TBXXfYpAMBKmLb1fprmOnHwJYY",
-            authDomain: "motos-hiram-db.firebaseapp.com",
-            projectId: "motos-hiram-db",
-            storageBucket: "motos-hiram-db.appspot.com",
-            messagingSenderId: "178070782865",
-            appId: "1:178070782865:web:bc56d65046412efce8d030"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        window.db = db;
-    </script>
-    <style>
-        .pdf-page {
-            background: #ffffff !important;
-            color: #0f172a !important;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 8px;
-            padding: 5px 8px;
-            width: 184mm;
-            box-sizing: border-box;
-            margin: 0 auto;
-        }
-        .pdf-header {
-            border-bottom: 2px solid #dc2626;
-            padding-bottom: 3px;
-            margin-bottom: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .pdf-title h1 { font-size: 13px; font-weight: 900; color: #0f172a; margin: 0; }
-        .pdf-title p { font-size: 7.5px; color: #64748b; margin: 1px 0; }
-        .pdf-title h2 { font-size: 8.5px; font-weight: 800; color: #dc2626; margin-top: 1px; text-transform: uppercase; }
-        .pdf-meta {
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            padding: 3px 5px;
-            border-radius: 3px;
-            text-align: right;
-            font-size: 7.5px;
-            color: #334155;
-        }
-        .pdf-kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-            margin-bottom: 4px;
-        }
-        .pdf-kpi-card {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 3px;
-            padding: 3px;
-            text-align: center;
-        }
-        .pdf-kpi-card span { font-size: 6.5px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; }
-        .pdf-kpi-card strong { font-size: 10px; font-weight: 900; color: #0f172a; margin-top: 1px; display: block; }
-        .pdf-section-title {
-            font-size: 8px;
-            font-weight: bold;
-            color: #0f172a;
-            border-bottom: 1.5px solid #0f172a;
-            padding-bottom: 1px;
-            margin-top: 4px;
-            margin-bottom: 2px;
-            text-transform: uppercase;
-        }
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 3px;
-            font-size: 7.5px;
-        }
-        .pdf-table th, .pdf-table td {
-            border: 1px solid #cbd5e1;
-            padding: 2px 3px;
-            text-align: left;
-            color: #1e293b;
-        }
-        .pdf-table th {
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            font-weight: bold;
-        }
-        .pdf-grid-2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
-            margin-bottom: 3px;
-        }
-        .pdf-box {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 3px;
-            padding: 3px;
-            font-size: 7.5px;
-        }
-        .pdf-box h4 {
-            font-size: 7.5px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 1px;
-            margin-bottom: 2px;
-        }
-        .pdf-signatures {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 6px;
-            text-align: center;
-        }
-        .pdf-sig-line {
-            border-top: 1px solid #475569;
-            padding-top: 2px;
-            margin-top: 12px;
-        }
-        .pdf-sig-line p { font-size: 7.5px; font-weight: bold; color: #0f172a; margin: 0; }
-        .pdf-sig-line span { font-size: 6.5px; color: #64748b; }
-        @media print {
-            body { background: #ffffff !important; }
-            .print\:hidden { display: none !important; }
-        }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased">
-
-    <!-- HEADER INSTITUCIONAL (WEB) -->
-    <header class="bg-slate-900 border-b border-slate-800 shadow-xl print:hidden">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="bg-red-600 text-white p-2.5 rounded-xl font-black text-xl shadow-lg">MH</div>
-                <div>
-                    <h1 class="text-lg font-extrabold tracking-tight text-white">MOTOS HIRAM, C.A.</h1>
-                    <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Ejecutivo de Cierres Pro</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3 flex-wrap">
-                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2">
-                    <span class="text-xs text-slate-400 font-semibold"><i class="fa-solid fa-store text-red-500 mr-1"></i> Sede:</span>
-                    <select id="sucursalActiva" onchange="actualizarPersonalSede(); verificarCierreExistente();" class="bg-slate-900 text-white font-bold text-xs px-2.5 py-1 rounded-lg border border-red-500 focus:outline-none cursor-pointer">
-                        <option value="MARACAIBO">Maracaibo (Principal)</option>
-                        <option value="CABIMAS">Cabimas</option>
-                    </select>
-                </div>
-                <!-- CALENDARIO INTERACTIVO -->
-                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-slate-300">
-                    <i class="fa-solid fa-calendar text-red-500"></i> Fecha:
-                    <input type="date" id="inputFechaCierre" onchange="actualizarValoresGlobales(); verificarCierreExistente();" class="bg-slate-900 border border-slate-600 rounded p-1 text-white font-bold text-xs cursor-pointer focus:outline-none focus:border-red-500">
-                </div>
-                <!-- TASA BCV GLOBAL -->
-                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-amber-400">
-                    <i class="fa-solid fa-coins"></i> Tasa: 
-                    <input type="number" id="txtTasaBCV" value="1000" placeholder="Ej. 1000" oninput="actualizarValoresGlobales()" class="w-20 bg-slate-900 border border-amber-500 rounded p-1 text-center font-bold text-white text-xs"> Bs/$
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- NAVEGACIÓN -->
-    <nav class="bg-slate-900/80 backdrop-blur border-b border-slate-800 print:hidden">
-        <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto text-sm">
-            <button onclick="cambiarPestana('cierre')" id="btnTabCierre" class="tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-file-invoice-dollar"></i> Cierre Diario</button>
-            <button onclick="cambiarPestana('historico')" id="btnTabHistorico" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-clock-rotate-left"></i> Histórico Nube</button>
-            <button onclick="cambiarPestana('reportes')" id="btnTabReportes" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-chart-line"></i> Reportes & Análisis</button>
-            <button onclick="cambiarPestana('config')" id="btnTabConfig" class="tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-gear"></i> Configuración</button>
-        </div>
-    </nav>
-
-    <!-- ALERTA DE CIERRE YA DECLARADO -->
-    <div id="alertaCierreDeclarado" class="max-w-5xl mx-auto px-6 pt-4 hidden print:hidden">
-        <div class="bg-red-900/80 border border-red-500 p-4 rounded-xl flex items-center justify-between text-white text-xs shadow-lg">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>
-                <span><strong>[BLOQUEO DE SEGURIDAD]</strong> No se puede generar doble cierre de un mismo día por favor revisar el histórico. Ya existe un cierre registrado para esta Sede en la fecha seleccionada.</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- PESTAÑA 1: CIERRE DIARIO -->
-    <main id="seccion-cierre" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 print:hidden">
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h2 class="text-base font-bold text-white"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias (Cierre de Sede)</h2>
-            </div>
-            
-            <!-- TARJETAS WEB -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Total Facturado</p>
-                    <p class="text-xl font-black text-white mt-1" id="webTotalFacturado">$0.00</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Pagos del Día (Ingresos)</p>
-                    <p class="text-xl font-black text-emerald-400 mt-1" id="webTotalAbonos">$0.00</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Cuentas por Cobrar</p>
-                    <p class="text-xl font-black text-amber-400 mt-1" id="webTotalCXC">$0.00</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Seguro Caracas (CxP)</p>
-                    <p class="text-xl font-black text-blue-400 mt-1" id="webTotalSegurosCard">$0.00</p>
-                </div>
-            </div>
-
-            <!-- BOTONES DE CARGA INTERACTIVOS -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-800" id="panelBotonesCarga">
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center"><span class="font-bold text-sm">1. Motos / Abonos</span><label class="text-xs text-amber-400 flex items-center gap-1 cursor-pointer"><input type="checkbox" id="checkSinMotos" onchange="toggleSinMovimiento('motos')" class="rounded"> Sin Mov.</label></div>
-                    <button onclick="iniciarModalRegistro('MOTO')" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold shadow cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Cargar Venta Moto</button>
-                </div>
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center"><span class="font-bold text-sm">2. Servicios de Taller</span><label class="text-xs text-amber-400 flex items-center gap-1 cursor-pointer"><input type="checkbox" id="checkSinTaller" onchange="toggleSinMovimiento('taller')" class="rounded"> Sin Mov.</label></div>
-                    <button onclick="iniciarModalRegistro('TALLER')" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold shadow cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Cargar Taller</button>
-                </div>
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center"><span class="font-bold text-sm">3. Pólizas Seguros</span><label class="text-xs text-amber-400 flex items-center gap-1 cursor-pointer"><input type="checkbox" id="checkSinSeguros" onchange="toggleSinMovimiento('seguros')" class="rounded"> 0 Pólizas</label></div>
-                    <button onclick="agregarLineaSeguro()" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold border border-slate-700 shadow cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Agregar Póliza</button>
-                </div>
-            </div>
-
-            <!-- TABLAS VISIBLES EN PANTALLA WEB -->
-            <div class="space-y-4 pt-4 border-t border-slate-800">
-                <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-emerald-500 mr-2"></i> Verificación de Registros del Día</h3>
-                
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Motos Cargadas</p>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead><tr class="bg-slate-900 text-slate-400 border-b border-slate-800"><th class="p-2">Cliente</th><th class="p-2">Modelo</th><th class="p-2">Factura</th><th class="p-2">Pago Día ($)</th><th class="p-2 text-center">Acción</th></tr></thead>
-                            <tbody id="webTablaMotosBody"><tr><td colspan="5" class="p-3 text-center text-slate-500 italic">No hay motos cargadas aún.</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Servicios de Taller Cargados</p>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead><tr class="bg-slate-900 text-slate-400 border-b border-slate-800"><th class="p-2">Cliente</th><th class="p-2">N° Factura</th><th class="p-2">Concepto</th><th class="p-2">Total ($)</th><th class="p-2 text-center">Acción</th></tr></thead>
-                            <tbody id="webTablaTallerBody"><tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Sin servicios de taller cargados aún.</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas (CxP / Pasivo)</p>
-                    <div id="webContenedorSeguros" class="space-y-2">
-                        <p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INVENTARIO INTERACTIVO -->
-            <div class="pt-4 border-t border-slate-800 space-y-3">
-                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-300"><i class="fa-solid fa-boxes-stacked text-red-500 mr-1.5"></i> 5. Inventario de Motos al Cierre (Confirmación Diaria)</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs" id="webInventarioContainer"></div>
-                <div class="flex justify-between items-center font-bold text-xs bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <span>Total Unidades en Existencia:</span>
-                    <span id="webTotalInventario" class="text-emerald-400 text-sm">0</span>
-                </div>
-            </div>
-
-            <!-- BOTÓN TOTALIZAR Y DESCARGAR PDF (UBICADO ABAJO EN EL CIERRE) -->
-            <div class="pt-4 border-t border-slate-800 flex justify-end">
-                <button id="btnTotalizarPDF" onclick="totalizarYDescargarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-6 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-file-pdf"></i> Totalizar y Descargar PDF de Cierre
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- PESTAÑA 2: HISTÓRICO NUBE -->
-    <main id="seccion-historico" class="max-w-7xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-clock-rotate-left text-blue-500 mr-2"></i> Histórico de Cierres Sincronizados</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-slate-800 text-slate-400 uppercase border-b border-slate-700">
-                            <th class="p-3">Fecha</th>
-                            <th class="p-3">Sede</th>
-                            <th class="p-3">Total Facturado ($)</th>
-                            <th class="p-3">Ingresos del Día ($)</th>
-                            <th class="p-3">CXC ($)</th>
-                            <th class="p-3">Motos Vendidas</th>
-                            <th class="p-3">Pólizas</th>
-                            <th class="p-3 text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaHistoricoBody"><tr><td colspan="8" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr></tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <!-- PESTAÑA 3: REPORTES & ANÁLISIS -->
-    <main id="seccion-reportes" class="max-w-7xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
-            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-chart-line text-amber-500 mr-2"></i> Reportes & Análisis Estadístico en Vivo</h2>
-            
-            <!-- SEGMENTADORES -->
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs">
-                <div>
-                    <label class="font-bold text-slate-400 block mb-1">Sede</label>
-                    <select id="repFiltroSede" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white font-bold cursor-pointer">
-                        <option value="TODAS">Ambas Sedes</option>
-                        <option value="MARACAIBO">Maracaibo</option>
-                        <option value="CABIMAS">Cabimas</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="font-bold text-slate-400 block mb-1">Desde</label>
-                    <input type="date" id="repFechaDesde" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">
-                </div>
-                <div>
-                    <label class="font-bold text-slate-400 block mb-1">Hasta</label>
-                    <input type="date" id="repFechaHasta" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">
-                </div>
-                <div>
-                    <label class="font-bold text-slate-400 block mb-1">Tipo de Ingreso</label>
-                    <select id="repTipoIngreso" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white font-bold cursor-pointer">
-                        <option value="TODOS">Todos</option>
-                        <option value="MOTO">Ventas de Motos</option>
-                        <option value="TALLER">Servicios de Taller</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button onclick="limpiarFiltrosReportes()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold p-1.5 rounded border border-slate-700 cursor-pointer">Limpiar Filtros</button>
-                </div>
-            </div>
-
-            <!-- TARJETAS DE ESTADÍSTICAS -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Facturado Filtrado</p>
-                    <p class="text-xl font-black text-white mt-1" id="repStatFacturado">$0.00</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Recaudado Filtrado</p>
-                    <p class="text-xl font-black text-emerald-400 mt-1" id="repStatRecaudado">$0.00</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Motos Totales</p>
-                    <p class="text-xl font-black text-amber-400 mt-1" id="repStatMotos">0</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Cierres Procesados</p>
-                    <p class="text-xl font-black text-blue-400 mt-1" id="repStatCierres">0</p>
-                </div>
-            </div>
-
-            <!-- GRÁFICOS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase mb-3"><i class="fa-solid fa-chart-bar text-red-500 mr-1"></i> Comparativa Facturado vs Recaudado</h3>
-                    <div class="h-64"><canvas id="chartComparativa"></canvas></div>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase mb-3"><i class="fa-solid fa-chart-pie text-emerald-500 mr-1"></i> Distribución de Métodos de Pago</h3>
-                    <div class="h-64"><canvas id="chartMetodosPago"></canvas></div>
-                </div>
-            </div>
-
-            <!-- TABLA ANALÍTICA -->
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                <h3 class="text-xs font-bold text-slate-300 uppercase"><i class="fa-solid fa-table text-blue-500 mr-1"></i> Detalle Analítico de Cierres</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead><tr class="bg-slate-900 text-slate-400 border-b border-slate-800"><th class="p-2">Fecha</th><th class="p-2">Sede</th><th class="p-2">Facturado ($)</th><th class="p-2">Recaudado ($)</th><th class="p-2">Efectivo</th><th class="p-2">Zelle</th><th class="p-2">Binance</th><th class="p-2">Bs. Eq</th></tr></thead>
-                        <tbody id="tablaAnaliticaBody"><tr><td colspan="8" class="p-3 text-center text-slate-500 italic">No hay datos para mostrar con los filtros actuales.</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- PESTAÑA 4: CONFIGURACIÓN -->
-    <main id="seccion-config" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl max-w-xl space-y-5">
-            <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-gear text-amber-500 mr-2"></i> Configuración y Seguridad Avanzada</h2>
-            <div class="space-y-4 text-xs">
-                <!-- 3. CAMBIAR CLAVE GERENCIAL -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <label class="font-bold text-slate-300 block">3. Cambiar Clave Gerencial Interna</label>
-                    <div class="flex gap-2">
-                        <input type="password" id="txtNuevaClave" placeholder="Nueva clave gerencial" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 font-bold text-white">
-                        <button onclick="cambiarClaveGerencial()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded font-bold cursor-pointer">Actualizar Clave</button>
-                    </div>
-                </div>
-
-                <!-- 2. RESPALDO PARA GERENCIA -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <label class="font-bold text-slate-300 block">2. Respaldo Completo para Gerencia (JSON Backup)</label>
-                    <p class="text-slate-400 text-[11px]">Descarga un respaldo completo con todos los cierres almacenados en Firestore para auditoría y gerencia.</p>
-                    <button onclick="generarRespaldoJSON()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Descargar Respaldo Gerencial</button>
-                </div>
-
-                <!-- 1. RESETEAR POR TIENDA CON RESPALDO AUTOMÁTICO -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <label class="font-bold text-red-400 block">1. Resetear por Tienda (Con Respaldo Automático)</label>
-                    <p class="text-slate-400 text-[11px]">Limpia y resetea la pantalla activa generando automáticamente un archivo de respaldo local.</p>
-                    <button onclick="resetearTiendaConRespaldo()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-rotate-left"></i> Resetear Tienda & Respaldar</button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- PLANTILLA MAESTRA DEL PDF GERENCIAL -->
-    <div id="areaPDF" style="display:none;">
-        <div class="pdf-page">
-            <div class="pdf-header">
-                <div class="pdf-title">
-                    <h1>MOTOS HIRAM, C.A.</h1>
-                    <p>ZULIA • RIF: J-050770055-0</p>
-                    <h2 id="pdfReporteTitulo">INFORME EJECUTIVO DE CIERRE - MARACAIBO</h2>
-                </div>
-                <div class="pdf-meta">
-                    <p><strong>Fecha:</strong> <span id="lblFechaPDF">--/--/----</span></p>
-                    <p><strong>Tasa BCV:</strong> <span id="lblTasaPDF">0.00</span> Bs/$</p>
-                </div>
-            </div>
-
-            <!-- KPIs GERENCIALES -->
-            <div class="pdf-kpi-grid">
-                <div class="pdf-kpi-card">
-                    <span>Total Facturado</span>
-                    <strong id="pdfTotalFacturado">$0.00</strong>
-                </div>
-                <div class="pdf-kpi-card">
-                    <span>Pagos del Día (Ingresos)</span>
-                    <strong id="pdfTotalAbonos" style="color: #059669;">$0.00</strong>
-                </div>
-                <div class="pdf-kpi-card">
-                    <span>Cuentas por Cobrar</span>
-                    <strong id="pdfTotalCXC" style="color: #d97706;">$0.00</strong>
-                </div>
-                <div class="pdf-kpi-card">
-                    <span>Seguro Caracas (CxP)</span>
-                    <strong id="pdfTotalSegurosCard" style="color: #2563eb;">$0.00</strong>
-                </div>
-            </div>
-
-            <!-- 1. MOTOS -->
-            <div class="pdf-section-title">1. Ventas y Abonos de Motocicletas</div>
-            <div id="pdfContenedorMotos">
-                <table class="pdf-table">
-                    <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Modelo</th>
-                            <th>Factura</th>
-                            <th>Facturación ($)</th>
-                            <th>Abonos Ant. ($)</th>
-                            <th>Pago Día ($)</th>
-                            <th>CXC ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pdfTablaMotosBody">
-                        <tr><td colspan="7" style="text-align: center; color: #64748b;">No hay ventas o abonos de motos cargados.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 2. TALLER -->
-            <div class="pdf-section-title">2. Movimientos y Servicios de Taller</div>
-            <div id="pdfContenedorTaller">
-                <table class="pdf-table">
-                    <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>N° Factura</th>
-                            <th>Concepto / Descripción</th>
-                            <th>Medio de Pago</th>
-                            <th>Total ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pdfTablaTallerBody">
-                        <tr><td colspan="5" style="text-align: center; color: #64748b;">Sin movimientos de taller registrados.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 3. SEGUROS CARACAS -->
-            <div class="pdf-section-title">3. Pólizas Seguros Caracas (Cuentas por Pagar)</div>
-            <div id="pdfContenedorSeguros">
-                <table class="pdf-table">
-                    <thead>
-                        <tr>
-                            <th>Concepto</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unitario ($)</th>
-                            <th>Subtotal CxP ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pdfTablaSegurosBody">
-                        <tr><td colspan="4" style="text-align: center; color: #64748b;">0 Pólizas registradas.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 4. RESUMEN DE FORMAS DE PAGO -->
-            <div class="pdf-section-title">4. Resumen Detallado de Formas de Pago y Referencias</div>
-            <div class="pdf-grid-2">
-                <div class="pdf-box">
-                    <h4 style="color: #059669; margin: 0 0 2px 0;">Efectivo Divisas ($)</h4>
-                    <div id="pdfResumenEfectivo"><p style="color: #64748b; font-style: italic; margin: 0;">Sin arqueo registrado.</p></div>
-                </div>
-                <div class="pdf-box">
-                    <h4 style="color: #2563eb; margin: 0 0 2px 0;">Zelle ($) - Referencias y Titulares</h4>
-                    <div id="pdfResumenZelle"><p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Zelle registrados.</p></div>
-                </div>
-                <div class="pdf-box">
-                    <h4 style="color: #d97706; margin: 0 0 2px 0;">Binance / Towerbank ($)</h4>
-                    <div id="pdfResumenBinance"><p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos por Binance registrados.</p></div>
-                </div>
-                <div class="pdf-box">
-                    <h4 style="color: #7c3aed; margin: 0 0 2px 0;">Bolívares (Pago Móvil / Transf / Punto)</h4>
-                    <div id="pdfResumenBs"><p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos en Bolívares registrados.</p></div>
-                </div>
-            </div>
-
-            <!-- CUADRE GERENCIAL -->
-            <div class="pdf-box" style="background: #f1f5f9; border: 1px solid #94a3b8; margin-bottom: 3px; padding: 3px;">
-                <h4 style="color: #0f172a; text-align: center; font-weight: bold; font-size: 7.5px; margin: 0 0 2px 0;">Cuadre Gerencial de Cierre (Diferencia Objetivo: $0.00)</h4>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
-                    <div><span style="font-size: 6.5px; color: #64748b;">Total Ingresos Recibidos</span><strong id="pdfCuadreIngresos" style="font-size: 9px; color: #059669;">$0.00</strong></div>
-                    <div><span style="font-size: 6.5px; color: #64748b;">Total Venta Facturada</span><strong id="pdfCuadreVentas" style="font-size: 9px; color: #0f172a;">$0.00</strong></div>
-                    <div><span style="font-size: 6.5px; color: #64748b;">Diferencia (Cuadre)</span><strong id="pdfCuadreDiferencia" style="font-size: 9px; color: #dc2626;">$0.00</strong></div>
-                </div>
-            </div>
-
-            <!-- 5. INVENTARIO -->
-            <div class="pdf-section-title">5. Inventario de Motocicletas al Cierre</div>
-            <table class="pdf-table" style="margin-bottom: 2px;">
-                <thead>
-                    <tr>
-                        <th>Modelo de Motocicleta</th>
-                        <th style="text-align: center;">Existencia al Cierre</th>
-                    </tr>
-                </thead>
-                <tbody id="pdfTablaInventarioBody"></tbody>
-            </table>
-            <div style="text-align: right; font-weight: bold; font-size: 8px; margin-bottom: 5px;">
-                Total Unidades en Existencia: <span id="pdfTotalInventario" style="color: #059669;">0</span>
-            </div>
-
-            <!-- FIRMAS INSTITUCIONALES -->
-            <div class="pdf-signatures">
-                <div>
-                    <div class="pdf-sig-line">
-                        <p id="pdfAdminNombre">Jennmary Parra</p>
-                        <span>Preparado por (Analista Administrativo)</span>
-                    </div>
-                </div>
-                <div>
-                    <div class="pdf-sig-line">
-                        <p id="pdfGerenteNombre">Lic. David A. García V. (CI: 22.362.833)</p>
-                        <span>Revisado por (Gerente de Concesionario)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE REGISTRO UNIFICADO -->
-    <div id="modalRegistro" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 text-white relative">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-base font-bold" id="modalTitulo">Registrar Operación</h3>
-                <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="font-bold text-slate-400">Nro. de Factura</label>
-                        <input type="text" id="regFactura" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white" placeholder="Ej. 00151">
-                    </div>
-                    <div>
-                        <label class="font-bold text-slate-400">Nombre del Cliente</label>
-                        <input type="text" id="regCliente" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white" placeholder="Nombre completo">
-                    </div>
-                </div>
-
-                <!-- GRUPO MOTO -->
-                <div id="grupoMotoCampos" class="space-y-2 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                    <div>
-                        <label class="font-bold text-slate-400">Modelo de Motocicleta</label>
-                        <select id="regModeloMoto" onchange="actualizarPrecioMoto()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold text-white cursor-pointer">
-                            <option value="BOXER CT100|1420">Boxer CT100 - $1,420</option>
-                            <option value="BOXER BM150|1890">Boxer BM150 - $1,890</option>
-                            <option value="PULSAR NEON 150|2500">Pulsar Neon 150 - $2,500</option>
-                            <option value="PULSAR N160|3100">Pulsar N160 (Carburada) - $3,100</option>
-                            <option value="PULSAR NS200|3700">Pulsar NS200 - $3,700</option>
-                            <option value="PULSAR N250|4700">Pulsar N250 - $4,700</option>
-                            <option value="KTM DUKE 200|5200">KTM Duke 200 - $5,200</option>
-                            <option value="KTM DUKE 390|8540">KTM Duke 390 - $8,540</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div><label class="font-bold text-slate-400">Precio ($)</label><input type="number" id="regPrecioMoto" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-white" value="1420" readonly></div>
-                        <div><label class="font-bold text-slate-400">Abono Ant. ($)</label><input type="number" id="regAbonoAnt" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-white" value="0"></div>
-                        <div>
-                            <label class="font-bold text-slate-400">Modalidad</label>
-                            <select id="regModalidad" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-white cursor-pointer">
-                                <option value="CONTADO">Contado</option>
-                                <option value="APARTADO">Apartado (CXC)</option>
-                                <option value="MOTOS_YES">Motos Yes</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- GRUPO TALLER -->
-                <div id="grupoTallerCampos" class="space-y-2 bg-slate-800/50 p-3 rounded-xl border border-slate-700 hidden">
-                    <div>
-                        <label class="font-bold text-slate-400">Concepto / Servicio de Taller</label>
-                        <input type="text" id="regConceptoTaller" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white" placeholder="Ej. Cambio de aceite">
-                    </div>
-                    <div>
-                        <label class="font-bold text-slate-400">Monto Total ($)</label>
-                        <input type="number" id="regMontoTaller" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold text-white" value="0">
-                    </div>
-                </div>
-
-                <!-- MEDIOS DE PAGO -->
-                <div class="border-t border-slate-800 pt-2 space-y-2">
-                    <h4 class="font-bold uppercase text-slate-400">Desglose de Medios de Pago</h4>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-slate-400 block mb-1">Efectivo ($)</label>
-                            <div class="flex gap-1">
-                                <input type="text" id="pagoEfec" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-emerald-400 text-center text-xs" value="$0.00" readonly>
-                                <button type="button" onclick="abrirArqueoModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs font-bold shadow cursor-pointer">Arqueo</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-slate-400 block mb-1">Zelle ($)</label>
-                            <div class="flex gap-1">
-                                <input type="text" id="pagoZelleDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-blue-400 text-center text-xs" value="$0.00" readonly>
-                                <button type="button" onclick="abrirZelleModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-bold shadow cursor-pointer">Zelle</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-slate-400 block mb-1">Binance ($)</label>
-                            <div class="flex gap-1">
-                                <input type="text" id="pagoBinanceDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-amber-400 text-center text-xs" value="$0.00" readonly>
-                                <button type="button" onclick="abrirBinanceModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-xs font-bold shadow cursor-pointer">Binance</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 pt-1">
-                        <div>
-                            <label class="text-slate-400 block mb-1">Pago Móvil (Bs.)</label>
-                            <div class="flex gap-1">
-                                <input type="text" id="pagoMovilDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
-                                <button type="button" onclick="abrirBsModal('PAGO_MOVIL')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs font-bold shadow cursor-pointer">Bs</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-slate-400 block mb-1">Transf. (Bs.)</label>
-                            <div class="flex gap-1">
-                                <input type="text" id="pagoTransfDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
-                                <button type="button" onclick="abrirBsModal('TRANSF')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs font-bold shadow cursor-pointer">Bs</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-slate-400 block mb-1">Punto (Bs.)</label>
-                            <div class="flex gap-1">
-                                <input type="text" id="pagoPuntoDisp" class="w-full bg-slate-800 border border-slate-700 rounded p-1 font-bold text-purple-400 text-center text-xs" value="0 Bs." readonly>
-                                <button type="button" onclick="abrirBsModal('PUNTO')" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs font-bold shadow cursor-pointer">Bs</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-slate-800 pt-3 flex justify-end gap-2">
-                <button onclick="cerrarModal()" class="bg-slate-800 text-slate-300 px-4 py-1.5 rounded-lg font-bold text-xs cursor-pointer">Cancelar</button>
-                <button onclick="procesarRegistro()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg font-bold text-xs shadow cursor-pointer">Guardar en Cierre</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE CLAVE GERENCIAL -->
-    <div id="modalClaveGerencial" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white text-xs">
-            <h3 class="text-sm font-bold border-b border-slate-800 pb-2 text-amber-400"><i class="fa-solid fa-lock mr-1"></i> Autorización Gerencial</h3>
-            <p class="text-slate-400">Ingrese la clave de gerencia para autorizar esta acción:</p>
-            <div><input type="password" id="txtClaveIngresada" placeholder="Clave gerencial" class="w-full bg-slate-800 border border-slate-700 rounded p-2 font-bold text-white text-center"></div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="cerrarModalClave()" class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded font-bold cursor-pointer">Cancelar</button>
-                <button onclick="verificarClaveYEjecutar()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded font-bold cursor-pointer">Autorizar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODALES DE PAGOS SECUNDARIOS -->
-    <div id="modalArqueo" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white">
-            <h3 class="text-sm font-bold border-b border-slate-800 pb-2">Arqueo por Denominaciones ($)</h3>
-            <div class="space-y-1.5 text-xs">
-                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$100</span><input type="number" id="arq100" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$50</span><input type="number" id="arq50" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$20</span><input type="number" id="arq20" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$10</span><input type="number" id="arq10" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$5</span><input type="number" id="arq5" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
-                <div class="flex justify-between items-center bg-slate-800 p-1 rounded"><span>$1</span><input type="number" id="arq1" value="0" oninput="calcularArqueoModal()" class="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold"></div>
-            </div>
-            <div class="bg-slate-800 p-2 rounded flex justify-between font-bold text-xs"><span>Total:</span><span id="lblArqTotal" class="text-emerald-400">$0.00</span></div>
-            <div class="flex justify-end pt-2"><button onclick="cerrarArqueoModal(true)" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Aceptar</button></div>
-        </div>
-    </div>
-
-    <div id="modalZelle" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white text-xs">
-            <h3 class="text-sm font-bold border-b border-slate-800 pb-2">Registro Zelle</h3>
-            <div><label class="block mb-1">Referencia</label><input type="text" id="zelleRef" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Referencia"></div>
-            <div><label class="block mb-1">Titular</label><input type="text" id="zelleTitular" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Nombre titular"></div>
-            <div><label class="block mb-1">Monto ($)</label><input type="number" id="zelleMonto" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
-            <div class="flex justify-end pt-2"><button onclick="guardarZelle()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Aceptar</button></div>
-        </div>
-    </div>
-
-    <div id="modalBinance" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white text-xs">
-            <h3 class="text-sm font-bold border-b border-slate-800 pb-2">Registro Binance / Towerbank</h3>
-            <div><label class="block mb-1">Referencia TX</label><input type="text" id="binRef" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Referencia"></div>
-            <div><label class="block mb-1">Monto Pagado ($)</label><input type="number" id="binMontoPagado" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
-            <div><label class="block mb-1">Monto Recibido ($)</label><input type="number" id="binMontoRecibido" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
-            <div class="flex justify-end pt-2"><button onclick="guardarBinance()" class="bg-amber-600 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Aceptar</button></div>
-        </div>
-    </div>
-
-    <div id="modalBs" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-5 space-y-3 text-white text-xs">
-            <h3 class="text-sm font-bold border-b border-slate-800 pb-2" id="tituloModalBs">Carga en Bolívares</h3>
-            <div><label class="block mb-1">Nro. Referencia / Lote</label><input type="text" id="bsRef" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" placeholder="Referencia"></div>
-            <div><label class="block mb-1">Monto en Bs.</label><input type="number" id="bsMonto" oninput="calcularEquivalenteModalBs()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 font-bold" value="0"></div>
-            <div class="bg-slate-800 p-2 rounded flex justify-between font-bold"><span>Equiv. USD:</span><span id="lblBsEqUSD" class="text-purple-400">$0.00</span></div>
-            <div class="flex justify-end pt-2"><button onclick="guardarBsModal()" class="bg-purple-600 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Aceptar</button></div>
-        </div>
-    </div>
-
-    <!-- SCRIPT DE LÓGICA PRO -->
-    <script>
-        let claveGerencialActual = "MotosHiram";
-        let accionPendienteAutorizacion = null;
-        let datosHistoricoGlobal = [];
-        let chartComparativaInstancia = null;
-        let chartMetodosInstancia = null;
-
-        let tipoActual = 'MOTO';
-        let movimientosMotos = [];
-        let movimientosTaller = [];
-        let tasaBCV = 1000;
-        let efectivoCalculado = 0;
-        let zelleData = { monto: 0, ref: '', titular: '' };
-        let binanceData = { monto: 0, recibido: 0, ref: '' };
-        let bsDataList = [];
-        let polizasData = [];
-        
-        let inventario = {
-            "BOXER CT100": 3,
-            "BOXER BM150": 3,
-            "PULSAR NEON 150": 2,
-            "PULSAR N160": 3,
-            "PULSAR NS200": 11,
-            "PULSAR N250": 0,
-            "KTM DUKE 200": 1,
-            "KTM DUKE 390": 1
-        };
-
-        let personalSedes = {
-            "MARACAIBO": { admin: "Jennmary Parra", gerente: "Lic. David A. García V." },
-            "CABIMAS": { admin: "Alejandra Florida", gerente: "Néstor Córdoba" }
-        };
-
-        function actualizarValoresGlobales() {
-            let tasaInput = document.getElementById('txtTasaBCV');
-            tasaBCV = tasaInput ? parseFloat(tasaInput.value) || 0 : 1000;
-            
-            let fechaEl = document.getElementById('inputFechaCierre');
-            let fechaVal = fechaEl ? fechaEl.value : '';
-            let fechaTexto = fechaVal ? new Date(fechaVal + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }) : new Date().toLocaleDateString();
-            
-            let lblFechaPDF = document.getElementById('lblFechaPDF');
-            let lblTasaPDF = document.getElementById('lblTasaPDF');
-
-            if(lblFechaPDF) lblFechaPDF.innerText = fechaTexto;
-            if(lblTasaPDF) lblTasaPDF.innerText = tasaBCV.toFixed(2);
-        }
-
-        function cambiarPestana(p) {
-            ['cierre', 'historico', 'reportes', 'config'].forEach(tab => {
-                let sec = document.getElementById(`seccion-${tab}`);
-                let btn = document.getElementById(`btnTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-                if(sec) sec.classList.toggle('hidden', tab !== p);
-                if(btn) {
-                    if(tab === p) {
-                        btn.className = "tab-btn py-3 px-3 border-b-2 font-bold text-red-500 border-red-500 flex items-center gap-2 cursor-pointer";
-                    } else {
-                        btn.className = "tab-btn py-3 px-3 border-b-2 font-semibold text-slate-400 border-transparent hover:text-white flex items-center gap-2 cursor-pointer";
-                    }
-                }
-            });
-            if(p === 'historico' || p === 'reportes') cargarHistoricoNube();
-        }
-
-        async function verificarCierreExistente() {
-            let sucursal = document.getElementById('sucursalActiva').value;
-            let fecha = document.getElementById('inputFechaCierre').value;
-            if(!fecha) return;
-
-            try {
-                let snapshot = await db.collection("cierres").where("sucursal", "==", sucursal).where("fecha", "==", fecha).get();
-                let existe = !snapshot.empty;
-                
-                let alerta = document.getElementById('alertaCierreDeclarado');
-                let btnTotalizar = document.getElementById('btnTotalizarPDF');
-                let panelBotones = document.getElementById('panelBotonesCarga');
-
-                if(existe) {
-                    if(alerta) alerta.classList.remove('hidden');
-                    if(btnTotalizar) btnTotalizar.classList.add('opacity-50', 'pointer-events-none');
-                    if(panelBotones) panelBotones.classList.add('opacity-50', 'pointer-events-none');
-                } else {
-                    if(alerta) alerta.classList.add('hidden');
-                    if(btnTotalizar) btnTotalizar.classList.remove('opacity-50', 'pointer-events-none');
-                    if(panelBotones) panelBotones.classList.remove('opacity-50', 'pointer-events-none');
-                }
-            } catch(e) {
-                console.error("Error verificando cierre existente:", e);
-            }
-        }
-
-        async function cargarHistoricoNube() {
-            let tbody = document.getElementById('tablaHistoricoBody');
-            if(!tbody) return;
-            tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr>`;
-            try {
-                let snapshot = await db.collection("cierres").orderBy("timestamp", "desc").get();
-                datosHistoricoGlobal = [];
-                if(snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500 italic">No hay cierres registrados en la nube.</td></tr>`;
-                    actualizarReportesEstadisticos();
-                    return;
-                }
-                tbody.innerHTML = '';
-                snapshot.forEach(doc => {
-                    let d = doc.data();
-                    d.id = doc.id;
-                    datosHistoricoGlobal.push(d);
-
-                    let totF = d.totalFacturado || 0;
-                    let totA = d.motos ? d.motos.reduce((a,b)=>a+b.pagoDia,0) : 0;
-                    if(d.taller) totA += d.taller.reduce((a,b)=>a+b.total,0);
-                    let cxc = d.motos ? d.motos.reduce((a,b)=>a+b.cxc,0) : 0;
-                    let cantMotos = d.motos ? d.motos.length : 0;
-                    let cantPolizas = d.polizas ? d.polizas.reduce((a,b)=>a+b.cantidad,0) : 0;
-
-                    tbody.innerHTML += `
-                        <tr class="border-b border-slate-800 hover:bg-slate-900">
-                            <td class="p-3 font-semibold text-white">${d.fecha || 'N/A'}</td>
-                            <td class="p-3 text-slate-300">${d.sucursal || 'MARACAIBO'}</td>
-                            <td class="p-3 text-white font-bold">$${totF.toFixed(2)}</td>
-                            <td class="p-3 text-emerald-400 font-bold">$${totA.toFixed(2)}</td>
-                            <td class="p-3 text-amber-400 font-bold">$${cxc.toFixed(2)}</td>
-                            <td class="p-3 text-center">${cantMotos}</td>
-                            <td class="p-3 text-center">${cantPolizas}</td>
-                            <td class="p-3 text-center flex justify-center gap-2">
-                                <button onclick="reimprimirPDF('${d.id}')" title="Reimprimir PDF" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs cursor-pointer"><i class="fa-solid fa-file-pdf"></i></button>
-                                <button onclick="pedirClaveParaAccion('EDITAR', '${d.id}')" title="Modificar" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-xs cursor-pointer"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="pedirClaveParaAccion('ELIMINAR', '${d.id}')" title="Eliminar" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                actualizarReportesEstadisticos();
-            } catch(e) {
-                console.error("Error al cargar histórico:", e);
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-400">Error al consultar la base de datos.</td></tr>`;
-            }
-        }
-
-        function pedirClaveParaAccion(accion, idDoc) {
-            accionPendienteAutorizacion = { accion, idDoc };
-            document.getElementById('txtClaveIngresada').value = '';
-            document.getElementById('modalClaveGerencial').classList.remove('hidden');
-        }
-
-        function cerrarModalClave() {
-            document.getElementById('modalClaveGerencial').classList.add('hidden');
-            accionPendienteAutorizacion = null;
-        }
-
-        function verificarClaveYEjecutar() {
-            let ingresada = document.getElementById('txtClaveIngresada').value;
-            if(ingresada !== claveGerencialActual) {
-                alert('Clave gerencial incorrecta. Operación denegada.');
-                return;
-            }
-            let { accion, idDoc } = accionPendienteAutorizacion;
-            cerrarModalClave();
-
-            if(accion === 'ELIMINAR') eliminarCierreNube(idDoc);
-            if(accion === 'EDITAR') cargarCierreParaEditar(idDoc);
-        }
-
-        async function eliminarCierreNube(idDoc) {
-            if(!confirm('¿Está seguro de eliminar este cierre de la nube?')) return;
-            try {
-                await db.collection("cierres").doc(idDoc).delete();
-                alert('¡Cierre eliminado con éxito!');
-                cargarHistoricoNube();
-            } catch(e) {
-                alert('Error al eliminar el registro.');
-            }
-        }
-
-        async function cargarCierreParaEditar(idDoc) {
-            let cierre = datosHistoricoGlobal.find(d => d.id === idDoc);
-            if(!cierre) return;
-
-            document.getElementById('sucursalActiva').value = cierre.sucursal || 'MARACAIBO';
-            document.getElementById('inputFechaCierre').value = cierre.fecha || '';
-            document.getElementById('txtTasaBCV').value = cierre.tasa || 1000;
-
-            movimientosMotos = cierre.motos || [];
-            movimientosTaller = cierre.taller || [];
-            polizasData = cierre.polizas || [];
-            
-            actualizarValoresGlobales();
-            renderMotos();
-            renderTaller();
-            renderSeguros();
-            cambiarPestana('cierre');
-            alert('Cierre cargado en pantalla para modificación.');
-        }
-
-        function reimprimirPDF(idDoc) {
-            let cierre = datosHistoricoGlobal.find(d => d.id === idDoc);
-            if(!cierre) return;
-            
-            document.getElementById('sucursalActiva').value = cierre.sucursal || 'MARACAIBO';
-            document.getElementById('inputFechaCierre').value = cierre.fecha || '';
-            document.getElementById('txtTasaBCV').value = cierre.tasa || 1000;
-            movimientosMotos = cierre.motos || [];
-            movimientosTaller = cierre.taller || [];
-            polizasData = cierre.polizas || [];
-            actualizarValoresGlobales();
-            renderMotos();
-            renderTaller();
-            renderSeguros();
-            renderInventario();
-
-            setTimeout(() => {
-                let element = document.getElementById('areaPDF');
-                element.style.display = 'block';
-                let opt = {
-                    margin: [2, 2, 2, 2],
-                    filename: `Cierre_Gerencial_${cierre.sucursal}_${cierre.fecha}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                html2pdf().from(element).set(opt).save().then(() => {
-                    element.style.display = 'none';
-                });
-            }, 500);
-        }
-
-        function actualizarPersonalSede() {
-            let sede = document.getElementById('sucursalActiva').value;
-            let adminEl = document.getElementById('pdfAdminNombre');
-            let gerenteEl = document.getElementById('pdfGerenteNombre');
-            let reporteTitEl = document.getElementById('pdfReporteTitulo');
-
-            if(adminEl) adminEl.innerText = personalSedes[sede].admin;
-            if(gerenteEl) gerenteEl.innerText = personalSedes[sede].gerente;
-            if(reporteTitEl) reporteTitEl.innerText = `INFORME EJECUTIVO DE CIERRE - ${sede}`;
-        }
-
-        function iniciarModalRegistro(tipo) {
-            actualizarValoresGlobales();
-            if(tasaBCV <= 0) {
-                alert('Por favor, ingrese primero la Tasa del Día.');
-                return;
-            }
-            tipoActual = tipo;
-            document.getElementById('modalTitulo').innerText = tipo === 'MOTO' ? 'Registrar Venta de Motocicleta o Abono' : 'Registrar Servicio de Taller';
-            
-            document.getElementById('grupoMotoCampos').classList.toggle('hidden', tipo !== 'MOTO');
-            document.getElementById('grupoTallerCampos').classList.toggle('hidden', tipo !== 'TALLER');
-            
-            document.getElementById('regFactura').value = '';
-            document.getElementById('regCliente').value = '';
-            document.getElementById('regAbonoAnt').value = '0';
-            document.getElementById('regMontoTaller').value = '0';
-
-            efectivoCalculado = 0;
-            zelleData = { monto: 0, ref: '', titular: '' };
-            binanceData = { monto: 0, recibido: 0, ref: '' };
-            bsDataList = [];
-
-            document.getElementById('pagoEfec').value = "$0.00";
-            document.getElementById('pagoZelleDisp').value = "$0.00";
-            document.getElementById('pagoBinanceDisp').value = "$0.00";
-            document.getElementById('pagoMovilDisp').value = "0 Bs.";
-            document.getElementById('pagoTransfDisp').value = "0 Bs.";
-            document.getElementById('pagoPuntoDisp').value = "0 Bs.";
-            
-            document.getElementById('modalRegistro').classList.remove('hidden');
-        }
-
-        function cerrarModal() { document.getElementById('modalRegistro').classList.add('hidden'); }
-
-        function abrirArqueoModal() { document.getElementById('modalArqueo').classList.remove('hidden'); }
-        function cerrarArqueoModal(guardar) {
-            if(guardar) {
-                let t = (parseFloat(document.getElementById('arq100').value || 0) * 100) +
-                        (parseFloat(document.getElementById('arq50').value || 0) * 50) +
-                        (parseFloat(document.getElementById('arq20').value || 0) * 20) +
-                        (parseFloat(document.getElementById('arq10').value || 0) * 10) +
-                        (parseFloat(document.getElementById('arq5').value || 0) * 5) +
-                        (parseFloat(document.getElementById('arq1').value || 0) * 1);
-                efectivoCalculado = t;
-                document.getElementById('pagoEfec').value = `$${t.toFixed(2)}`;
-            }
-            document.getElementById('modalArqueo').classList.add('hidden');
-        }
-        function calcularArqueoModal() {
-            let t = (parseFloat(document.getElementById('arq100').value || 0) * 100) +
-                    (parseFloat(document.getElementById('arq50').value || 0) * 50) +
-                    (parseFloat(document.getElementById('arq20').value || 0) * 20) +
-                    (parseFloat(document.getElementById('arq10').value || 0) * 10) +
-                    (parseFloat(document.getElementById('arq5').value || 0) * 5) +
-                    (parseFloat(document.getElementById('arq1').value || 0) * 1);
-            document.getElementById('lblArqTotal').innerText = `$${t.toFixed(2)}`;
-        }
-
-        function abrirZelleModal() { document.getElementById('modalZelle').classList.remove('hidden'); }
-        function guardarZelle() {
-            let monto = parseFloat(document.getElementById('zelleMonto').value || 0);
-            let ref = document.getElementById('zelleRef').value || '';
-            let titular = document.getElementById('zelleTitular').value || '';
-            zelleData = { monto, ref, titular };
-            document.getElementById('pagoZelleDisp').value = `$${monto.toFixed(2)}`;
-            document.getElementById('modalZelle').classList.add('hidden');
-        }
-
-        function abrirBinanceModal() { document.getElementById('modalBinance').classList.remove('hidden'); }
-        function guardarBinance() {
-            let monto = parseFloat(document.getElementById('binMontoPagado').value || 0);
-            let recibido = parseFloat(document.getElementById('binMontoRecibido').value || 0);
-            let ref = document.getElementById('binRef').value || '';
-            binanceData = { monto, recibido, ref };
-            document.getElementById('pagoBinanceDisp').value = `$${monto.toFixed(2)}`;
-            document.getElementById('modalBinance').classList.add('hidden');
-        }
-
-        let tipoBsActual = '';
-        function abrirBsModal(tipo) {
-            tipoBsActual = tipo;
-            let titulos = { 'PAGO_MOVIL': 'Pago Móvil', 'TRANSF': 'Transferencia Nacional', 'PUNTO': 'Punto de Venta' };
-            document.getElementById('tituloModalBs').innerText = `Carga ${titulos[tipo]}`;
-            document.getElementById('bsRef').value = '';
-            document.getElementById('bsMonto').value = '0';
-            document.getElementById('lblBsEqUSD').innerText = '$0.00';
-            document.getElementById('modalBs').classList.remove('hidden');
-        }
-        function calcularEquivalenteModalBs() {
-            let bs = parseFloat(document.getElementById('bsMonto').value || 0);
-            let usd = tasaBCV > 0 ? (bs / tasaBCV) : 0;
-            document.getElementById('lblBsEqUSD').innerText = `$${usd.toFixed(2)}`;
-        }
-        function guardarBsModal() {
-            let bs = parseFloat(document.getElementById('bsMonto').value || 0);
-            let ref = document.getElementById('bsRef').value || '';
-            let usd = tasaBCV > 0 ? (bs / tasaBCV) : 0;
-            
-            bsDataList = bsDataList.filter(item => item.tipo !== tipoBsActual);
-            bsDataList.push({ tipo: tipoBsActual, montoBs: bs, ref, usd });
-            
-            if(tipoBsActual === 'PAGO_MOVIL') document.getElementById('pagoMovilDisp').value = `${bs} Bs.`;
-            if(tipoBsActual === 'TRANSF') document.getElementById('pagoTransfDisp').value = `${bs} Bs.`;
-            if(tipoBsActual === 'PUNTO') document.getElementById('pagoPuntoDisp').value = `${bs} Bs.`;
-            
-            document.getElementById('modalBs').classList.add('hidden');
-        }
-
-        function actualizarPrecioMoto() {
-            let v = document.getElementById('regModeloMoto').value.split('|');
-            document.getElementById('regPrecioMoto').value = v[1];
-        }
-
-        function procesarRegistro() {
-            let cliente = document.getElementById('regCliente').value || 'Cliente General';
-            let factura = document.getElementById('regFactura').value || 'S/N';
-            
-            let efec = efectivoCalculado;
-            let zelle = zelleData.monto;
-            let binance = binanceData.monto;
-            let totalBsUSD = bsDataList.reduce((acc, item) => acc + item.usd, 0);
-            
-            let pagoDia = efec + zelle + binance + totalBsUSD;
-
-            if(tipoActual === 'MOTO') {
-                let mData = document.getElementById('regModeloMoto').value.split('|');
-                let modelo = mData[0];
-                let facturado = parseFloat(document.getElementById('regPrecioMoto').value) || 0;
-                let abonoAnt = parseFloat(document.getElementById('regAbonoAnt').value) || 0;
-
-                let cxc = facturado - abonoAnt - pagoDia;
-                if(cxc < 0) cxc = 0;
-
-                movimientosMotos.push({ cliente, modelo, factura, facturado, abonoAnt, pagoDia, cxc, efec, zelle, binance, zelleRef: zelleData.ref, zelleTitular: zelleData.titular, binRef: binanceData.ref, binRecibido: binanceData.recibido, bsList: [...bsDataList] });
-                renderMotos();
-            } else {
-                let concepto = document.getElementById('regConceptoTaller').value || 'Servicio General';
-                let total = parseFloat(document.getElementById('regMontoTaller').value) || 0;
-                let medio = `Efec:$${efec} / Zel:$${zelle} / Bin:$${binance} / BsUSD:$${totalBsUSD.toFixed(2)}`;
-
-                movimientosTaller.push({ cliente, factura, concepto, medio, total, efec, zelle, binance, zelleRef: zelleData.ref, zelleTitular: zelleData.titular, binRef: binanceData.ref, binRecibido: binanceData.recibido, bsList: [...bsDataList] });
-                renderTaller();
-            }
-
-            actualizarResumenFinanciero();
-            cerrarModal();
-        }
-
-        function toggleSinMovimiento(seccion) {
-            if(seccion === 'motos') {
-                if(document.getElementById('checkSinMotos').checked) movimientosMotos = [];
-                renderMotos();
-            } else if(seccion === 'taller') {
-                if(document.getElementById('checkSinTaller').checked) movimientosTaller = [];
-                renderTaller();
-            } else if(seccion === 'seguros') {
-                if(document.getElementById('checkSinSeguros').checked) polizasData = [];
-                renderSeguros();
-            }
-            actualizarResumenFinanciero();
-        }
-
-        function renderMotos() {
-            let webTbody = document.getElementById('webTablaMotosBody');
-            let pdfTbody = document.getElementById('pdfTablaMotosBody');
-            if(!webTbody || !pdfTbody) return;
-
-            if(document.getElementById('checkSinMotos').checked) {
-                webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
-                pdfTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
-                actualizarResumenFinanciero();
-                return;
-            }
-
-            if(movimientosMotos.length === 0) {
-                webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
-                pdfTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; font-style: italic;">No hay ventas o abonos de motos cargados.</td></tr>`;
-                actualizarResumenFinanciero();
-                return;
-            }
-
-            webTbody.innerHTML = '';
-            pdfTbody.innerHTML = '';
-            movimientosMotos.forEach((m, idx) => {
-                webTbody.innerHTML += `
-                    <tr class="border-b border-slate-800 hover:bg-slate-900">
-                        <td class="p-2 font-semibold text-white">${m.cliente}</td>
-                        <td class="p-2 text-slate-300">${m.modelo}</td>
-                        <td class="p-2">${m.factura}</td>
-                        <td class="p-2 text-emerald-400 font-bold">$${m.pagoDia.toFixed(2)}</td>
-                        <td class="p-2 text-center"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                `;
-                pdfTbody.innerHTML += `
-                    <tr>
-                        <td>${m.cliente}</td>
-                        <td>${m.modelo}</td>
-                        <td>${m.factura}</td>
-                        <td>$${m.facturado.toFixed(2)}</td>
-                        <td>$${m.abonoAnt.toFixed(2)}</td>
-                        <td style="font-weight: bold; color: #059669;">$${m.pagoDia.toFixed(2)}</td>
-                        <td style="font-weight: bold; color: #d97706;">$${m.cxc.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-            actualizarResumenFinanciero();
-        }
-
-        function renderTaller() {
-            let webTbody = document.getElementById('webTablaTallerBody');
-            let pdfTbody = document.getElementById('pdfTablaTallerBody');
-            if(!webTbody || !pdfTbody) return;
-
-            if(document.getElementById('checkSinTaller').checked) {
-                webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
-                pdfTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
-                actualizarResumenFinanciero();
-                return;
-            }
-
-            if(movimientosTaller.length === 0) {
-                webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
-                pdfTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748b; font-style: italic;">Sin movimientos de taller registrados.</td></tr>`;
-                actualizarResumenFinanciero();
-                return;
-            }
-
-            webTbody.innerHTML = '';
-            pdfTbody.innerHTML = '';
-            movimientosTaller.forEach((t, idx) => {
-                webTbody.innerHTML += `
-                    <tr class="border-b border-slate-800 hover:bg-slate-900">
-                        <td class="p-2 font-semibold text-white">${t.cliente}</td>
-                        <td class="p-2">${t.factura}</td>
-                        <td class="p-2 text-slate-300">${t.concepto}</td>
-                        <td class="p-2 text-emerald-400 font-bold">$${t.total.toFixed(2)}</td>
-                        <td class="p-2 text-center"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                `;
-                pdfTbody.innerHTML += `
-                    <tr>
-                        <td>${t.cliente}</td>
-                        <td>${t.factura}</td>
-                        <td>${t.concepto}</td>
-                        <td>${t.medio}</td>
-                        <td style="font-weight: bold; color: #059669;">$${t.total.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-            actualizarResumenFinanciero();
-        }
-
-        function agregarLineaSeguro() {
-            document.getElementById('checkSinSeguros').checked = false;
-            polizasData.push({ cantidad: 1, precio: 15.00 });
-            renderSeguros();
-        }
-
-        function renderSeguros() {
-            let webCont = document.getElementById('webContenedorSeguros');
-            let pdfBody = document.getElementById('pdfTablaSegurosBody');
-            if(!pdfBody) return;
-
-            if(webCont) webCont.innerHTML = '';
-
-            if(polizasData.length === 0) {
-                pdfBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748b; font-style: italic;">0 Pólizas registradas.</td></tr>`;
-                if(webCont) webCont.innerHTML = `<p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún.</p>`;
-                document.getElementById('webTotalSegurosCard').innerText = '$0.00';
-                document.getElementById('pdfTotalSegurosCard').innerText = '$0.00';
-                return;
-            }
-
-            pdfBody.innerHTML = '';
-            let totalSeg = 0;
-            polizasData.forEach((p, idx) => {
-                let sub = p.cantidad * p.precio;
-                totalSeg += sub;
-                
-                pdfBody.innerHTML += `
-                    <tr>
-                        <td>Póliza Seguros Caracas (CxP)</td>
-                        <td>${p.cantidad}</td>
-                        <td>$${p.precio.toFixed(2)}</td>
-                        <td style="font-weight: bold; color: #2563eb;">$${sub.toFixed(2)}</td>
-                    </tr>
-                `;
-                if(webCont) {
-                    webCont.innerHTML += `
-                        <div class="grid grid-cols-4 gap-2 items-center bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs">
-                            <div><label class="text-[10px] text-slate-400">Cantidad</label><input type="number" value="${p.cantidad}" onchange="polizasData[${idx}].cantidad=parseInt(this.value)||0;renderSeguros();" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-white font-bold text-xs"></div>
-                            <div><label class="text-[10px] text-slate-400">Precio Unit ($)</label><input type="number" value="${p.precio}" onchange="polizasData[${idx}].precio=parseFloat(this.value)||0;renderSeguros();" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-white font-bold text-xs"></div>
-                            <div><label class="text-[10px] text-slate-400">Subtotal CxP</label><p class="font-black text-blue-400 py-1 text-xs">$${sub.toFixed(2)}</p></div>
-                            <div class="text-right"><button onclick="polizasData.splice(${idx},1);renderSeguros();" class="text-red-400 text-xs font-bold cursor-pointer">Eliminar</button></div>
-                        </div>
-                    `;
-                }
-            });
-
-            document.getElementById('webTotalSegurosCard').innerText = `$${totalSeg.toFixed(2)}`;
-            document.getElementById('pdfTotalSegurosCard').innerText = `$${totalSeg.toFixed(2)}`;
-        }
-
-        function actualizarResumenFinanciero() {
-            let totFactMotos = movimientosMotos.reduce((a,b) => a + b.facturado, 0);
-            let totFactTaller = movimientosTaller.reduce((a,b) => a + b.total, 0);
-            let totalFacturado = totFactMotos + totFactTaller;
-
-            let totPagoMotos = movimientosMotos.reduce((a,b) => a + b.pagoDia, 0);
-            let totPagoTaller = movimientosTaller.reduce((a,b) => a + b.total, 0);
-            let pagosDelDia = totPagoMotos + totPagoTaller;
-
-            let totalCXC = movimientosMotos.reduce((a,b) => a + b.cxc, 0);
-
-            document.getElementById('webTotalFacturado').innerText = `$${totalFacturado.toFixed(2)}`;
-            document.getElementById('pdfTotalFacturado').innerText = `$${totalFacturado.toFixed(2)}`;
-            document.getElementById('webTotalAbonos').innerText = `$${pagosDelDia.toFixed(2)}`;
-            document.getElementById('pdfTotalAbonos').innerText = `$${pagosDelDia.toFixed(2)}`;
-            document.getElementById('webTotalCXC').innerText = `$${totalCXC.toFixed(2)}`;
-            document.getElementById('pdfTotalCXC').innerText = `$${totalCXC.toFixed(2)}`;
-
-            let totalEfec = 0, totalZelle = 0, totalBinance = 0, totalBs = 0;
-            let zelleLines = [], binanceLines = [], bsLines = [];
-
-            let todasOps = [...movimientosMotos, ...movimientosTaller];
-            todasOps.forEach(op => {
-                if(op.efec > 0) totalEfec += op.efec;
-                if(op.zelle > 0) {
-                    totalZelle += op.zelle;
-                    zelleLines.push(`<p style="margin: 1px 0;">${op.cliente} | Ref: ${op.zelleRef} | Titular: ${op.zelleTitular} | <strong>$${op.zelle.toFixed(2)}</strong></p>`);
-                }
-                if(op.binance > 0) {
-                    totalBinance += op.binance;
-                    binanceLines.push(`<p style="margin: 1px 0;">${op.cliente} | Ref: ${op.binRef} | Recibido: <strong>$${(op.binRecibido || op.binance).toFixed(2)}</strong></p>`);
-                }
-                if(op.bsList) {
-                    op.bsList.forEach(bs => {
-                        totalBs += bs.usd;
-                        bsLines.push(`<p style="margin: 1px 0;">${bs.tipo}: ${bs.montoBs} Bs. (Ref: ${bs.ref}) -> <strong>$${bs.usd.toFixed(2)}</strong></p>`);
-                    });
-                }
-            });
-
-            document.getElementById('pdfResumenEfectivo').innerHTML = totalEfec > 0 ? `<p style="margin: 0;">Total Efectivo: <strong>$${totalEfec.toFixed(2)}</strong></p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin arqueo.</p>`;
-            document.getElementById('pdfResumenZelle').innerHTML = zelleLines.length > 0 ? zelleLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Zelle: $${totalZelle.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos Zelle.</p>`;
-            document.getElementById('pdfResumenBinance').innerHTML = binanceLines.length > 0 ? binanceLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Binance: $${totalBinance.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos Binance.</p>`;
-            document.getElementById('pdfResumenBs').innerHTML = bsLines.length > 0 ? bsLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Bs. Eq: $${totalBs.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos Bs.</p>`;
-
-            let totalIngresosRecibidos = totalEfec + totalZelle + totalBinance + totalBs;
-            let diferencia = totalIngresosRecibidos - pagosDelDia;
-
-            document.getElementById('pdfCuadreIngresos').innerText = `$${totalIngresosRecibidos.toFixed(2)}`;
-            document.getElementById('pdfCuadreVentas').innerText = `$${pagosDelDia.toFixed(2)}`;
-            let difEl = document.getElementById('pdfCuadreDiferencia');
-            difEl.innerText = `$${diferencia.toFixed(2)}`;
-            difEl.style.color = Math.abs(diferencia) < 0.01 ? '#059669' : '#dc2626';
-        }
-
-        function renderInventario() {
-            let container = document.getElementById('webInventarioContainer');
-            let pdfContainer = document.getElementById('pdfTablaInventarioBody');
-            if(!container || !pdfContainer) return;
-
-            container.innerHTML = '';
-            pdfContainer.innerHTML = '';
-            
-            let totalUnidades = 0;
-            for (let [mod, cant] of Object.entries(inventario)) {
-                totalUnidades += cant;
-                container.innerHTML += `
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
-                        <span class="text-[11px] font-bold text-slate-300">${mod}</span>
-                        <input type="number" value="${cant}" onchange="inventario['${mod}']=parseInt(this.value)||0;renderInventario();" class="w-14 bg-slate-800 border border-slate-700 rounded p-1 text-center font-bold text-xs text-white">
-                    </div>
-                `;
-                pdfContainer.innerHTML += `
-                    <tr>
-                        <td><strong>${mod}</strong></td>
-                        <td style="text-align: center; font-weight: bold;">${cant}</td>
-                    </tr>
-                `;
-            }
-            document.getElementById('webTotalInventario').innerText = totalUnidades;
-            document.getElementById('pdfTotalInventario').innerText = totalUnidades;
-        }
-
-        async function totalizarYDescargarPDF() {
-            actualizarValoresGlobales();
-            let sucursal = document.getElementById('sucursalActiva').value;
-            let fecha = document.getElementById('inputFechaCierre').value;
-
-            if(tasaBCV <= 0) {
-                alert('Atención: Ingrese la Tasa del Día.');
-                return;
-            }
-
-            // ALERTA DE BLOQUEO DE DOBLE CIERRE DIARIO
-            try {
-                let snapshot = await db.collection("cierres").where("sucursal", "==", sucursal).where("fecha", "==", fecha).get();
-                if(!snapshot.empty) {
-                    alert(`[BLOQUEO DE SEGURIDAD] No se puede generar doble cierre de un mismo día por favor revisar el histórico. Ya existe un cierre registrado para la sede ${sucursal} en fecha ${fecha}.`);
-                    return;
-                }
-            } catch(e) {}
-
-            let totF = movimientosMotos.reduce((a,b) => a + b.facturado, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
-            
-            try {
-                await db.collection("cierres").add({
-                    sucursal: sucursal,
-                    fecha: fecha,
-                    tasa: tasaBCV,
-                    totalFacturado: totF,
-                    motos: movimientosMotos,
-                    taller: movimientosTaller,
-                    polizas: polizasData,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch(e) {
-                console.error("Error al guardar en Firebase:", e);
-            }
-
-            let element = document.getElementById('areaPDF');
-            element.style.display = 'block';
-
-            let opt = {
-                margin: [2, 2, 2, 2],
-                filename: `Cierre_Gerencial_${sucursal}_${fecha}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().from(element).set(opt).save().then(() => {
-                element.style.display = 'none';
-                alert('¡Informe consolidado y PDF descargado con éxito!');
-                verificarCierreExistente();
-            });
-        }
-
-        function cambiarClaveGerencial() {
-            let nueva = document.getElementById('txtNuevaClave').value;
-            if(!nueva) {
-                alert('Ingrese una clave válida.');
-                return;
-            }
-            claveGerencialActual = nueva;
-            document.getElementById('txtNuevaClave').value = '';
-            alert('¡Clave gerencial actualizada con éxito!');
-        }
-
-        function generarRespaldoJSON() {
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosHistoricoGlobal, null, 2));
-            let downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `Respaldo_Gerencia_MotosHiram_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function resetearTiendaConRespaldo() {
-            if(!confirm('¿Desea resetear la tienda activa? Se generará un respaldo automático local antes de limpiar.')) return;
-            
-            let sucursal = document.getElementById('sucursalActiva').value;
-            let datosTienda = { sucursal, fechaRespaldo: new Date().toISOString(), motos: movimientosMotos, taller: movimientosTaller, polizas: polizasData };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosTienda, null, 2));
-            let downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `Respaldo_Automatico_${sucursal}_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-
-            movimientosMotos = [];
-            movimientosTaller = [];
-            polizasData = [];
-            renderMotos();
-            renderTaller();
-            renderSeguros();
-            alert('¡Respaldo automático generado y tienda reseteada con éxito!');
-        }
-
-        function aplicarFiltrosReportes() {
-            let sede = document.getElementById('repFiltroSede').value;
-            let desde = document.getElementById('repFechaDesde').value;
-            let hasta = document.getElementById('repFechaHasta').value;
-            let tipo = document.getElementById('repTipoIngreso').value;
-
-            let filtrados = datosHistoricoGlobal.filter(d => {
-                if(sede !== 'TODAS' && d.sucursal !== sede) return false;
-                if(desde && d.fecha < desde) return false;
-                if(hasta && d.fecha > hasta) return false;
-                return true;
-            });
-
-            let totalFact = 0, totalRec = 0, totalMotos = 0;
-            let tablaAnalitica = document.getElementById('tablaAnaliticaBody');
-            tablaAnalitica.innerHTML = '';
-
-            let pagosMetodos = { Efectivo: 0, Zelle: 0, Binance: 0, Bolivares: 0 };
-            let grafLabels = [];
-            let grafFact = [];
-            let grafRec = [];
-
-            filtrados.forEach(d => {
-                let fMotos = tipo !== 'TALLER' && d.motos ? d.motos : [];
-                let fTaller = tipo !== 'MOTO' && d.taller ? d.taller : [];
-                
-                let subFact = fMotos.reduce((a,b)=>a+b.facturado,0) + fTaller.reduce((a,b)=>a+b.total,0);
-                let subRec = fMotos.reduce((a,b)=>a+b.pagoDia,0) + fTaller.reduce((a,b)=>a+b.total,0);
-                
-                totalFact += subFact;
-                totalRec += subRec;
-                totalMotos += fMotos.length;
-
-                grafLabels.push(`${d.fecha} (${d.sucursal})`);
-                grafFact.push(subFact);
-                grafRec.push(subRec);
-
-                let efecC = 0, zelleC = 0, binC = 0, bsC = 0;
-                [...fMotos, ...fTaller].forEach(op => {
-                    efecC += (op.efec || 0);
-                    zelleC += (op.zelle || 0);
-                    binC += (op.binance || 0);
-                    if(op.bsList) op.bsList.forEach(b => bsC += b.usd);
-                });
-
-                pagosMetodos.Efectivo += efecC;
-                pagosMetodos.Zelle += zelleC;
-                pagosMetodos.Binance += binC;
-                pagosMetodos.Bolivares += bsC;
-
-                tablaAnalitica.innerHTML += `
-                    <tr class="border-b border-slate-800 hover:bg-slate-900">
-                        <td class="p-2">${d.fecha}</td>
-                        <td class="p-2">${d.sucursal}</td>
-                        <td class="p-2 text-white font-bold">$${subFact.toFixed(2)}</td>
-                        <td class="p-2 text-emerald-400 font-bold">$${subRec.toFixed(2)}</td>
-                        <td class="p-2">$${efecC.toFixed(2)}</td>
-                        <td class="p-2">$${zelleC.toFixed(2)}</td>
-                        <td class="p-2">$${binC.toFixed(2)}</td>
-                        <td class="p-2">$${bsC.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-
-            if(filtrados.length === 0) {
-                tablaAnalitica.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500 italic">No hay datos coincidentes.</td></tr>`;
-            }
-
-            document.getElementById('repStatFacturado').innerText = `$${totalFact.toFixed(2)}`;
-            document.getElementById('repStatRecaudado').innerText = `$${totalRec.toFixed(2)}`;
-            document.getElementById('repStatMotos').innerText = totalMotos;
-            document.getElementById('repStatCierres').innerText = filtrados.length;
-
-            actualizarGraficos(grafLabels, grafFact, grafRec, pagosMetodos);
-        }
-
-        function limpiarFiltrosReportes() {
-            document.getElementById('repFiltroSede').value = 'TODAS';
-            document.getElementById('repFechaDesde').value = '';
-            document.getElementById('repFechaHasta').value = '';
-            document.getElementById('repTipoIngreso').value = 'TODOS';
-            aplicarFiltrosReportes();
-        }
-
-        function actualizarReportesEstadisticos() {
-            aplicarFiltrosReportes();
-        }
-
-        function actualizarGraficos(labels, fact, rec, pagos) {
-            let ctx1 = document.getElementById('chartComparativa').getContext('2d');
-            if(chartComparativaInstancia) chartComparativaInstancia.destroy();
-            chartComparativaInstancia = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Facturado ($)', data: fact, backgroundColor: '#dc2626' },
-                        { label: 'Recaudado ($)', data: rec, backgroundColor: '#059669' }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            let ctx2 = document.getElementById('chartMetodosPago').getContext('2d');
-            if(chartMetodosInstancia) chartMetodosInstancia.destroy();
-            chartMetodosInstancia = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Efectivo', 'Zelle', 'Binance', 'Bolívares'],
-                    datasets: [{
-                        data: [pagos.Efectivo, pagos.Zelle, pagos.Binance, pagos.Bolivares],
-                        backgroundColor: ['#059669', '#2563eb', '#d97706', '#7c3aed']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        window.onload = () => { 
-            let hoy = new Date().toISOString().split('T')[0];
-            let inputF = document.getElementById('inputFechaCierre');
-            if(inputF && !inputF.value) inputF.value = hoy;
-            actualizarValoresGlobales(); 
-            renderInventario(); 
-            renderMotos();
-            renderTaller();
-            renderSeguros();
-            verificarCierreExistente();
-        };
-    </script>
-</body>
-</html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motos Hiram C.A. - Cierres Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAqyGE49TBXXfYpAMBKmLb1fprmOnHwJYY",authDomain:"motos-hiram-db.firebaseapp.com",projectId:"motos-hiram-db",storageBucket:"motos-hiram-db.appspot.com",messagingSenderId:"178070782865",appId:"1:178070782865:web:bc56d65046412efce8d030"});
+const db=firebase.firestore();
+</script>
+<style>
+.inp{width:100%;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px;color:#fff;font-size:12px}
+.card{background:#020617;border:1px solid #1e293b;border-radius:12px;padding:14px}
+.btn{padding:8px 14px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;color:#fff}
+.pdf{background:#fff;color:#0f172a;font-family:Arial,sans-serif;font-size:10px;width:190mm;padding:6mm;box-sizing:border-box}
+.pdf table{width:100%;border-collapse:collapse;margin:3px 0 8px}.pdf th{background:#0f172a;color:#fff;padding:4px;text-align:left}
+.pdf td{border:1px solid #cbd5e1;padding:3px 4px}.pdf h3{font-size:11px;border-bottom:2px solid #0f172a;margin:10px 0 3px;text-transform:uppercase}
+.kp{background:#f1f5f9;border:1px solid #cbd5e1;border-top:3px solid #dc2626;border-radius:4px;padding:6px;text-align:center}
+.kp span{font-size:8px;color:#64748b;font-weight:700;text-transform:uppercase;display:block}.kp b{font-size:15px}
+.bar{height:9px;background:#e2e8f0;border-radius:5px;overflow:hidden}.bar i{display:block;height:100%}
+</style></head>
+<body class="bg-slate-950 text-slate-100 font-sans">
+<header class="bg-slate-900 border-b border-slate-800 p-3 flex flex-wrap gap-3 items-center justify-between max-w-7xl mx-auto">
+ <div class="flex items-center gap-3"><div class="bg-red-600 p-2.5 rounded-xl font-black text-xl">MH</div>
+ <div><h1 class="font-extrabold">MOTOS HIRAM, C.A.</h1><p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Ejecutivo de Cierres Pro</p></div></div>
+ <div class="flex gap-2 flex-wrap text-xs font-bold">
+  <select id="sede" onchange="cambioContexto(true)" class="inp !w-auto"><option value="MARACAIBO">Maracaibo (Principal)</option><option value="CABIMAS">Cabimas</option></select>
+  <input type="date" id="fecha" onchange="cambioContexto(false)" class="inp !w-auto">
+  <span class="text-amber-400 flex items-center gap-1">Tasa <input type="number" id="tasa" value="1000" min="0" step="any" class="inp !w-24 text-center"> Bs/$</span>
+ </div></header>
+<nav class="bg-slate-900/80 border-b border-slate-800 flex gap-5 px-4 text-sm overflow-x-auto" id="nav"></nav>
+<div id="alerta" class="hidden max-w-5xl mx-auto mt-4 bg-red-900/80 border border-red-500 p-3 rounded-xl text-xs">
+ <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <b>[BLOQUEO]</b> No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.</div>
+ 
+<main id="t-cierre" class="max-w-5xl mx-auto p-5 space-y-5">
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+  <div class="card"><p class="text-xs text-slate-400 font-bold">TOTAL FACTURADO</p><p id="kF" class="text-xl font-black">$0.00</p></div>
+  <div class="card"><p class="text-xs text-slate-400 font-bold">PAGOS DEL DÍA</p><p id="kR" class="text-xl font-black text-emerald-400">$0.00</p></div>
+  <div class="card"><p class="text-xs text-slate-400 font-bold">CUENTAS POR COBRAR</p><p id="kC" class="text-xl font-black text-amber-400">$0.00</p></div>
+  <div class="card"><p class="text-xs text-slate-400 font-bold">SEGURO CARACAS (CXP)</p><p id="kP" class="text-xl font-black text-blue-400">$0.00</p></div>
+ </div>
+ <div id="panel" class="grid md:grid-cols-3 gap-3">
+  <div><label class="text-xs text-amber-400"><input type="checkbox" id="sm-motos" onchange="sinMov('motos')"> Sin Mov.</label><button onclick="abrir('MOTO')" class="btn bg-red-600 w-full">+ Cargar Venta Moto</button></div>
+  <div><label class="text-xs text-amber-400"><input type="checkbox" id="sm-taller" onchange="sinMov('taller')"> Sin Mov.</label><button onclick="abrir('TALLER')" class="btn bg-amber-600 w-full">+ Cargar Taller</button></div>
+  <div><label class="text-xs text-amber-400"><input type="checkbox" id="sm-seguros" onchange="sinMov('seguros')"> 0 Pólizas</label><button onclick="addPoliza()" class="btn bg-slate-700 w-full">+ Agregar Póliza</button></div>
+ </div>
+ <div class="card"><p class="text-xs font-bold text-slate-400 mb-2">MOTOS CARGADAS</p><div id="lMotos" class="text-xs"></div></div>
+ <div class="card"><p class="text-xs font-bold text-slate-400 mb-2">SERVICIOS DE TALLER</p><div id="lTaller" class="text-xs"></div></div>
+ <div class="card"><p class="text-xs font-bold text-slate-400 mb-2">PÓLIZAS SEGUROS CARACAS (CXP / PASIVO)</p><div id="lPol" class="text-xs space-y-2"></div></div>
+ <div class="card"><p class="text-xs font-bold text-slate-300 mb-2">INVENTARIO DE MOTOS AL CIERRE</p><div id="lInv" class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs"></div>
+  <p class="text-right text-xs font-bold mt-2">Total unidades: <span id="kI" class="text-emerald-400">0</span></p></div>
+ <div class="flex justify-end border-t border-slate-800 pt-4">
+  <button id="btnTot" onclick="totalizar()" class="btn bg-emerald-600 px-6 py-3"><i class="fa-solid fa-file-pdf"></i> Totalizar y Cerrar Reporte</button></div>
+</main>
+ 
+<main id="t-historico" class="hidden max-w-7xl mx-auto p-5"><div class="card overflow-x-auto"><table class="w-full text-xs text-left"><thead class="bg-slate-800 text-slate-400"><tr>
+ <th class="p-2">Fecha</th><th>Sede</th><th>Facturado</th><th>Ingresos</th><th>CXC</th><th>Motos</th><th>Pólizas</th><th class="text-center">Acciones</th></tr></thead><tbody id="hBody"></tbody></table></div></main>
+ 
+<main id="t-reportes" class="hidden max-w-7xl mx-auto p-5 space-y-4">
+ <div class="card grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+  <select id="rSede" onchange="reportes()" class="inp"><option value="TODAS">Ambas sedes</option><option>MARACAIBO</option><option>CABIMAS</option></select>
+  <input type="date" id="rDesde" onchange="reportes()" class="inp"><input type="date" id="rHasta" onchange="reportes()" class="inp">
+  <select id="rTipo" onchange="reportes()" class="inp"><option value="TODOS">Motos + Taller</option><option value="MOTO">Solo Motos</option><option value="TALLER">Solo Taller</option></select>
+  <button onclick="['rDesde','rHasta'].forEach(i=>$(i).value='');$('rSede').value='TODAS';$('rTipo').value='TODOS';reportes()" class="btn bg-slate-700">Limpiar</button></div>
+ <div id="rKpi" class="grid grid-cols-2 md:grid-cols-6 gap-3 text-center"></div>
+ <div class="grid md:grid-cols-2 gap-4">
+  <div class="card"><div class="h-64"><canvas id="c1"></canvas></div></div><div class="card"><div class="h-64"><canvas id="c2"></canvas></div></div>
+  <div class="card"><div class="h-64"><canvas id="c3"></canvas></div></div><div class="card"><div class="h-64"><canvas id="c4"></canvas></div></div></div>
+ <div class="card overflow-x-auto"><table class="w-full text-xs text-left"><thead class="text-slate-400"><tr><th class="p-2">Fecha</th><th>Sede</th><th>Facturado</th><th>Recaudado</th><th>CXC</th><th>Efectivo</th><th>Zelle</th><th>Binance</th><th>Bs Eq.</th></tr></thead><tbody id="rBody"></tbody></table></div>
+</main>
+ 
+<main id="t-catalogo" class="hidden max-w-3xl mx-auto p-5"><div class="card space-y-3">
+ <h2 class="font-bold">Catálogo de Modelos y Precios</h2><div id="catBody" class="space-y-2 text-xs"></div>
+ <div class="flex gap-2"><button onclick="catAdd()" class="btn bg-slate-700">+ Modelo</button><button onclick="catGuardar()" class="btn bg-emerald-600">Guardar Catálogo (requiere clave)</button></div></div></main>
+ 
+<main id="t-config" class="hidden max-w-xl mx-auto p-5 space-y-4 text-xs">
+ <div class="card space-y-2"><b>Cambiar Clave Gerencial</b><input type="password" id="cvOld" placeholder="Clave actual" class="inp"><input type="password" id="cvNew" placeholder="Nueva clave (mín. 6)" class="inp"><button onclick="cambiarClave()" class="btn bg-amber-600">Actualizar Clave</button></div>
+ <div class="card space-y-2"><b>Respaldo</b><p class="text-slate-400">Descarga todos los cierres de la nube. Úselo en cualquier momento.</p><button onclick="respaldo('Respaldo')" class="btn bg-blue-600">Hacer Respaldo</button></div>
+ <div class="card space-y-2"><b class="text-red-400">Resetear (genera respaldo automático antes)</b>
+  <select id="rsAlcance" class="inp"><option value="MARACAIBO">Solo Maracaibo</option><option value="CABIMAS">Solo Cabimas</option><option value="GENERAL">GENERAL (ambas sedes)</option></select>
+  <button onclick="resetear()" class="btn bg-red-600">Resetear</button></div>
+</main>
+ 
+<div id="modal" class="hidden fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 overflow-y-auto"><div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-5 space-y-3 text-xs">
+ <h3 id="mT" class="font-bold text-base"></h3>
+ <div class="grid grid-cols-2 gap-2"><div>Nro. Factura<input id="fFac" class="inp"></div><div>Cliente<input id="fCli" class="inp"></div></div>
+ <div id="gMoto" class="grid grid-cols-3 gap-2"><div class="col-span-3">Modelo<select id="fMod" onchange="$('fPre').value=catalogo[this.value].precio" class="inp"></select></div>
+  <div>Precio $<input id="fPre" class="inp" readonly></div><div>Abono anterior $<input id="fAbo" type="number" min="0" value="0" class="inp"></div>
+  <div>Modalidad<select id="fModa" class="inp"><option value="CONTADO">Contado</option><option value="APARTADO">Apartado (CXC)</option><option value="MOTOS_YES">Motos Yes</option></select></div></div>
+ <div id="gTaller" class="grid grid-cols-2 gap-2"><div>Concepto<input id="fCon" class="inp"></div><div>Monto total $<input id="fMon" type="number" min="0" value="0" class="inp"></div></div>
+ <p class="font-bold text-slate-400 pt-2 border-t border-slate-800">DESGLOSE DE PAGOS</p>
+ <div class="grid grid-cols-3 gap-2"><div>Efectivo $<input id="pEf" type="number" min="0" value="0" class="inp"></div>
+  <div>Zelle $<input id="pZ" type="number" min="0" value="0" class="inp"></div><div>Binance $<input id="pB" type="number" min="0" value="0" class="inp"></div>
+  <div>Ref. Zelle<input id="zRef" class="inp"></div><div>Titular Zelle<input id="zTit" class="inp"></div><div>Ref. Binance<input id="bRef" class="inp"></div>
+  <div>Pago Móvil Bs<input id="bsPM" type="number" min="0" value="0" class="inp"></div><div>Transf. Bs<input id="bsTR" type="number" min="0" value="0" class="inp"></div><div>Punto Bs<input id="bsPU" type="number" min="0" value="0" class="inp"></div>
+  <div class="col-span-3">Referencia(s) Bs<input id="bsRef" class="inp"></div></div>
+ <div class="flex justify-end gap-2 pt-2"><button onclick="$('modal').classList.add('hidden')" class="btn bg-slate-700">Cancelar</button><button onclick="guardarReg()" class="btn bg-red-600">Guardar en Cierre</button></div></div></div>
+ 
+<div id="mClave" class="hidden fixed inset-0 bg-slate-950/90 z-[60] flex items-center justify-center p-4"><div class="bg-slate-900 border border-slate-800 rounded-2xl w-72 p-5 space-y-3 text-xs">
+ <b class="text-amber-400">Autorización Gerencial</b><input type="password" id="cvIn" class="inp text-center" placeholder="Clave gerencial" onkeydown="if(event.key==='Enter')$('cvOk').click()">
+ <div class="flex justify-end gap-2"><button onclick="claveCierra(false)" class="btn bg-slate-700">Cancelar</button><button id="cvOk" onclick="claveCierra(true)" class="btn bg-red-600">Autorizar</button></div></div></div>
+ 
+<div id="pdfWrap" style="position:fixed;left:-10000px;top:0"></div>
+ 
+<script>
+const $=i=>document.getElementById(i);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const n2=v=>(Number(v)||0).toFixed(2), M=v=>'$'+(Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const PERSONAL={MARACAIBO:{a:'Jennmary Parra',g:'Lic. David A. García V. (CI: 22.362.833)'},CABIMAS:{a:'Alejandra Florida',g:'Néstor Córdoba'}};
+const CAT0=[["BOXER CT100",1420],["BOXER BM150",1890],["PULSAR NEON 150",2500],["PULSAR N160",3100],["PULSAR NS200",3700],["PULSAR N250",4700],["KTM DUKE 200",5200],["KTM DUKE 390",8540]].map(([nombre,precio])=>({nombre,precio}));
+let catalogo=[...CAT0], hist=[], charts={}, tipo='MOTO', editId=null, cierreExiste=false, claveCb=null, guardando=false;
+let S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:{}};
+ 
+/* ---------- Seguridad (clave guardada en Firestore como hash SHA-256) ---------- */
+async function hash(t){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('MH|'+t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=0;for(const c of 'MH|'+t)h=(h*31+c.charCodeAt(0))|0;return 'f'+h}}
+async function claveOk(c){const d=await db.collection('config').doc('seguridad').get();const h=await hash(c);if(!d.exists){if(c==='MotosHiram'){await db.collection('config').doc('seguridad').set({hash:h});return true}return false}return d.data().hash===h}
+function pedirClave(){return new Promise(r=>{$('cvIn').value='';$('mClave').classList.remove('hidden');$('cvIn').focus();claveCb=async ok=>{$('mClave').classList.add('hidden');if(!ok)return r(false);try{const v=await claveOk($('cvIn').value);if(!v)alert('Clave incorrecta. Operación denegada.');r(v)}catch(e){alert('Error verificando clave: '+e.message);r(false)}}})}
+function claveCierra(ok){if(claveCb)claveCb(ok)}
+async function cambiarClave(){const o=$('cvOld').value,n=$('cvNew').value;if(n.length<6)return alert('La nueva clave debe tener mínimo 6 caracteres.');
+ try{if(!await claveOk(o))return alert('Clave actual incorrecta.');await db.collection('config').doc('seguridad').set({hash:await hash(n)});$('cvOld').value=$('cvNew').value='';alert('Clave actualizada.')}catch(e){alert('Error: '+e.message)}}
+ 
+/* ---------- Navegación ---------- */
+const TABS=[['cierre','fa-file-invoice-dollar','Cierre Diario'],['historico','fa-clock-rotate-left','Histórico Nube'],['reportes','fa-chart-line','Reportes & Análisis'],['catalogo','fa-motorcycle','Catálogo'],['config','fa-gear','Configuración']];
+function tab(p){TABS.forEach(([k])=>{$('t-'+k).classList.toggle('hidden',k!==p);$('b-'+k).className='py-3 px-2 border-b-2 whitespace-nowrap cursor-pointer '+(k===p?'font-bold text-red-500 border-red-500':'text-slate-400 border-transparent hover:text-white')});
+ $('alerta').classList.toggle('hidden',p!=='cierre'||!cierreExiste||!!editId);if(p==='historico'||p==='reportes')cargarHist();if(p==='catalogo')catRender()}
+$('nav').innerHTML=TABS.map(([k,i,t])=>`<button id="b-${k}" onclick="tab('${k}')"><i class="fa-solid ${i}"></i> ${t}</button>`).join('');
+ 
+/* ---------- Cálculos centrales (única fuente de verdad) ---------- */
+function calc(c){const m=c.motos||[],t=c.taller||[],o=[...m,...t];const s=(a,f)=>a.reduce((x,y)=>x+(Number(f(y))||0),0);
+ const r={fM:s(m,x=>x.facturado),fT:s(t,x=>x.total),rM:s(m,x=>x.pagoDia),rT:s(t,x=>x.pagoDia??x.total),cxc:s(m,x=>x.cxc),abo:s(m,x=>x.abonoAnt),pol:s(c.polizas||[],p=>p.cantidad*p.precio),
+  ef:s(o,x=>x.efec),ze:s(o,x=>x.zelle),bi:s(o,x=>x.binance),bs:s(o,x=>(x.bsList||[]).reduce((a,b)=>a+(b.usd||0),0))};
+ r.fact=r.fM+r.fT;r.rec=r.rM+r.rT;r.medios=r.ef+r.ze+r.bi+r.bs;r.esperado=r.fact-r.abo-r.cxc;r.dif=r.medios-r.esperado;r.cobr=r.fact?Math.min(100,(r.rec/r.fact)*100):0;return r}
+const cur=()=>({sucursal:$('sede').value,fecha:$('fecha').value,tasa:parseFloat($('tasa').value)||0,motos:S.motos,taller:S.taller,polizas:S.polizas});
+ 
+/* ---------- Contexto / bloqueo de doble cierre ---------- */
+const docId=(s,f)=>`${s}_${f}`;
+async function cambioContexto(sedeCambio){const f=$('fecha').value,s=$('sede').value;if(sedeCambio)await cargarInv();
+ if(!f)return;try{const d=await db.collection('cierres').doc(docId(s,f)).get();cierreExiste=d.exists&&d.id!==editId}catch(e){cierreExiste=false}
+ $('alerta').classList.toggle('hidden',!cierreExiste);$('btnTot').classList.toggle('opacity-50',cierreExiste);$('panel').classList.toggle('opacity-50',cierreExiste)}
+async function cargarInv(){S.inv={};catalogo.forEach(m=>S.inv[m.nombre]=0);try{const d=await db.collection('config').doc('inv_'+$('sede').value).get();if(d.exists)Object.assign(S.inv,d.data().inv)}catch(e){}renderInv()}
+async function cargarCat(){try{const d=await db.collection('config').doc('catalogo').get();if(d.exists&&d.data().modelos?.length)catalogo=d.data().modelos}catch(e){}}
+ 
+/* ---------- Render ---------- */
+const th=a=>`<tr class="text-slate-400 border-b border-slate-800">${a.map(x=>`<th class="p-2 text-left">${x}</th>`).join('')}</tr>`;
+function render(){const smM=S.sm.motos,smT=S.sm.taller,smS=S.sm.seguros;['motos','taller','seguros'].forEach(k=>$('sm-'+k).checked=S.sm[k]);
+ const vacio=(f,msg)=>`<p class="text-center italic ${f?'text-emerald-400 font-bold':'text-slate-500'} p-2">${f?'[ SECCIÓN SIN MOVIMIENTOS ]':msg}</p>`;
+ $('lMotos').innerHTML=S.motos.length?`<table class="w-full">${th(['Cliente','Modelo','Factura','Pago Día','CXC',''])}${S.motos.map((m,i)=>`<tr class="border-b border-slate-800"><td class="p-2">${esc(m.cliente)}</td><td>${esc(m.modelo)}</td><td>${esc(m.factura)}</td><td class="text-emerald-400">${M(m.pagoDia)}</td><td class="text-amber-400">${M(m.cxc)}</td><td><button onclick="S.motos.splice(${i},1);render()" class="text-red-400"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')}</table>`:vacio(smM,'No hay motos cargadas.');
+ $('lTaller').innerHTML=S.taller.length?`<table class="w-full">${th(['Cliente','Factura','Concepto','Total',''])}${S.taller.map((t,i)=>`<tr class="border-b border-slate-800"><td class="p-2">${esc(t.cliente)}</td><td>${esc(t.factura)}</td><td>${esc(t.concepto)}</td><td class="text-emerald-400">${M(t.total)}</td><td><button onclick="S.taller.splice(${i},1);render()" class="text-red-400"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')}</table>`:vacio(smT,'Sin servicios de taller.');
+ $('lPol').innerHTML=S.polizas.length?S.polizas.map((p,i)=>`<div class="grid grid-cols-4 gap-2 items-end"><div>Cantidad<input type="number" min="0" value="${p.cantidad}" onchange="S.polizas[${i}].cantidad=Math.max(0,parseInt(this.value)||0);render()" class="inp"></div><div>Precio $<input type="number" min="0" value="${p.precio}" onchange="S.polizas[${i}].precio=Math.max(0,parseFloat(this.value)||0);render()" class="inp"></div><b class="text-blue-400">${M(p.cantidad*p.precio)}</b><button onclick="S.polizas.splice(${i},1);render()" class="text-red-400 text-left">Eliminar</button></div>`).join(''):vacio(smS,'Sin pólizas agregadas.');
+ const r=calc(cur());$('kF').textContent=M(r.fact);$('kR').textContent=M(r.rec);$('kC').textContent=M(r.cxc);$('kP').textContent=M(r.pol)}
+function renderInv(){$('lInv').innerHTML=catalogo.map(m=>`<div class="bg-slate-900 p-2 rounded-xl border border-slate-800 flex justify-between items-center"><span class="font-bold">${esc(m.nombre)}</span><input type="number" min="0" value="${S.inv[m.nombre]||0}" onchange="S.inv[${JSON.stringify(m.nombre).replace(/"/g,'&quot;')}]=Math.max(0,parseInt(this.value)||0);renderInv()" class="inp !w-14 text-center"></div>`).join('');
+ $('kI').textContent=catalogo.reduce((a,m)=>a+(S.inv[m.nombre]||0),0)}
+function sinMov(k){const el=$('sm-'+k),lst={motos:'motos',taller:'taller',seguros:'polizas'}[k];
+ if(el.checked&&S[lst].length&&!confirm('Esto eliminará los registros cargados de esta sección. ¿Continuar?')){el.checked=false;return}
+ S.sm[k]=el.checked;if(el.checked)S[lst]=[];render()}
+function addPoliza(){S.sm.seguros=false;S.polizas.push({cantidad:1,precio:15});render()}
+ 
+/* ---------- Registro de operaciones ---------- */
+function abrir(t){if(cierreExiste)return alert('Ya existe un cierre para esta sede y fecha. Revise el histórico.');if(!(parseFloat($('tasa').value)>0))return alert('Ingrese primero la Tasa del Día.');
+ tipo=t;$('mT').textContent=t==='MOTO'?'Registrar Venta de Moto o Abono':'Registrar Servicio de Taller';$('gMoto').classList.toggle('hidden',t!=='MOTO');$('gTaller').classList.toggle('hidden',t!=='TALLER');
+ ['fFac','fCli','fCon','zRef','zTit','bRef','bsRef'].forEach(i=>$(i).value='');['fAbo','fMon','pEf','pZ','pB','bsPM','bsTR','bsPU'].forEach(i=>$(i).value=0);
+ $('fMod').innerHTML=catalogo.map((m,i)=>`<option value="${i}">${esc(m.nombre)} - ${M(m.precio)}</option>`).join('');$('fPre').value=catalogo[0].precio;$('modal').classList.remove('hidden')}
+function guardarReg(){const tasa=parseFloat($('tasa').value)||0,v=i=>Math.max(0,parseFloat($(i).value)||0);
+ const cliente=$('fCli').value.trim(),factura=$('fFac').value.trim();if(!cliente||!factura)return alert('Cliente y Nro. de Factura son obligatorios.');
+ const bsList=[['PAGO_MOVIL','bsPM'],['TRANSF','bsTR'],['PUNTO','bsPU']].filter(([,i])=>v(i)>0).map(([k,i])=>({tipo:k,montoBs:v(i),ref:$('bsRef').value.trim(),usd:v(i)/tasa}));
+ const pago={efec:v('pEf'),zelle:v('pZ'),binance:v('pB'),zelleRef:$('zRef').value.trim(),zelleTitular:$('zTit').value.trim(),binRef:$('bRef').value.trim(),bsList};
+ if(pago.zelle>0&&!pago.zelleRef)return alert('Indique la referencia de Zelle.');if(pago.binance>0&&!pago.binRef)return alert('Indique la referencia de Binance.');
+ const pagoDia=pago.efec+pago.zelle+pago.binance+bsList.reduce((a,b)=>a+b.usd,0);
+ if([...S.motos,...S.taller].some(x=>x.factura===factura&&x.cliente===cliente)&&!confirm('Ya existe un registro con esa factura y cliente. ¿Agregar de todos modos?'))return;
+ if(tipo==='MOTO'){const m=catalogo[$('fMod').value],fa=m.precio,ab=v('fAbo'),mo=$('fModa').value;let cxc=Math.max(0,fa-ab-pagoDia);
+  if(mo==='CONTADO'&&cxc>0.01)return alert(`Venta de contado con saldo pendiente de ${M(cxc)}. Complete el pago o cambie la modalidad.`);
+  if(pagoDia+ab>fa+0.01)return alert('El pago más el abono anterior superan el precio de la moto.');
+  S.sm.motos=false;S.motos.push({cliente,factura,modelo:m.nombre,modalidad:mo,facturado:fa,abonoAnt:ab,pagoDia,cxc,...pago})}
+ else{const total=v('fMon'),concepto=$('fCon').value.trim()||'Servicio General';if(total<=0)return alert('Ingrese el monto del servicio.');
+  if(Math.abs(pagoDia-total)>0.01)return alert(`El desglose de pagos (${M(pagoDia)}) debe ser igual al total del servicio (${M(total)}).`);
+  S.sm.taller=false;S.taller.push({cliente,factura,concepto,total,pagoDia,...pago})}
+ $('modal').classList.add('hidden');render()}
+ 
+/* ---------- Totalizar y cerrar ---------- */
+async function totalizar(){if(guardando)return;const c=cur();
+ if(!c.fecha)return alert('Seleccione la fecha del cierre.');if(c.tasa<=0)return alert('Ingrese la Tasa del Día.');
+ if(!S.motos.length&&!S.sm.motos)return alert('Cargue ventas de motos o marque "Sin Mov." en Motos.');
+ if(!S.taller.length&&!S.sm.taller)return alert('Cargue servicios de taller o marque "Sin Mov." en Taller.');
+ if(!S.polizas.length&&!S.sm.seguros)return alert('Agregue pólizas o marque "0 Pólizas".');
+ const r=calc(c);if(Math.abs(r.dif)>0.01&&!confirm(`El cuadre presenta una diferencia de ${M(r.dif)}. ¿Cerrar de todos modos?`))return;
+ const data={...c,sinMov:{...S.sm},inventario:{...S.inv},totales:r,totalFacturado:r.fact,editado:!!editId};
+ const ref=db.collection('cierres').doc(docId(c.sucursal,c.fecha));guardando=true;$('btnTot').disabled=true;
+ try{await db.runTransaction(async tx=>{const d=await tx.get(ref);if(d.exists&&d.id!==editId)throw new Error('DUP');
+   if(editId&&editId!==ref.id)tx.delete(db.collection('cierres').doc(editId));tx.set(ref,{...data,timestamp:firebase.firestore.FieldValue.serverTimestamp()})});
+  await db.collection('config').doc('inv_'+c.sucursal).set({inv:S.inv});
+ }catch(e){guardando=false;$('btnTot').disabled=false;if(e.message==='DUP'){cierreExiste=true;$('alerta').classList.remove('hidden');return alert('No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.')}
+  return alert('No se pudo guardar el cierre (nada fue registrado): '+e.message)}
+ try{await pdf(data)}catch(e){alert('Cierre guardado, pero falló el PDF. Reimprímalo desde el Histórico.')}
+ editId=null;S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:S.inv};guardando=false;$('btnTot').disabled=false;render();await cambioContexto(false);alert('Cierre guardado y PDF generado con éxito.')}
+ 
+/* ---------- PDF gerencial ---------- */
+function bar(l,v,t,col){const p=t?Math.round(v/t*100):0;return `<tr><td style="width:22%;border:0">${l}</td><td style="border:0"><div class="bar"><i style="width:${p}%;background:${col}"></i></div></td><td style="width:26%;border:0;text-align:right"><b>${M(v)}</b> (${p}%)</td></tr>`}
+function pdfHTML(c){const r=c.totales||calc(c),sede=c.sucursal,P=PERSONAL[sede],ok=Math.abs(r.dif)<0.01,tm=r.fM+r.fT||1,inv=c.inventario||{};
+ const f=c.fecha?c.fecha.split('-').reverse().join('/'):'';const totInv=Object.values(inv).reduce((a,b)=>a+b,0);
+ const resumen=`Durante la jornada se facturaron <b>${M(r.fact)}</b> (motos ${M(r.fM)}, taller ${M(r.fT)}). Se recaudaron <b>${M(r.rec)}</b>, una cobranza del <b>${r.cobr.toFixed(1)}%</b>, con <b>${M(r.cxc)}</b> pendientes por cobrar. ${(c.motos||[]).length} moto(s) operada(s); obligaciones con Seguros Caracas (CxP): <b>${M(r.pol)}</b>.`;
+ return `<div class="pdf"><div style="display:flex;justify-content:space-between;border-bottom:3px solid #dc2626;padding-bottom:4px"><div><div style="font-size:18px;font-weight:900">MOTOS HIRAM, C.A.</div><div style="color:#64748b">ZULIA • RIF: J-050770055-0</div><div style="color:#dc2626;font-weight:800;font-size:12px">INFORME EJECUTIVO DE CIERRE - ${sede}</div></div>
+ <div style="text-align:right;background:#f1f5f9;padding:5px;border-radius:4px"><b>Fecha:</b> ${f}<br><b>Tasa BCV:</b> ${n2(c.tasa)} Bs/$</div></div>
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0"><div class="kp"><span>Total Facturado</span><b>${M(r.fact)}</b></div><div class="kp"><span>Pagos del Día</span><b style="color:#059669">${M(r.rec)}</b></div><div class="kp"><span>Cuentas por Cobrar</span><b style="color:#d97706">${M(r.cxc)}</b></div><div class="kp"><span>Seguro Caracas (CxP)</span><b style="color:#2563eb">${M(r.pol)}</b></div></div>
+ <div style="background:#f8fafc;border-left:4px solid #0f172a;padding:6px;margin-bottom:6px"><b>RESUMEN EJECUTIVO.</b> ${resumen}</div>
+ <h3>Indicadores de Gestión</h3><table style="margin:0"><tr><td style="border:0;width:22%">Eficiencia de cobranza</td><td style="border:0"><div class="bar"><i style="width:${r.cobr}%;background:#059669"></i></div></td><td style="border:0;width:12%;text-align:right"><b>${r.cobr.toFixed(1)}%</b></td></tr></table>
+ <table style="margin:0">${bar('Motos',r.fM,tm,'#dc2626')}${bar('Taller',r.fT,tm,'#d97706')}</table>
+ <h3>1. Ventas y Abonos de Motocicletas</h3><table><tr><th>Cliente</th><th>Modelo</th><th>Factura</th><th>Facturado</th><th>Abono Ant.</th><th>Pago Día</th><th>CXC</th></tr>
+ ${(c.motos||[]).map(m=>`<tr><td>${esc(m.cliente)}</td><td>${esc(m.modelo)}</td><td>${esc(m.factura)}</td><td>${M(m.facturado)}</td><td>${M(m.abonoAnt)}</td><td style="color:#059669"><b>${M(m.pagoDia)}</b></td><td style="color:#d97706"><b>${M(m.cxc)}</b></td></tr>`).join('')||`<tr><td colspan="7" style="text-align:center;color:#059669"><b>[ SECCIÓN SIN MOVIMIENTOS ]</b></td></tr>`}</table>
+ <h3>2. Servicios de Taller</h3><table><tr><th>Cliente</th><th>Factura</th><th>Concepto</th><th>Total</th></tr>
+ ${(c.taller||[]).map(t=>`<tr><td>${esc(t.cliente)}</td><td>${esc(t.factura)}</td><td>${esc(t.concepto)}</td><td><b>${M(t.total)}</b></td></tr>`).join('')||`<tr><td colspan="4" style="text-align:center;color:#059669"><b>[ SECCIÓN SIN MOVIMIENTOS ]</b></td></tr>`}</table>
+ <h3>3. Pólizas Seguros Caracas (Cuentas por Pagar)</h3><table><tr><th>Concepto</th><th>Cantidad</th><th>Precio Unit.</th><th>Subtotal CxP</th></tr>
+ ${(c.polizas||[]).map(p=>`<tr><td>Póliza Seguros Caracas</td><td>${p.cantidad}</td><td>${M(p.precio)}</td><td style="color:#2563eb"><b>${M(p.cantidad*p.precio)}</b></td></tr>`).join('')||`<tr><td colspan="4" style="text-align:center">0 Pólizas registradas.</td></tr>`}</table>
+ <h3>4. Formas de Pago (Mezcla de Ingresos)</h3><table style="margin:0">${bar('Efectivo',r.ef,r.medios||1,'#059669')}${bar('Zelle',r.ze,r.medios||1,'#2563eb')}${bar('Binance',r.bi,r.medios||1,'#d97706')}${bar('Bolívares',r.bs,r.medios||1,'#7c3aed')}</table>
+ ${[...(c.motos||[]),...(c.taller||[])].filter(o=>o.zelle>0||o.binance>0||(o.bsList||[]).length).map(o=>`<div style="font-size:8.5px;color:#334155">• ${esc(o.cliente)}: ${o.zelle>0?`Zelle ${M(o.zelle)} Ref ${esc(o.zelleRef)} (${esc(o.zelleTitular)}) `:''}${o.binance>0?`Binance ${M(o.binance)} Ref ${esc(o.binRef)} `:''}${(o.bsList||[]).map(b=>`${b.tipo} ${n2(b.montoBs)} Bs Ref ${esc(b.ref)}`).join(' | ')}</div>`).join('')}
+ <div style="margin:8px 0;padding:6px;border:2px solid ${ok?'#059669':'#dc2626'};border-radius:4px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center"><div>Ingresos recibidos<br><b>${M(r.medios)}</b></div><div>Cobro esperado (Fact. - Abonos - CxC)<br><b>${M(r.esperado)}</b></div><div>Diferencia<br><b style="color:${ok?'#059669':'#dc2626'}">${M(r.dif)} ${ok?'✔ CUADRADO':'✖ REVISAR'}</b></div></div>
+ <h3>5. Inventario de Motocicletas al Cierre</h3><table><tr><th>Modelo</th><th style="text-align:center">Existencia</th><th>Estado</th></tr>
+ ${Object.entries(inv).map(([k,v])=>`<tr><td><b>${esc(k)}</b></td><td style="text-align:center">${v}</td><td style="color:${v===0?'#dc2626':v<=1?'#d97706':'#059669'}">${v===0?'AGOTADO':v<=1?'STOCK BAJO':'DISPONIBLE'}</td></tr>`).join('')}</table>
+ <div style="text-align:right;font-weight:bold">Total unidades en existencia: ${totInv}</div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px;text-align:center"><div style="border-top:1px solid #475569;padding-top:3px"><b>${P.a}</b><br>Preparado por (Analista Administrativo)</div><div style="border-top:1px solid #475569;padding-top:3px"><b>${P.g}</b><br>Revisado por (Gerente)</div></div></div>`}
+async function pdf(c){const w=$('pdfWrap');w.innerHTML=pdfHTML(c);try{await html2pdf().from(w.firstElementChild).set({margin:[4,0,4,0],filename:`Cierre_Gerencial_${c.sucursal}_${c.fecha}.pdf`,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],avoid:['tr','h3']}}).save()}finally{w.innerHTML=''}}
+ 
+/* ---------- Histórico ---------- */
+async function cargarHist(){try{const s=await db.collection('cierres').orderBy('fecha','desc').get();hist=s.docs.map(d=>({...d.data(),id:d.id}))}catch(e){return alert('Error consultando la nube: '+e.message)}
+ $('hBody').innerHTML=hist.length?hist.map(d=>{const r=calc(d);return `<tr class="border-b border-slate-800"><td class="p-2 font-bold">${esc(d.fecha)}</td><td>${esc(d.sucursal)}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${(d.motos||[]).length}</td><td>${(d.polizas||[]).reduce((a,p)=>a+p.cantidad,0)}</td>
+ <td class="text-center"><button onclick="reimprimir('${d.id}')" class="btn bg-blue-600 !p-1.5" title="PDF"><i class="fa-solid fa-file-pdf"></i></button> <button onclick="editar('${d.id}')" class="btn bg-amber-600 !p-1.5" title="Modificar"><i class="fa-solid fa-pen"></i></button> <button onclick="eliminar('${d.id}')" class="btn bg-red-600 !p-1.5" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="8" class="p-4 text-center italic text-slate-500">Sin cierres registrados.</td></tr>';
+ if(!$('t-reportes').classList.contains('hidden'))reportes()}
+const buscar=id=>hist.find(d=>d.id===id);
+async function reimprimir(id){const d=buscar(id);if(d)try{await pdf(d)}catch(e){alert('Error generando PDF: '+e.message)}}
+async function editar(id){if(!await pedirClave())return;const d=buscar(id);if(!d)return;editId=id;$('sede').value=d.sucursal;$('fecha').value=d.fecha;$('tasa').value=d.tasa;
+ S={motos:d.motos||[],taller:d.taller||[],polizas:d.polizas||[],sm:d.sinMov||{motos:false,taller:false,seguros:false},inv:{...(d.inventario||{})}};
+ catalogo.forEach(m=>{if(!(m.nombre in S.inv))S.inv[m.nombre]=0});cierreExiste=false;render();renderInv();tab('cierre');alert('Cierre cargado para modificación. Al totalizar se actualizará el mismo registro.')}
+async function eliminar(id){if(!await pedirClave())return;if(!confirm('¿Eliminar este cierre de la nube? No se puede deshacer.'))return;try{await db.collection('cierres').doc(id).delete();cargarHist()}catch(e){alert('Error: '+e.message)}}
+ 
+/* ---------- Reportes (sin cuentas por pagar / pólizas) ---------- */
+function mkChart(id,type,labels,sets,extra={}){if(charts[id])charts[id].destroy();charts[id]=new Chart($(id),{type,data:{labels,datasets:sets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#cbd5e1'}},title:{display:true,text:extra.t||'',color:'#fff'}},scales:type==='doughnut'?{}:{x:{ticks:{color:'#94a3b8'}},y:{ticks:{color:'#94a3b8'}}}}})}
+function reportes(){const se=$('rSede').value,d1=$('rDesde').value,d2=$('rHasta').value,tp=$('rTipo').value;
+ const L=hist.filter(d=>(se==='TODAS'||d.sucursal===se)&&(!d1||d.fecha>=d1)&&(!d2||d.fecha<=d2)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+ const T={fact:0,rec:0,cxc:0,motos:0,tall:0,ef:0,ze:0,bi:0,bs:0},mod={},sed={},lab=[],F=[],R=[];let rows='';
+ L.forEach(d=>{const c={motos:tp==='TALLER'?[]:d.motos,taller:tp==='MOTO'?[]:d.taller},r=calc(c);
+  Object.keys(T).forEach(k=>{});T.fact+=r.fact;T.rec+=r.rec;T.cxc+=r.cxc;T.motos+=(c.motos||[]).length;T.tall+=r.fT;T.ef+=r.ef;T.ze+=r.ze;T.bi+=r.bi;T.bs+=r.bs;
+  (c.motos||[]).forEach(m=>mod[m.modelo]=(mod[m.modelo]||0)+1);sed[d.sucursal]=sed[d.sucursal]||[0,0];sed[d.sucursal][0]+=r.fact;sed[d.sucursal][1]+=r.rec;
+  lab.push(d.fecha.slice(5)+' '+d.sucursal.slice(0,3));F.push(r.fact);R.push(r.rec);
+  rows+=`<tr class="border-b border-slate-800"><td class="p-2">${d.fecha}</td><td>${d.sucursal}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${M(r.ef)}</td><td>${M(r.ze)}</td><td>${M(r.bi)}</td><td>${M(r.bs)}</td></tr>`});
+ $('rBody').innerHTML=rows||'<tr><td colspan="9" class="p-3 text-center italic text-slate-500">Sin datos con los filtros actuales.</td></tr>';
+ const K=[['Facturado',M(T.fact),'text-white'],['Recaudado',M(T.rec),'text-emerald-400'],['Por cobrar',M(T.cxc),'text-amber-400'],['Cobranza',(T.fact?T.rec/T.fact*100:0).toFixed(1)+'%','text-blue-400'],['Motos vendidas',T.motos,'text-white'],['Ticket prom./cierre',M(L.length?T.fact/L.length:0),'text-white']];
+ $('rKpi').innerHTML=K.map(([a,b,c])=>`<div class="card"><p class="text-[10px] text-slate-400 font-bold uppercase">${a}</p><p class="text-lg font-black ${c}">${b}</p></div>`).join('');
+ mkChart('c1','bar',lab,[{label:'Facturado',data:F,backgroundColor:'#dc2626'},{label:'Recaudado',data:R,backgroundColor:'#059669'}],{t:'Facturado vs Recaudado'});
+ mkChart('c2','doughnut',['Efectivo','Zelle','Binance','Bolívares'],[{data:[T.ef,T.ze,T.bi,T.bs],backgroundColor:['#059669','#2563eb','#d97706','#7c3aed']}],{t:'Métodos de Pago'});
+ mkChart('c3','bar',Object.keys(mod),[{label:'Unidades vendidas',data:Object.values(mod),backgroundColor:'#d97706'}],{t:'Ventas por Modelo'});
+ mkChart('c4','bar',Object.keys(sed),[{label:'Facturado',data:Object.values(sed).map(x=>x[0]),backgroundColor:'#dc2626'},{label:'Recaudado',data:Object.values(sed).map(x=>x[1]),backgroundColor:'#059669'}],{t:'Comparativa por Sede'})}
+ 
+/* ---------- Catálogo (con clave) ---------- */
+let catTmp=[];
+function catRender(){catTmp=catalogo.map(m=>({...m}));pintarCat()}
+function pintarCat(){$('catBody').innerHTML=catTmp.map((m,i)=>`<div class="grid grid-cols-6 gap-2 items-center"><input class="inp col-span-3" value="${esc(m.nombre)}" onchange="catTmp[${i}].nombre=this.value.trim().toUpperCase()"><input type="number" min="0" class="inp col-span-2" value="${m.precio}" onchange="catTmp[${i}].precio=Math.max(0,parseFloat(this.value)||0)"><button onclick="catTmp.splice(${i},1);pintarCat()" class="text-red-400">Quitar</button></div>`).join('')}
+function catAdd(){catTmp.push({nombre:'NUEVO MODELO',precio:0});pintarCat()}
+async function catGuardar(){const nombres=catTmp.map(m=>m.nombre);if(!catTmp.length||nombres.some(n=>!n)||new Set(nombres).size!==nombres.length)return alert('Los modelos deben tener nombre único y no vacío.');
+ if(catTmp.some(m=>!(m.precio>0)))return alert('Todos los precios deben ser mayores a 0.');if(!await pedirClave())return;
+ try{await db.collection('config').doc('catalogo').set({modelos:catTmp});catalogo=catTmp.map(m=>({...m}));catalogo.forEach(m=>{if(!(m.nombre in S.inv))S.inv[m.nombre]=0});renderInv();alert('Catálogo actualizado.')}catch(e){alert('Error: '+e.message)}}
+ 
+/* ---------- Respaldo y reseteo ---------- */
+async function respaldo(pref,sede){const q=await db.collection('cierres').get();const data=q.docs.map(d=>({...d.data(),id:d.id,timestamp:d.data().timestamp?.toDate?.().toISOString()||null})).filter(d=>!sede||sede==='GENERAL'||d.sucursal===sede);
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({generado:new Date().toISOString(),alcance:sede||'GENERAL',cierres:data},null,2)],{type:'application/json'}));a.download=`${pref}_MotosHiram_${sede||'GENERAL'}_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();return data}
+async function resetear(){const al=$('rsAlcance').value;if(!await pedirClave())return;if(prompt(`Escriba RESETEAR para borrar los cierres de: ${al}. Se descargará un respaldo antes.`)!=='RESETEAR')return;
+ try{const data=await respaldo('Respaldo_Previo_Reset',al);if(!data.length)return alert('No hay cierres para resetear.');
+  for(let i=0;i<data.length;i+=400){const b=db.batch();data.slice(i,i+400).forEach(d=>b.delete(db.collection('cierres').doc(d.id)));await b.commit()}
+  S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:S.inv};render();await cambioContexto(false);alert(`Reseteo completado (${data.length} cierres). Respaldo descargado.`)}catch(e){alert('Reseteo abortado: '+e.message)}}
+ 
+window.onload=async()=>{$('fecha').value=new Date().toLocaleDateString('en-CA');await cargarCat();await cargarInv();render();tab('cierre');await cambioContexto(false)};
+</script></body></html>
+ 
