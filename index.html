@@ -159,7 +159,7 @@
                         <option value="CABIMAS">Cabimas</option>
                     </select>
                 </div>
-                <!-- CALENDARIO INTERACTIVO NATIVO DESPLEGABLE -->
+                <!-- CALENDARIO INTERACTIVO -->
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-2 text-xs font-bold text-slate-300">
                     <i class="fa-solid fa-calendar text-red-500"></i> Fecha:
                     <input type="date" id="inputFechaCierre" onchange="actualizarValoresGlobales(); verificarCierreExistente();" class="bg-slate-900 border border-slate-600 rounded p-1 text-white font-bold text-xs cursor-pointer focus:outline-none focus:border-red-500">
@@ -188,7 +188,7 @@
         <div class="bg-red-900/80 border border-red-500 p-4 rounded-xl flex items-center justify-between text-white text-xs">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>
-                <span><strong>¡Atención!</strong> Ya existe un cierre registrado para esta Sede en la fecha seleccionada. El sistema está en modo de solo lectura / verificación para evitar duplicados.</span>
+                <span><strong>¡Atención!</strong> Ya existe un cierre registrado para esta Sede en la fecha seleccionada. El sistema está en modo de verificación.</span>
             </div>
         </div>
     </div>
@@ -196,8 +196,9 @@
     <!-- PESTAÑA 1: CIERRE DIARIO -->
     <main id="seccion-cierre" class="max-w-5xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 print:hidden">
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h2 class="text-base font-bold text-white"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias</h2>
+            <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-3 gap-3">
+                <h2 class="text-base font-bold text-white"><i class="fa-solid fa-laptop text-red-500 mr-2"></i> Panel de Operaciones Diarias (Cierre de Sede)</h2>
+                <!-- BOTÓN TOTALIZAR Y DESCARGAR PDF UBICADO ESTRICTAMENTE AQUÍ -->
                 <button id="btnTotalizarPDF" onclick="totalizarYDescargarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold shadow transition flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-file-pdf"></i> Totalizar y Descargar PDF
                 </button>
@@ -210,7 +211,7 @@
                     <p class="text-xl font-black text-white mt-1" id="webTotalFacturado">$0.00</p>
                 </div>
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Pagos del Día</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Pagos del Día (Ingresos)</p>
                     <p class="text-xl font-black text-emerald-400 mt-1" id="webTotalAbonos">$0.00</p>
                 </div>
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
@@ -264,7 +265,7 @@
                 </div>
 
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas (CxP)</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Pólizas Seguros Caracas (CxP / Pasivo)</p>
                     <div id="webContenedorSeguros" class="space-y-2">
                         <p class="text-slate-500 italic text-xs">Sin pólizas agregadas aún.</p>
                     </div>
@@ -294,30 +295,29 @@
                             <th class="p-3">Fecha</th>
                             <th class="p-3">Sede</th>
                             <th class="p-3">Total Facturado ($)</th>
-                            <th class="p-3">Total Abonos ($)</th>
-                            <th class="p-3">Total Recibido ($)</th>
+                            <th class="p-3">Ingresos del Día ($)</th>
                             <th class="p-3">CXC ($)</th>
                             <th class="p-3">Motos Vendidas</th>
                             <th class="p-3">Pólizas</th>
                             <th class="p-3 text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaHistoricoBody"><tr><td colspan="9" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr></tbody>
+                    <tbody id="tablaHistoricoBody"><tr><td colspan="8" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr></tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <!-- PESTAÑA 3: REPORTES & ANÁLISIS ESTADÍSTICO -->
+    <!-- PESTAÑA 3: REPORTES & ANÁLISIS -->
     <main id="seccion-reportes" class="max-w-7xl mx-auto px-6 py-6 space-y-6 bg-slate-950 text-slate-100 hidden print:hidden">
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
             <h2 class="text-base font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-chart-line text-amber-500 mr-2"></i> Reportes & Análisis Estadístico en Vivo</h2>
             
-            <!-- SEGMENTADORES Y BUSCADORES DINÁMICOS -->
+            <!-- SEGMENTADORES -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs">
                 <div>
                     <label class="font-bold text-slate-400 block mb-1">Sede</label>
-                    <select id="repFiltroSede" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white font-bold">
+                    <select id="repFiltroSede" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white font-bold cursor-pointer">
                         <option value="TODAS">Ambas Sedes</option>
                         <option value="MARACAIBO">Maracaibo</option>
                         <option value="CABIMAS">Cabimas</option>
@@ -333,7 +333,7 @@
                 </div>
                 <div>
                     <label class="font-bold text-slate-400 block mb-1">Tipo de Ingreso</label>
-                    <select id="repTipoIngreso" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white font-bold">
+                    <select id="repTipoIngreso" onchange="aplicarFiltrosReportes()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white font-bold cursor-pointer">
                         <option value="TODOS">Todos</option>
                         <option value="MOTO">Ventas de Motos</option>
                         <option value="TALLER">Servicios de Taller</option>
@@ -364,10 +364,10 @@
                 </div>
             </div>
 
-            <!-- GRÁFICOS PROYECCIÓN ANALISIS -->
+            <!-- GRÁFICOS -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase mb-3"><i class="fa-solid fa-chart-bar text-red-500 mr-1"></i> Comparativa Facturado vs Recaudado por Cierre</h3>
+                    <h3 class="text-xs font-bold text-slate-300 uppercase mb-3"><i class="fa-solid fa-chart-bar text-red-500 mr-1"></i> Comparativa Facturado vs Recaudado</h3>
                     <div class="h-64"><canvas id="chartComparativa"></canvas></div>
                 </div>
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
@@ -376,9 +376,9 @@
                 </div>
             </div>
 
-            <!-- TABLA ANALÍTICA DETALLADA -->
+            <!-- TABLA ANALÍTICA -->
             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                <h3 class="text-xs font-bold text-slate-300 uppercase"><i class="fa-solid fa-table text-blue-500 mr-1"></i> Detalle Analítico de Cierres Filtrados</h3>
+                <h3 class="text-xs font-bold text-slate-300 uppercase"><i class="fa-solid fa-table text-blue-500 mr-1"></i> Detalle Analítico de Cierres</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead><tr class="bg-slate-900 text-slate-400 border-b border-slate-800"><th class="p-2">Fecha</th><th class="p-2">Sede</th><th class="p-2">Facturado ($)</th><th class="p-2">Recaudado ($)</th><th class="p-2">Efectivo</th><th class="p-2">Zelle</th><th class="p-2">Binance</th><th class="p-2">Bs. Eq</th></tr></thead>
@@ -403,17 +403,17 @@
                     </div>
                 </div>
 
-                <!-- RESPALDO FRECUENTE -->
+                <!-- RESPALDO JSON -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <label class="font-bold text-slate-300 block">Generar Respaldo de Datos (JSON Backup)</label>
                     <p class="text-slate-400 text-[11px]">Descarga un respaldo completo local con todos los cierres almacenados en Firestore.</p>
                     <button onclick="generarRespaldoJSON()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Descargar Respaldo JSON</button>
                 </div>
 
-                <!-- RETIRAR / LIMPIAR INFORMACIÓN POR SEDE -->
+                <!-- RETIRAR / LIMPIAR PANTALLA -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <label class="font-bold text-red-400 block">Retirar / Limpiar Información de Pantalla por Sede</label>
-                    <p class="text-slate-400 text-[11px]">Limpia la pantalla activa actual de la sede seleccionada para iniciar un nuevo registro en blanco.</p>
+                    <p class="text-slate-400 text-[11px]">Limpia la pantalla activa actual para iniciar un nuevo registro en blanco.</p>
                     <button onclick="retirarInfoSede()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-trash-can"></i> Limpiar Pantalla Activa Sede</button>
                 </div>
             </div>
@@ -442,7 +442,7 @@
                     <strong id="pdfTotalFacturado">$0.00</strong>
                 </div>
                 <div class="pdf-kpi-card">
-                    <span>Pagos del Día</span>
+                    <span>Pagos del Día (Ingresos)</span>
                     <strong id="pdfTotalAbonos" style="color: #059669;">$0.00</strong>
                 </div>
                 <div class="pdf-kpi-card">
@@ -850,12 +850,12 @@
         async function cargarHistoricoNube() {
             let tbody = document.getElementById('tablaHistoricoBody');
             if(!tbody) return;
-            tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Consultando cierres en Firestore...</td></tr>`;
             try {
                 let snapshot = await db.collection("cierres").orderBy("timestamp", "desc").get();
                 datosHistoricoGlobal = [];
                 if(snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500 italic">No hay cierres registrados en la nube.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500 italic">No hay cierres registrados en la nube.</td></tr>`;
                     actualizarReportesEstadisticos();
                     return;
                 }
@@ -878,7 +878,6 @@
                             <td class="p-3 text-slate-300">${d.sucursal || 'MARACAIBO'}</td>
                             <td class="p-3 text-white font-bold">$${totF.toFixed(2)}</td>
                             <td class="p-3 text-emerald-400 font-bold">$${totA.toFixed(2)}</td>
-                            <td class="p-3 text-emerald-400 font-bold">$${totA.toFixed(2)}</td>
                             <td class="p-3 text-amber-400 font-bold">$${cxc.toFixed(2)}</td>
                             <td class="p-3 text-center">${cantMotos}</td>
                             <td class="p-3 text-center">${cantPolizas}</td>
@@ -893,7 +892,7 @@
                 actualizarReportesEstadisticos();
             } catch(e) {
                 console.error("Error al cargar histórico:", e);
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-red-400">Error al consultar la base de datos.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-400">Error al consultar la base de datos.</td></tr>`;
             }
         }
 
@@ -949,7 +948,7 @@
             renderTaller();
             renderSeguros();
             cambiarPestana('cierre');
-            alert('Cierre cargado en pantalla para modificación. Al totalizar se sobrescribirá.');
+            alert('Cierre cargado en pantalla para modificación.');
         }
 
         function reimprimirPDF(idDoc) {
@@ -1124,7 +1123,6 @@
                 let modelo = mData[0];
                 let facturado = parseFloat(document.getElementById('regPrecioMoto').value) || 0;
                 let abonoAnt = parseFloat(document.getElementById('regAbonoAnt').value) || 0;
-                let modalidad = document.getElementById('regModalidad').value;
 
                 let cxc = facturado - abonoAnt - pagoDia;
                 if(cxc < 0) cxc = 0;
@@ -1166,30 +1164,27 @@
             if(document.getElementById('checkSinMotos').checked) {
                 webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
                 pdfTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                actualizarResumenFinanciero();
                 return;
             }
 
             if(movimientosMotos.length === 0) {
                 webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">No hay ventas o abonos de motos cargados.</td></tr>`;
                 pdfTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; font-style: italic;">No hay ventas o abonos de motos cargados.</td></tr>`;
+                actualizarResumenFinanciero();
                 return;
             }
 
             webTbody.innerHTML = '';
             pdfTbody.innerHTML = '';
-            let totF = 0, totA = 0, totC = 0;
             movimientosMotos.forEach((m, idx) => {
-                totF += m.facturado;
-                totA += m.pagoDia;
-                totC += m.cxc;
-                
                 webTbody.innerHTML += `
                     <tr class="border-b border-slate-800 hover:bg-slate-900">
                         <td class="p-2 font-semibold text-white">${m.cliente}</td>
                         <td class="p-2 text-slate-300">${m.modelo}</td>
                         <td class="p-2">${m.factura}</td>
                         <td class="p-2 text-emerald-400 font-bold">$${m.pagoDia.toFixed(2)}</td>
-                        <td class="p-2 text-center"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
+                        <td class="p-2 text-center"><button onclick="movimientosMotos.splice(${idx},1);renderMotos();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
                 pdfTbody.innerHTML += `
@@ -1204,13 +1199,7 @@
                     </tr>
                 `;
             });
-
-            document.getElementById('webTotalFacturado').innerText = `$${totF.toFixed(2)}`;
-            document.getElementById('pdfTotalFacturado').innerText = `$${totF.toFixed(2)}`;
-            document.getElementById('webTotalAbonos').innerText = `$${totA.toFixed(2)}`;
-            document.getElementById('pdfTotalAbonos').innerText = `$${totA.toFixed(2)}`;
-            document.getElementById('webTotalCXC').innerText = `$${totC.toFixed(2)}`;
-            document.getElementById('pdfTotalCXC').innerText = `$${totC.toFixed(2)}`;
+            actualizarResumenFinanciero();
         }
 
         function renderTaller() {
@@ -1221,12 +1210,14 @@
             if(document.getElementById('checkSinTaller').checked) {
                 webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-emerald-400 font-bold">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
                 pdfTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #059669; font-weight: bold;">[ SECCIÓN SIN MOVIMIENTOS ]</td></tr>`;
+                actualizarResumenFinanciero();
                 return;
             }
 
             if(movimientosTaller.length === 0) {
                 webTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Sin movimientos de taller registrados.</td></tr>`;
                 pdfTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748b; font-style: italic;">Sin movimientos de taller registrados.</td></tr>`;
+                actualizarResumenFinanciero();
                 return;
             }
 
@@ -1239,7 +1230,7 @@
                         <td class="p-2">${t.factura}</td>
                         <td class="p-2 text-slate-300">${t.concepto}</td>
                         <td class="p-2 text-emerald-400 font-bold">$${t.total.toFixed(2)}</td>
-                        <td class="p-2 text-center"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();actualizarResumenFinanciero();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
+                        <td class="p-2 text-center"><button onclick="movimientosTaller.splice(${idx},1);renderTaller();" class="text-red-400 hover:text-red-300 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
                 pdfTbody.innerHTML += `
@@ -1252,6 +1243,7 @@
                     </tr>
                 `;
             });
+            actualizarResumenFinanciero();
         }
 
         function agregarLineaSeguro() {
@@ -1306,6 +1298,24 @@
         }
 
         function actualizarResumenFinanciero() {
+            // Suma unificada de Motos + Taller para Facturado y Pagos del Día
+            let totFactMotos = movimientosMotos.reduce((a,b) => a + b.facturado, 0);
+            let totFactTaller = movimientosTaller.reduce((a,b) => a + b.total, 0);
+            let totalFacturado = totFactMotos + totFactTaller;
+
+            let totPagoMotos = movimientosMotos.reduce((a,b) => a + b.pagoDia, 0);
+            let totPagoTaller = movimientosTaller.reduce((a,b) => a + b.total, 0);
+            let pagosDelDia = totPagoMotos + totPagoTaller;
+
+            let totalCXC = movimientosMotos.reduce((a,b) => a + b.cxc, 0);
+
+            document.getElementById('webTotalFacturado').innerText = `$${totalFacturado.toFixed(2)}`;
+            document.getElementById('pdfTotalFacturado').innerText = `$${totalFacturado.toFixed(2)}`;
+            document.getElementById('webTotalAbonos').innerText = `$${pagosDelDia.toFixed(2)}`;
+            document.getElementById('pdfTotalAbonos').innerText = `$${pagosDelDia.toFixed(2)}`;
+            document.getElementById('webTotalCXC').innerText = `$${totalCXC.toFixed(2)}`;
+            document.getElementById('pdfTotalCXC').innerText = `$${totalCXC.toFixed(2)}`;
+
             let totalEfec = 0, totalZelle = 0, totalBinance = 0, totalBs = 0;
             let zelleLines = [], binanceLines = [], bsLines = [];
 
@@ -1328,17 +1338,16 @@
                 }
             });
 
-            document.getElementById('pdfResumenEfectivo').innerHTML = totalEfec > 0 ? `<p style="margin: 0;">Total Efectivo Recaudado: <strong>$${totalEfec.toFixed(2)}</strong></p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin arqueo de efectivo.</p>`;
+            document.getElementById('pdfResumenEfectivo').innerHTML = totalEfec > 0 ? `<p style="margin: 0;">Total Efectivo: <strong>$${totalEfec.toFixed(2)}</strong></p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin arqueo.</p>`;
             document.getElementById('pdfResumenZelle').innerHTML = zelleLines.length > 0 ? zelleLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Zelle: $${totalZelle.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos Zelle.</p>`;
             document.getElementById('pdfResumenBinance').innerHTML = binanceLines.length > 0 ? binanceLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Binance: $${totalBinance.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos Binance.</p>`;
             document.getElementById('pdfResumenBs').innerHTML = bsLines.length > 0 ? bsLines.join('') + `<p style="margin-top: 2px; font-weight: bold;">Total Bs. Eq: $${totalBs.toFixed(2)}</p>` : `<p style="color: #64748b; font-style: italic; margin: 0;">Sin pagos Bs.</p>`;
 
-            let totalIngresos = totalEfec + totalZelle + totalBinance + totalBs;
-            let totalVentas = movimientosMotos.reduce((a,b) => a + b.pagoDia, 0) + movimientosTaller.reduce((a,b) => a + b.total, 0);
-            let diferencia = totalIngresos - totalVentas;
+            let totalIngresosRecibidos = totalEfec + totalZelle + totalBinance + totalBs;
+            let diferencia = totalIngresosRecibidos - pagosDelDia;
 
-            document.getElementById('pdfCuadreIngresos').innerText = `$${totalIngresos.toFixed(2)}`;
-            document.getElementById('pdfCuadreVentas').innerText = `$${totalVentas.toFixed(2)}`;
+            document.getElementById('pdfCuadreIngresos').innerText = `$${totalIngresosRecibidos.toFixed(2)}`;
+            document.getElementById('pdfCuadreVentas').innerText = `$${pagosDelDia.toFixed(2)}`;
             let difEl = document.getElementById('pdfCuadreDiferencia');
             difEl.innerText = `$${diferencia.toFixed(2)}`;
             difEl.style.color = Math.abs(diferencia) < 0.01 ? '#059669' : '#dc2626';
@@ -1382,11 +1391,10 @@
                 return;
             }
 
-            // Validar bloqueo por cierre duplicado
             try {
                 let snapshot = await db.collection("cierres").where("sucursal", "==", sucursal).where("fecha", "==", fecha).get();
                 if(!snapshot.empty) {
-                    alert(`[BLOQUEO DE SEGURIDAD] Ya existe un cierre declarado para la sede ${sucursal} en fecha ${fecha}. Verifique el histórico.`);
+                    alert(`[BLOQUEO DE SEGURIDAD] Ya existe un cierre declarado para la sede ${sucursal} en fecha ${fecha}.`);
                     return;
                 }
             } catch(e) {}
