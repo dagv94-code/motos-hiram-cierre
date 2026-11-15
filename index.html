@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Motos Hiram C.A. - Cierres Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -15,25 +18,41 @@ const db=firebase.firestore();
 .inp{width:100%;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px;color:#fff;font-size:12px}
 .card{background:#020617;border:1px solid #1e293b;border-radius:12px;padding:14px}
 .btn{padding:8px 14px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;color:#fff}
-.pdf{background:#fff;color:#0f172a;font-family:Arial,sans-serif;font-size:10px;width:190mm;padding:6mm;box-sizing:border-box}
-.pdf table{width:100%;border-collapse:collapse;margin:3px 0 8px}.pdf th{background:#0f172a;color:#fff;padding:4px;text-align:left}
-.pdf td{border:1px solid #cbd5e1;padding:3px 4px}.pdf h3{font-size:11px;border-bottom:2px solid #0f172a;margin:10px 0 3px;text-transform:uppercase}
+.pdf{background:#fff;color:#0f172a;font-family:Arial,sans-serif;font-size:10px;width:100%;max-width:190mm;box-sizing:border-box}
+.pdf table{width:100%;border-collapse:collapse;margin:3px 0 8px;table-layout:fixed;word-wrap:break-word}
+.pdf th{background:#0f172a;color:#fff;padding:4px;text-align:left;overflow:hidden;word-wrap:break-word}
+.pdf td{border:1px solid #cbd5e1;padding:3px 4px;overflow:hidden;word-wrap:break-word}
+.pdf h3{font-size:11px;border-bottom:2px solid #0f172a;margin:10px 0 3px;text-transform:uppercase}
 .kp{background:#f1f5f9;border:1px solid #cbd5e1;border-top:3px solid #dc2626;border-radius:4px;padding:6px;text-align:center}
-.kp span{font-size:8px;color:#64748b;font-weight:700;text-transform:uppercase;display:block}.kp b{font-size:15px}
-.bar{height:9px;background:#e2e8f0;border-radius:5px;overflow:hidden}.bar i{display:block;height:100%}
-</style></head>
+.kp span{font-size:8px;color:#64748b;font-weight:700;text-transform:uppercase;display:block}
+.kp b{font-size:15px}
+.bar{height:9px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%}
+</style>
+</head>
 <body class="bg-slate-950 text-slate-100 font-sans">
 <header class="bg-slate-900 border-b border-slate-800 p-3 flex flex-wrap gap-3 items-center justify-between max-w-7xl mx-auto">
- <div class="flex items-center gap-3"><div class="bg-red-600 p-2.5 rounded-xl font-black text-xl">MH</div>
- <div><h1 class="font-extrabold">MOTOS HIRAM, C.A.</h1><p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Ejecutivo de Cierres Pro</p></div></div>
+ <div class="flex items-center gap-3">
+  <div class="bg-red-600 p-2.5 rounded-xl font-black text-xl">MH</div>
+  <div>
+   <h1 class="font-extrabold">MOTOS HIRAM, C.A.</h1>
+   <p class="text-xs text-slate-400">RIF: J-050770055-0 | Sistema Ejecutivo de Cierres Pro</p>
+  </div>
+ </div>
  <div class="flex gap-2 flex-wrap text-xs font-bold">
-  <select id="sede" onchange="cambioContexto(true)" class="inp !w-auto"><option value="MARACAIBO">Maracaibo (Principal)</option><option value="CABIMAS">Cabimas</option></select>
+  <select id="sede" onchange="cambioContexto(true)" class="inp !w-auto">
+   <option value="MARACAIBO">Maracaibo (Principal)</option>
+   <option value="CABIMAS">Cabimas</option>
+  </select>
   <input type="date" id="fecha" onchange="cambioContexto(false)" class="inp !w-auto">
   <span class="text-amber-400 flex items-center gap-1">Tasa <input type="number" id="tasa" value="1000" min="0" step="any" class="inp !w-24 text-center"> Bs/$</span>
- </div></header>
+ </div>
+</header>
 <nav class="bg-slate-900/80 border-b border-slate-800 flex gap-5 px-4 text-sm overflow-x-auto" id="nav"></nav>
 <div id="alerta" class="hidden max-w-5xl mx-auto mt-4 bg-red-900/80 border border-red-500 p-3 rounded-xl text-xs">
- <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <b>[BLOQUEO]</b> No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.</div>
+ <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+ <b>[BLOQUEO]</b> No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.
+</div>
  
 <main id="t-cierre" class="max-w-5xl mx-auto p-5 space-y-5">
  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
@@ -104,13 +123,14 @@ const db=firebase.firestore();
 <script>
 const $=i=>document.getElementById(i);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const n2=v=>(Number(v)||0).toFixed(2), M=v=>'$'+(Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const n2=v=>(Number(v)||0).toFixed(2),
+M=v=>'$'+(Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const PERSONAL={MARACAIBO:{a:'Jennmary Parra',g:'Lic. David A. García V. (CI: 22.362.833)'},CABIMAS:{a:'Alejandra Florida',g:'Néstor Córdoba'}};
 const CAT0=[["BOXER CT100",1420],["BOXER BM150",1890],["PULSAR NEON 150",2500],["PULSAR N160",3100],["PULSAR NS200",3700],["PULSAR N250",4700],["KTM DUKE 200",5200],["KTM DUKE 390",8540]].map(([nombre,precio])=>({nombre,precio}));
 let catalogo=[...CAT0], hist=[], charts={}, tipo='MOTO', editId=null, cierreExiste=false, claveCb=null, guardando=false;
 let S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:{}};
  
-/* ---------- Seguridad (clave guardada en Firestore como hash SHA-256) ---------- */
+/* ---------- Seguridad ---------- */
 async function hash(t){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('MH|'+t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=0;for(const c of 'MH|'+t)h=(h*31+c.charCodeAt(0))|0;return 'f'+h}}
 async function claveOk(c){const d=await db.collection('config').doc('seguridad').get();const h=await hash(c);if(!d.exists){if(c==='MotosHiram'){await db.collection('config').doc('seguridad').set({hash:h});return true}return false}return d.data().hash===h}
 function pedirClave(){return new Promise(r=>{$('cvIn').value='';$('mClave').classList.remove('hidden');$('cvIn').focus();claveCb=async ok=>{$('mClave').classList.add('hidden');if(!ok)return r(false);try{const v=await claveOk($('cvIn').value);if(!v)alert('Clave incorrecta. Operación denegada.');r(v)}catch(e){alert('Error verificando clave: '+e.message);r(false)}}})}
@@ -124,14 +144,14 @@ function tab(p){TABS.forEach(([k])=>{$('t-'+k).classList.toggle('hidden',k!==p);
  $('alerta').classList.toggle('hidden',p!=='cierre'||!cierreExiste||!!editId);if(p==='historico'||p==='reportes')cargarHist();if(p==='catalogo')catRender()}
 $('nav').innerHTML=TABS.map(([k,i,t])=>`<button id="b-${k}" onclick="tab('${k}')"><i class="fa-solid ${i}"></i> ${t}</button>`).join('');
  
-/* ---------- Cálculos centrales (única fuente de verdad) ---------- */
+/* ---------- Cálculos centrales ---------- */
 function calc(c){const m=c.motos||[],t=c.taller||[],o=[...m,...t];const s=(a,f)=>a.reduce((x,y)=>x+(Number(f(y))||0),0);
  const r={fM:s(m,x=>x.facturado),fT:s(t,x=>x.total),rM:s(m,x=>x.pagoDia),rT:s(t,x=>x.pagoDia??x.total),cxc:s(m,x=>x.cxc),abo:s(m,x=>x.abonoAnt),pol:s(c.polizas||[],p=>p.cantidad*p.precio),
-  ef:s(o,x=>x.efec),ze:s(o,x=>x.zelle),bi:s(o,x=>x.binance),bs:s(o,x=>(x.bsList||[]).reduce((a,b)=>a+(b.usd||0),0))};
+ ef:s(o,x=>x.efec),ze:s(o,x=>x.zelle),bi:s(o,x=>x.binance),bs:s(o,x=>(x.bsList||[]).reduce((a,b)=>a+(b.usd||0),0))};
  r.fact=r.fM+r.fT;r.rec=r.rM+r.rT;r.medios=r.ef+r.ze+r.bi+r.bs;r.esperado=r.fact-r.abo-r.cxc;r.dif=r.medios-r.esperado;r.cobr=r.fact?Math.min(100,(r.rec/r.fact)*100):0;return r}
 const cur=()=>({sucursal:$('sede').value,fecha:$('fecha').value,tasa:parseFloat($('tasa').value)||0,motos:S.motos,taller:S.taller,polizas:S.polizas});
  
-/* ---------- Contexto / bloqueo de doble cierre ---------- */
+/* ---------- Contexto / bloqueo ---------- */
 const docId=(s,f)=>`${s}_${f}`;
 async function cambioContexto(sedeCambio){const f=$('fecha').value,s=$('sede').value;if(sedeCambio)await cargarInv();
  if(!f)return;try{const d=await db.collection('cierres').doc(docId(s,f)).get();cierreExiste=d.exists&&d.id!==editId}catch(e){cierreExiste=false}
@@ -169,10 +189,10 @@ function guardarReg(){const tasa=parseFloat($('tasa').value)||0,v=i=>Math.max(0,
  if(tipo==='MOTO'){const m=catalogo[$('fMod').value],fa=m.precio,ab=v('fAbo'),mo=$('fModa').value;let cxc=Math.max(0,fa-ab-pagoDia);
   if(mo==='CONTADO'&&cxc>0.01)return alert(`Venta de contado con saldo pendiente de ${M(cxc)}. Complete el pago o cambie la modalidad.`);
   if(pagoDia+ab>fa+0.01)return alert('El pago más el abono anterior superan el precio de la moto.');
-  S.sm.motos=false;S.motos.push({cliente,factura,modelo:m.nombre,modalidad:mo,facturado:fa,abonoAnt:ab,pagoDia,cxc,...pago})}
+ S.sm.motos=false;S.motos.push({cliente,factura,modelo:m.nombre,modalidad:mo,facturado:fa,abonoAnt:ab,pagoDia,cxc,...pago})}
  else{const total=v('fMon'),concepto=$('fCon').value.trim()||'Servicio General';if(total<=0)return alert('Ingrese el monto del servicio.');
   if(Math.abs(pagoDia-total)>0.01)return alert(`El desglose de pagos (${M(pagoDia)}) debe ser igual al total del servicio (${M(total)}).`);
-  S.sm.taller=false;S.taller.push({cliente,factura,concepto,total,pagoDia,...pago})}
+ S.sm.taller=false;S.taller.push({cliente,factura,concepto,total,pagoDia,...pago})}
  $('modal').classList.add('hidden');render()}
  
 /* ---------- Totalizar y cerrar ---------- */
@@ -185,7 +205,7 @@ async function totalizar(){if(guardando)return;const c=cur();
  const data={...c,sinMov:{...S.sm},inventario:{...S.inv},totales:r,totalFacturado:r.fact,editado:!!editId};
  const ref=db.collection('cierres').doc(docId(c.sucursal,c.fecha));guardando=true;$('btnTot').disabled=true;
  try{await db.runTransaction(async tx=>{const d=await tx.get(ref);if(d.exists&&d.id!==editId)throw new Error('DUP');
-   if(editId&&editId!==ref.id)tx.delete(db.collection('cierres').doc(editId));tx.set(ref,{...data,timestamp:firebase.firestore.FieldValue.serverTimestamp()})});
+  if(editId&&editId!==ref.id)tx.delete(db.collection('cierres').doc(editId));tx.set(ref,{...data,timestamp:firebase.firestore.FieldValue.serverTimestamp()})});
   await db.collection('config').doc('inv_'+c.sucursal).set({inv:S.inv});
  }catch(e){guardando=false;$('btnTot').disabled=false;if(e.message==='DUP'){cierreExiste=true;$('alerta').classList.remove('hidden');return alert('No es permitido realizar dos declaraciones de una misma fecha, por favor revisar el histórico.')}
   return alert('No se pudo guardar el cierre (nada fue registrado): '+e.message)}
@@ -195,7 +215,6 @@ async function totalizar(){if(guardando)return;const c=cur();
 /* ---------- PDF gerencial ---------- */
 function bar(l,v,t,col){const p=t?Math.round(v/t*100):0;return `<tr><td style="width:22%;border:0">${l}</td><td style="border:0"><div class="bar"><i style="width:${p}%;background:${col}"></i></div></td><td style="width:26%;border:0;text-align:right"><b>${M(v)}</b> (${p}%)</td></tr>`}
 const tb=(h,rows,msg)=>`<table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.length?rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${h.length}" style="text-align:center;color:#059669;font-weight:700;padding:7px">${msg}</td></tr>`}</table>`;
-const tot=(h,rows,sum)=>rows.length?[...rows,[...Array(h.length-2).fill(''),'<b>TOTAL</b>','<b>'+M(sum)+'</b>']]:rows;
 function pdfHTML(c){const r=c.totales||calc(c),P=PERSONAL[c.sucursal],ok=Math.abs(r.dif)<0.01,inv=c.inventario||{},mo=c.motos||[],ta=c.taller||[],po=c.polizas||[],tm=(r.fM+r.fT)||1;
  const f=c.fecha?c.fecha.split('-').reverse().join('/'):'',all=[...mo.map(x=>({...x,t:'Moto'})),...ta.map(x=>({...x,t:'Taller'}))],totInv=Object.values(inv).reduce((a,b)=>a+b,0);
  const NB={PAGO_MOVIL:'Pago Móvil',TRANSF:'Transferencia',PUNTO:'Punto de Venta'};
@@ -212,29 +231,58 @@ function pdfHTML(c){const r=c.totales||calc(c),P=PERSONAL[c.sucursal],ok=Math.ab
  const hB=['Cliente','Factura','Referencia TX','Monto'],rB=all.filter(o=>o.binance>0).map(o=>[esc(o.cliente),esc(o.factura),esc(o.binRef),M(o.binance)]);
  const hS=['Cliente','Medio','Referencia','Monto Bs.','Tasa','Equiv. $'],rS=all.flatMap(o=>(o.bsList||[]).map(b=>[esc(o.cliente),NB[b.tipo]||b.tipo,esc(b.ref),n2(b.montoBs)+' Bs',n2(c.tasa),M(b.usd)]));
  const sec=(n,t)=>`<h3>${n}. ${t}</h3>`;
- return `<div class="pdf"><div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #dc2626;padding-bottom:5px"><div><div style="font-size:19px;font-weight:900">MOTOS HIRAM, C.A.</div><div style="color:#64748b">ZULIA • RIF: J-050770055-0</div><div style="color:#dc2626;font-weight:800;font-size:12px">INFORME EJECUTIVO DE CIERRE DIARIO - ${c.sucursal}</div></div>
- <div style="text-align:right;background:#f1f5f9;padding:6px;border-radius:4px"><b>Fecha:</b> ${f}<br><b>Tasa BCV:</b> ${n2(c.tasa)} Bs/$<br><b>Operaciones:</b> ${all.length}</div></div>
- <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0"><div class="kp"><span>Total Facturado</span><b>${M(r.fact)}</b></div><div class="kp"><span>Pagos del Día</span><b style="color:#059669">${M(r.rec)}</b></div><div class="kp"><span>Cuentas por Cobrar</span><b style="color:#d97706">${M(r.cxc)}</b></div><div class="kp"><span>Seguro Caracas (CxP)</span><b style="color:#2563eb">${M(r.pol)}</b></div></div>
- <div style="background:#f8fafc;border-left:4px solid #0f172a;padding:6px;line-height:1.5"><b>QUÉ OCURRIÓ EN LA JORNADA.</b> ${dia}</div>
- <table style="margin:6px 0 0">${bar('Cobranza',r.rec,r.fact||1,'#059669')}${bar('Ventas motos',r.fM,tm,'#dc2626')}${bar('Servicios taller',r.fT,tm,'#d97706')}</table>
- ${sec(1,'Ventas y Abonos de Motocicletas')}${tb(hM,rM,'SIN MOVIMIENTOS — No hubo ventas ni abonos de motocicletas en la jornada.')}
- ${sec(2,'Servicios de Taller (detalle por nota)')}${tb(hT,rT,'SIN MOVIMIENTOS — No hubo servicios de taller en la jornada.')}
- ${sec(3,'Pólizas Seguros Caracas (Cuentas por Pagar)')}${tb(hP,rP,'SIN MOVIMIENTOS — No se emitieron pólizas en la jornada.')}
- ${sec(4,'Desglose de Pagos Recibidos')}<table style="margin:0">${bar('Efectivo',r.ef,r.medios||1,'#059669')}${bar('Zelle',r.ze,r.medios||1,'#2563eb')}${bar('Binance',r.bi,r.medios||1,'#d97706')}${bar('Bolívares',r.bs,r.medios||1,'#7c3aed')}</table>
- <b>4.1 Efectivo en divisas</b>${tb(hE,tot(hE,rE,r.ef),'Sin pagos en efectivo en la jornada.')}
- <b>4.2 Zelle (${rZ.length} movimiento(s))</b>${tb(hZ,tot(hZ,rZ,r.ze),'Sin pagos por Zelle en la jornada.')}
- <b>4.3 Binance / Towerbank (${rB.length} movimiento(s))</b>${tb(hB,tot(hB,rB,r.bi),'Sin pagos por Binance en la jornada.')}
- <b>4.4 Bolívares: Pago Móvil / Transferencia / Punto</b>${tb(hS,tot(hS,rS,r.bs),'Sin pagos en bolívares en la jornada.')}
- ${sec(5,'Cuadre de Caja')}<div style="padding:7px;border:2px solid ${ok?'#059669':'#dc2626'};border-radius:4px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center"><div>Ingresos recibidos (Σ medios)<br><b style="font-size:13px">${M(r.medios)}</b></div><div>Cobro esperado (Fact. − Abonos − CxC)<br><b style="font-size:13px">${M(r.esperado)}</b></div><div>Diferencia<br><b style="font-size:13px;color:${ok?'#059669':'#dc2626'}">${M(r.dif)} ${ok?'✔ CUADRADO':'✖ REVISAR'}</b></div></div>
- ${sec(6,'Inventario de Motocicletas al Cierre')}${tb(['Modelo','Existencia','Estado'],[...Object.entries(inv).map(([k,v])=>['<b>'+esc(k)+'</b>',v,`<b style="color:${v===0?'#dc2626':v<=1?'#d97706':'#059669'}">${v===0?'AGOTADO':v<=1?'STOCK BAJO':'DISPONIBLE'}</b>`]),['<b>TOTAL UNIDADES</b>','<b>'+totInv+'</b>','']],'Sin inventario registrado.')}
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:28px;text-align:center"><div style="border-top:1px solid #475569;padding-top:3px"><b>${P.a}</b><br>Preparado por (Analista Administrativo)</div><div style="border-top:1px solid #475569;padding-top:3px"><b>${P.g}</b><br>Revisado por (Gerente)</div></div>
- <div style="text-align:center;color:#94a3b8;font-size:8px;margin-top:8px">Documento generado por el Sistema Ejecutivo de Cierres Pro • Motos Hiram, C.A.</div></div>`}
-async function pdf(c){const w=$('pdfWrap');window.scrollTo(0,0);w.innerHTML=pdfHTML(c);try{await html2pdf().from(w.firstElementChild).set({margin:[5,0,5,0],filename:`Cierre_Gerencial_${c.sucursal}_${c.fecha}.pdf`,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,backgroundColor:'#fff',scrollX:0,scrollY:0,x:0,y:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],avoid:['tr','h3']}}).save()}finally{w.innerHTML=''}}
+ return `<div class="pdf">
+  <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #dc2626;padding-bottom:5px">
+   <div><div style="font-size:19px;font-weight:900">MOTOS HIRAM, C.A.</div><div style="color:#64748b">ZULIA • RIF: J-050770055-0</div><div style="color:#dc2626;font-weight:800;font-size:12px">INFORME EJECUTIVO DE CIERRE DIARIO - ${c.sucursal}</div></div>
+   <div style="text-align:right;background:#f1f5f9;padding:6px;border-radius:4px"><b>Fecha:</b> ${f}<br><b>Tasa BCV:</b> ${n2(c.tasa)} Bs/$<br><b>Operaciones:</b> ${all.length}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0">
+   <div class="kp"><span>Total Facturado</span><b>${M(r.fact)}</b></div>
+   <div class="kp"><span>Pagos del Día</span><b style="color:#059669">${M(r.rec)}</b></div>
+   <div class="kp"><span>Cuentas por Cobrar</span><b style="color:#d97706">${M(r.cxc)}</b></div>
+   <div class="kp"><span>Seguro Caracas (CxP)</span><b style="color:#2563eb">${M(r.pol)}</b></div>
+  </div>
+  <div style="background:#f8fafc;border-left:4px solid #0f172a;padding:6px;line-height:1.5"><b>QUÉ OCURRIÓ EN LA JORNADA.</b> ${dia}</div>
+  <table style="margin:6px 0 0">${bar('Cobranza',r.rec,r.fact||1,'#059669')}${bar('Ventas motos',r.fM,tm,'#dc2626')}${bar('Servicios taller',r.fT,tm,'#d97706')}</table>
+  ${sec(1,'Ventas y Abonos de Motocicletas')}${tb(hM,rM,'SIN MOVIMIENTOS — No hubo ventas ni abonos de motocicletas en la jornada.')}
+  ${sec(2,'Servicios de Taller (detalle por nota)')}${tb(hT,rT,'SIN MOVIMIENTOS — No hubo servicios de taller en la jornada.')}
+  ${sec(3,'Pólizas Seguros Caracas (Cuentas por Pagar)')}${tb(hP,rP,'SIN MOVIMIENTOS — No se emitieron pólizas en la jornada.')}
+  ${sec(4,'Desglose de Pagos Recibidos')}<table style="margin:0">${bar('Efectivo',r.ef,r.medios||1,'#059669')}${bar('Zelle',r.ze,r.medios||1,'#2563eb')}${bar('Binance',r.bi,r.medios||1,'#d97706')}${bar('Bolívares',r.bs,r.medios||1,'#7c3aed')}</table>
+  <b>4.1 Efectivo en divisas</b>${tb(hE,rE.length?[...rE,['<b>TOTAL EFECTIVO</b>','','','<b>'+M(r.ef)+'</b>']]:rE,'Sin pagos en efectivo en la jornada.')}
+  <b>4.2 Zelle (${rZ.length} movimiento(s))</b>${tb(hZ,rZ.length?[...rZ,['','','','<b>TOTAL ZELLE</b>','<b>'+M(r.ze)+'</b>']]:rZ,'Sin pagos por Zelle en la jornada.')}
+  <b>4.3 Binance / Towerbank (${rB.length} movimiento(s))</b>${tb(hB,rB.length?[...rB,['','','<b>TOTAL BINANCE</b>','<b>'+M(r.bi)+'</b>']]:rB,'Sin pagos por Binance en la jornada.')}
+  <b>4.4 Bolívares: Pago Móvil / Transferencia / Punto</b>${tb(hS,rS.length?[...rS,['','','','','<b>TOTAL BS.</b>','<b>'+M(r.bs)+'</b>']]:rS,'Sin pagos en bolívares en la jornada.')}
+  ${sec(5,'Cuadre de Caja')}<div style="padding:7px;border:2px solid ${ok?'#059669':'#dc2626'};border-radius:4px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center"><div>Ingresos recibidos (Σ medios)<br><b style="font-size:13px">${M(r.medios)}</b></div><div>Cobro esperado (Fact. − Abonos − CxC)<br><b style="font-size:13px">${M(r.esperado)}</b></div><div>Diferencia<br><b style="font-size:13px;color:${ok?'#059669':'#dc2626'}">${M(r.dif)} ${ok?'✔ CUADRADO':'✖ REVISAR'}</b></div></div>
+  ${sec(6,'Inventario de Motocicletas al Cierre')}${tb(['Modelo','Existencia','Estado'],[...Object.entries(inv).map(([k,v])=>['<b>'+esc(k)+'</b>',v,`<b style="color:${v===0?'#dc2626':v<=1?'#d97706':'#059669'}">${v===0?'AGOTADO':v<=1?'STOCK BAJO':'DISPONIBLE'}</b>`]),['<b>TOTAL UNIDADES</b>','<b>'+totInv+'</b>','']],'Sin inventario registrado.')}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:28px;text-align:center">
+   <div style="border-top:1px solid #475569;padding-top:3px"><b>${P.a}</b><br>Preparado por (Analista Administrativo)</div>
+   <div style="border-top:1px solid #475569;padding-top:3px"><b>${P.g}</b><br>Revisado por (Gerente)</div>
+  </div>
+  <div style="text-align:center;color:#94a3b8;font-size:8px;margin-top:8px">Documento generado por el Sistema Ejecutivo de Cierres Pro • Motos Hiram, C.A.</div>
+ </div>`}
+
+async function pdf(c){
+ const w=$('pdfWrap');
+ window.scrollTo(0,0);
+ w.innerHTML=pdfHTML(c);
+ try{
+  await html2pdf().from(w.firstElementChild).set({
+   margin: 10, // Margen uniforme de 10mm alrededor de la hoja A4 (210x297mm -> 190mm ancho útil exacto)
+   filename:`Cierre_Gerencial_${c.sucursal}_${c.fecha}.pdf`,
+   image:{type:'jpeg',quality:.98},
+   html2canvas:{scale:2,backgroundColor:'#fff',useCORS:true,scrollX:0,scrollY:0},
+   jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+   pagebreak:{mode:['css','legacy'],avoid:['tr','h3']}
+  }).save();
+ }finally{
+  w.innerHTML='';
+ }
+}
  
 /* ---------- Histórico ---------- */
 async function cargarHist(){try{const s=await db.collection('cierres').orderBy('fecha','desc').get();hist=s.docs.map(d=>({...d.data(),id:d.id}))}catch(e){return alert('Error consultando la nube: '+e.message)}
  $('hBody').innerHTML=hist.length?hist.map(d=>{const r=calc(d);return `<tr class="border-b border-slate-800"><td class="p-2 font-bold">${esc(d.fecha)}</td><td>${esc(d.sucursal)}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${(d.motos||[]).length}</td><td>${(d.polizas||[]).reduce((a,p)=>a+p.cantidad,0)}</td>
- <td class="text-center"><button onclick="reimprimir('${d.id}')" class="btn bg-blue-600 !p-1.5" title="PDF"><i class="fa-solid fa-file-pdf"></i></button> <button onclick="editar('${d.id}')" class="btn bg-amber-600 !p-1.5" title="Modificar"><i class="fa-solid fa-pen"></i></button> <button onclick="eliminar('${d.id}')" class="btn bg-red-600 !p-1.5" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="8" class="p-4 text-center italic text-slate-500">Sin cierres registrados.</td></tr>';
+  <td class="text-center"><button onclick="reimprimir('${d.id}')" class="btn bg-blue-600 !p-1.5" title="PDF"><i class="fa-solid fa-file-pdf"></i></button> <button onclick="editar('${d.id}')" class="btn bg-amber-600 !p-1.5" title="Modificar"><i class="fa-solid fa-pen"></i></button> <button onclick="eliminar('${d.id}')" class="btn bg-red-600 !p-1.5" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="8" class="p-4 text-center italic text-slate-500">Sin cierres registrados.</td></tr>';
  if(!$('t-reportes').classList.contains('hidden'))reportes()}
 const buscar=id=>hist.find(d=>d.id===id);
 async function reimprimir(id){const d=buscar(id);if(d)try{await pdf(d)}catch(e){alert('Error generando PDF: '+e.message)}}
@@ -243,7 +291,7 @@ async function editar(id){if(!await pedirClave())return;const d=buscar(id);if(!d
  catalogo.forEach(m=>{if(!(m.nombre in S.inv))S.inv[m.nombre]=0});cierreExiste=false;render();renderInv();tab('cierre');alert('Cierre cargado para modificación. Al totalizar se actualizará el mismo registro.')}
 async function eliminar(id){if(!await pedirClave())return;if(!confirm('¿Eliminar este cierre de la nube? No se puede deshacer.'))return;try{await db.collection('cierres').doc(id).delete();cargarHist()}catch(e){alert('Error: '+e.message)}}
  
-/* ---------- Reportes (sin cuentas por pagar / pólizas) ---------- */
+/* ---------- Reportes ---------- */
 function mkChart(id,type,labels,sets,extra={}){if(charts[id])charts[id].destroy();charts[id]=new Chart($(id),{type,data:{labels,datasets:sets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#cbd5e1'}},title:{display:true,text:extra.t||'',color:'#fff'}},scales:type==='doughnut'?{}:{x:{ticks:{color:'#94a3b8'}},y:{ticks:{color:'#94a3b8'}}}}})}
 let R={sede:'TODAS',tipo:'TODOS',anio:String(new Date().getFullYear()),mes:'TODOS',d1:'',d2:''};
 const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -251,27 +299,27 @@ function setR(k,v){R[k]=v;reportes()}
 function chips(k,ops){return ops.map(([v,l])=>`<button onclick="setR('${k}','${v}')" class="px-3 py-1.5 rounded-full font-bold border cursor-pointer ${R[k]===v?'bg-red-600 border-red-500 text-white':'bg-slate-900 border-slate-700 text-slate-300'}">${l}</button>`).join(' ')}
 function filtros(){const ys=[...new Set([...hist.map(d=>d.fecha.slice(0,4)),String(new Date().getFullYear()),String(new Date().getFullYear()+1)])].sort();
  $('rFil').innerHTML=`<div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">SEDE</b>${chips('sede',[['TODAS','Ambas'],['MARACAIBO','Maracaibo'],['CABIMAS','Cabimas']])}</div>
- <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">ÁREA</b>${chips('tipo',[['TODOS','Todo'],['MOTO','Motos'],['TALLER','Taller']])}</div>
- <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">AÑO</b>${chips('anio',[['TODOS','Todos'],...ys.map(y=>[y,y])])}</div>
- <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">MES</b>${chips('mes',[['TODOS','Todos'],...MESES.map((m,i)=>[String(i+1).padStart(2,'0'),m])])}</div>
- <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">RANGO</b><input type="date" value="${R.d1}" onchange="setR('d1',this.value)" class="inp !w-auto"><input type="date" value="${R.d2}" onchange="setR('d2',this.value)" class="inp !w-auto"><button onclick="R={sede:'TODAS',tipo:'TODOS',anio:String(new Date().getFullYear()),mes:'TODOS',d1:'',d2:''};reportes()" class="btn bg-slate-700">Restablecer</button></div>`}
+  <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">ÁREA</b>${chips('tipo',[['TODOS','Todo'],['MOTO','Motos'],['TALLER','Taller']])}</div>
+  <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">AÑO</b>${chips('anio',[['TODOS','Todos'],...ys.map(y=>[y,y])])}</div>
+  <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">MES</b>${chips('mes',[['TODOS','Todos'],...MESES.map((m,i)=>[String(i+1).padStart(2,'0'),m])])}</div>
+  <div class="flex flex-wrap gap-2 items-center"><b class="w-16 text-slate-400">RANGO</b><input type="date" value="${R.d1}" onchange="setR('d1',this.value)" class="inp !w-auto"><input type="date" value="${R.d2}" onchange="setR('d2',this.value)" class="inp !w-auto"><button onclick="R={sede:'TODAS',tipo:'TODOS',anio:String(new Date().getFullYear()),mes:'TODOS',d1:'',d2:''};reportes()" class="btn bg-slate-700">Restablecer</button></div>`}
 function reportes(){filtros();const tp=R.tipo,d1=R.d1,d2=R.d2;
  const L=hist.filter(d=>(R.sede==='TODAS'||d.sucursal===R.sede)&&(R.anio==='TODOS'||d.fecha.slice(0,4)===R.anio)&&(R.mes==='TODOS'||d.fecha.slice(5,7)===R.mes)&&(!d1||d.fecha>=d1)&&(!d2||d.fecha<=d2)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
- const T={fact:0,rec:0,cxc:0,motos:0,tall:0,ef:0,ze:0,bi:0,bs:0},mod={},sed={},lab=[],F=[],R=[];let rows='';
+ const T={fact:0,rec:0,cxc:0,motos:0,tall:0,ef:0,ze:0,bi:0,bs:0},mod={},sed={},lab=[],F=[],RArr=[];let rows='';
  L.forEach(d=>{const c={motos:tp==='TALLER'?[]:d.motos,taller:tp==='MOTO'?[]:d.taller},r=calc(c);
-  Object.keys(T).forEach(k=>{});T.fact+=r.fact;T.rec+=r.rec;T.cxc+=r.cxc;T.motos+=(c.motos||[]).length;T.tall+=r.fT;T.ef+=r.ef;T.ze+=r.ze;T.bi+=r.bi;T.bs+=r.bs;
-  (c.motos||[]).forEach(m=>mod[m.modelo]=(mod[m.modelo]||0)+1);sed[d.sucursal]=sed[d.sucursal]||[0,0];sed[d.sucursal][0]+=r.fact;sed[d.sucursal][1]+=r.rec;
-  lab.push(d.fecha.slice(5)+' '+d.sucursal.slice(0,3));F.push(r.fact);R.push(r.rec);
-  rows+=`<tr class="border-b border-slate-800"><td class="p-2">${d.fecha}</td><td>${d.sucursal}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${M(r.ef)}</td><td>${M(r.ze)}</td><td>${M(r.bi)}</td><td>${M(r.bs)}</td></tr>`});
+ T.fact+=r.fact;T.rec+=r.rec;T.cxc+=r.cxc;T.motos+=(c.motos||[]).length;T.tall+=r.fT;T.ef+=r.ef;T.ze+=r.ze;T.bi+=r.bi;T.bs+=r.bs;
+ (c.motos||[]).forEach(m=>mod[m.modelo]=(mod[m.modelo]||0)+1);sed[d.sucursal]=sed[d.sucursal]||[0,0];sed[d.sucursal][0]+=r.fact;sed[d.sucursal][1]+=r.rec;
+ lab.push(d.fecha.slice(5)+' '+d.sucursal.slice(0,3));F.push(r.fact);RArr.push(r.rec);
+ rows+=`<tr class="border-b border-slate-800"><td class="p-2">${d.fecha}</td><td>${d.sucursal}</td><td>${M(r.fact)}</td><td class="text-emerald-400">${M(r.rec)}</td><td class="text-amber-400">${M(r.cxc)}</td><td>${M(r.ef)}</td><td>${M(r.ze)}</td><td>${M(r.bi)}</td><td>${M(r.bs)}</td></tr>`});
  $('rBody').innerHTML=rows||'<tr><td colspan="9" class="p-3 text-center italic text-slate-500">Sin datos con los filtros actuales.</td></tr>';
  const K=[['Facturado',M(T.fact),'text-white'],['Recaudado',M(T.rec),'text-emerald-400'],['Por cobrar',M(T.cxc),'text-amber-400'],['Cobranza',(T.fact?T.rec/T.fact*100:0).toFixed(1)+'%','text-blue-400'],['Motos vendidas',T.motos,'text-white'],['Ticket prom./cierre',M(L.length?T.fact/L.length:0),'text-white']];
  $('rKpi').innerHTML=K.map(([a,b,c])=>`<div class="card"><p class="text-[10px] text-slate-400 font-bold uppercase">${a}</p><p class="text-lg font-black ${c}">${b}</p></div>`).join('');
- mkChart('c1','bar',lab,[{label:'Facturado',data:F,backgroundColor:'#dc2626'},{label:'Recaudado',data:R,backgroundColor:'#059669'}],{t:'Facturado vs Recaudado'});
+ mkChart('c1','bar',lab,[{label:'Facturado',data:F,backgroundColor:'#dc2626'},{label:'Recaudado',data:RArr,backgroundColor:'#059669'}],{t:'Facturado vs Recaudado'});
  mkChart('c2','doughnut',['Efectivo','Zelle','Binance','Bolívares'],[{data:[T.ef,T.ze,T.bi,T.bs],backgroundColor:['#059669','#2563eb','#d97706','#7c3aed']}],{t:'Métodos de Pago'});
  mkChart('c3','bar',Object.keys(mod),[{label:'Unidades vendidas',data:Object.values(mod),backgroundColor:'#d97706'}],{t:'Ventas por Modelo'});
  mkChart('c4','bar',Object.keys(sed),[{label:'Facturado',data:Object.values(sed).map(x=>x[0]),backgroundColor:'#dc2626'},{label:'Recaudado',data:Object.values(sed).map(x=>x[1]),backgroundColor:'#059669'}],{t:'Comparativa por Sede'})}
  
-/* ---------- Catálogo (con clave) ---------- */
+/* ---------- Catálogo ---------- */
 let catTmp=[];
 function catRender(){catTmp=catalogo.map(m=>({...m}));pintarCat()}
 function pintarCat(){$('catBody').innerHTML=catTmp.map((m,i)=>`<div class="grid grid-cols-6 gap-2 items-center"><input class="inp col-span-3" value="${esc(m.nombre)}" onchange="catTmp[${i}].nombre=this.value.trim().toUpperCase()"><input type="number" min="0" class="inp col-span-2" value="${m.precio}" onchange="catTmp[${i}].precio=Math.max(0,parseFloat(this.value)||0)"><button onclick="catTmp.splice(${i},1);pintarCat()" class="text-red-400">Quitar</button></div>`).join('')}
@@ -288,8 +336,10 @@ async function resetear(){const al=$('rsAlcance').value;if(!await pedirClave())r
  try{const data=await respaldo('Respaldo_Previo_Reset',al);await new Promise(r=>setTimeout(r,800));
   for(let i=0;i<data.length;i+=400){const b=db.batch();data.slice(i,i+400).forEach(d=>b.delete(db.collection('cierres').doc(d.id)));await b.commit()}
   for(const sd of (al==='GENERAL'?['MARACAIBO','CABIMAS']:[al]))await db.collection('config').doc('inv_'+sd).set({inv:{}});
-  editId=null;S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:{}};hist=[];await cargarInv();render();await cambioContexto(false);await cargarHist();
+ editId=null;S={motos:[],taller:[],polizas:[],sm:{motos:false,taller:false,seguros:false},inv:{}};hist=[];await cargarInv();render();await cambioContexto(false);await cargarHist();
   alert(`Reseteo completado: ${data.length} cierre(s) eliminados, inventario y pantalla reiniciados. El respaldo fue descargado.`)}catch(e){alert('Reseteo abortado, verifique las reglas de Firestore (permiso de borrado): '+e.message)}}
  
 window.onload=async()=>{$('fecha').value=new Date().toLocaleDateString('en-CA');await cargarCat();await cargarInv();render();tab('cierre');await cambioContexto(false)};
-</script></body></html>
+</script>
+</body>
+</html>
